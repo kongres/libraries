@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="EntityFramework" Version="6.2.0" />
+    <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
+    <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
+    <PackageReference Include="PagedList" Version="1.17.0" />
+    <PackageReference Include="SqlBulkTools" Version="4.5.0" />
+    <PackageReference Include="LinqKit" Version="1.1.15" />
+    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.7.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Utilities\Utilities.EF6\Utilities.EF6.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Utilities.Enumerable.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Expression\Utilities.Expression.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Object\Utilities.Object.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Queryable\Utilities.Queryable.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Reflection\Utilities.Reflection.csproj" />
+    <ProjectReference Include="..\Infrastructure.Models\Infrastructure.Models.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Models\Infrastructure.Models.csproj" />
+    <ProjectReference Include="..\Infrastructure.Repository\Infrastructure.Repository.csproj" />
+  </ItemGroup>
+
+</Project>

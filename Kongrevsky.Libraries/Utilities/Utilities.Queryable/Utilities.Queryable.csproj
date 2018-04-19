@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities.Enumerable\Utilities.Enumerable.csproj" />
+  </ItemGroup>
+
+</Project>

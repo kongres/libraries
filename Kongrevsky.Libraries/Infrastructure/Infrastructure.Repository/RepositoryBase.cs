@@ -1,0 +1,510 @@
+﻿namespace Infrastructure.Repository
+{
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity;
+    using System.Data.Entity.Migrations;
+    using System.Data.SqlClient;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Net;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    using System.Transactions;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
+    using Infrastructure.Models;
+    using Infrastructure.Repository.Models;
+    using Infrastructure.Repository.Triggers;
+    using Infrastructure.Repository.Utils;
+    using LinqKit;
+    using PagedList;
+    using SqlBulkTools;
+    using SqlBulkTools.Enumeration;
+    using Utilities.EF6;
+    using Utilities.Enumerable.Models;
+    using Utilities.Object;
+    using Utilities.Queryable;
+    using Utilities.Reflection;
+    using Z.EntityFramework.Plus;
+    using QueryableUtils = Infrastructure.Repository.Utils.QueryableUtils;
+
+    public class RepositoryBase<T, DB> : Repository, IRepositoryBase<T, DB>
+        where T : class
+        where DB : DbContext
+    {
+        public RepositoryBase(IDatabaseFactory<DB> databaseFactory)
+        {
+            _databaseFactory = databaseFactory;
+            Dbset = DataContext.Set<T>();
+        }
+
+        private static readonly object _lockObject = new object();
+        private IDatabaseFactory<DB> _databaseFactory { get; }
+        private DB _dataContext { get; set; }
+
+        protected DbSet<T> Dbset { get; }
+        protected DB DataContext => _dataContext ?? (_dataContext = _databaseFactory.Get());
+        protected IQueryable<TSet> GetDbSet<TSet>() where TSet : class => DataContext.Set<TSet>().AsExpandable();
+        protected virtual string ConnectionString => DataContext.Database.Connection.ConnectionString;
+
+        public virtual int BulkInsert<TSource>(List<TSource> entities) where TSource : BaseEntity
+        {
+            if (!entities.Any())
+                return 0;
+
+            lock (_lockObject)
+            {
+                TriggersBulk<TSource, DB>.RaiseInserting(entities, DataContext);
+
+                var config = new MapperConfiguration(conf =>
+                                                     {
+                                                         conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                                                                                                                      {
+                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                                                                                                                              return;
+                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                                                                                                                              return;
+                                                                                                                          c.Ignore();
+                                                                                                                      });
+                                                     });
+                var mapper = config.CreateMapper();
+
+                var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
+                var ent = mapper.Map<List<TSource>>(distEnts);
+
+                int num;
+                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
+                {
+                    using (var conn = new SqlConnection(ConnectionString))
+                    {
+                        num = new BulkOperations().Setup<TSource>()
+                                .ForCollection(ent)
+                                .WithTable(DataContext.GetTableName<TSource>())
+                                .AddAllColumns()
+                                .DetectColumnWithCustomColumnName()
+                                .BulkInsert()
+                                .SetIdentityColumn(x => x.Id, ColumnDirectionType.Input)
+                                .Commit(conn);
+                    }
+
+                    trans.Complete();
+
+                }
+                TriggersBulk<TSource, DB>.RaiseInserted(entities, DataContext);
+                return num;
+            }
+        }
+
+        public virtual int ClassicBulkInsert(List<T> entities)
+        {
+            DataContext.Configuration.AutoDetectChangesEnabled = false;
+
+            foreach (var entity in entities)
+                DataContext.Entry(entity).State = EntityState.Added;
+
+            DataContext.Configuration.AutoDetectChangesEnabled = true;
+
+            return entities.Count;
+        }
+
+        public virtual int BulkUpdate<TSource>(List<TSource> entities) where TSource : BaseEntity
+        {
+            if (!entities.Any())
+                return 0;
+
+            lock (_lockObject)
+            {
+                TriggersBulk<TSource, DB>.RaiseUpdating(entities, DataContext);
+
+                var config = new MapperConfiguration(conf =>
+                                                     {
+                                                         conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                                                                                                                      {
+                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                                                                                                                              return;
+                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                                                                                                                              return;
+                                                                                                                          c.Ignore();
+                                                                                                                      });
+                                                     });
+                var mapper = config.CreateMapper();
+
+                var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
+                var ent = mapper.Map<List<TSource>>(distEnts);
+                ent.ForEach(x => x.DateModified = DateTime.UtcNow);
+
+                int num;
+                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
+                {
+                    using (var conn = new SqlConnection(ConnectionString))
+                    {
+                        num = new BulkOperations().Setup<TSource>()
+                                .ForCollection(ent)
+                                .WithTable(DataContext.GetTableName<TSource>())
+                                .AddAllColumns()
+                                .BulkUpdate()
+                                .MatchTargetOn(x => x.Id)
+                                .Commit(conn);
+                    }
+
+                    trans.Complete();
+                }
+                TriggersBulk<TSource, DB>.RaiseUpdated(entities, DataContext);
+                return num;
+            }
+        }
+
+        public virtual int ClassicBulkUpdate(List<T> entities)
+        {
+            DataContext.Configuration.AutoDetectChangesEnabled = false;
+
+            foreach (var entity in entities)
+                DataContext.Entry(entity).State = EntityState.Modified;
+
+            DataContext.Configuration.AutoDetectChangesEnabled = true;
+
+            return entities.Count;
+        }
+
+        public virtual int BulkDelete<TSource>(List<TSource> entities) where TSource : BaseEntity
+        {
+            if (!entities.Any())
+                return 0;
+
+            lock (_lockObject)
+            {
+                TriggersBulk<TSource, DB>.RaiseDeleting(entities, DataContext);
+                int num;
+                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
+                {
+                    using (var conn = new SqlConnection(ConnectionString))
+                    {
+                        num = new BulkOperations().Setup<TSource>()
+                                .ForCollection(entities)
+                                .WithTable(DataContext.GetTableName<TSource>())
+                                .AddColumn(x => x.Id)
+                                .BulkDelete()
+                                .MatchTargetOn(x => x.Id)
+                                .Commit(conn);
+                    }
+
+                    trans.Complete();
+                }
+                TriggersBulk<TSource, DB>.RaiseDeleted(entities, DataContext);
+                return num;
+            }
+        }
+
+        public virtual int BulkDelete<TSource>(Expression<Func<TSource, bool>> where) where TSource : BaseEntity
+        {
+            lock (_lockObject)
+            {
+                var entities = DataContext.Set<TSource>().Where(where).ToList();
+                TriggersBulk<TSource, DB>.RaiseDeleting(entities, DataContext);
+                var bulkDelete = DataContext.Set<TSource>().Where(where).Delete();
+                TriggersBulk<TSource, DB>.RaiseDeleted(entities, DataContext);
+                return bulkDelete;
+            }
+        }
+
+        public virtual int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null)
+        {
+            var num = 0;
+            lock (_lockObject)
+            {
+                if (!typeof(BaseEntity).IsAssignableFrom(typeof(T)))
+                    return num;
+
+                var records = (where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).ToList();
+
+                var ent = new List<T>();
+                foreach (var group in records)
+                {
+                    var entities = group.OrderBy(x => (x as BaseEntity)?.DateCreated).Skip(1).ToList();
+                    ent.AddRange(entities);
+                }
+
+                if (!ent.Any())
+                    return num;
+
+
+                try
+                {
+                    var bulk = new BulkOperations();
+
+                    using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
+                    {
+                        using (var conn = new SqlConnection(ConnectionString))
+                        {
+                            num = bulk.Setup<T>()
+                                    .ForCollection(ent)
+                                    .WithTable(DataContext.GetTableName<T>())
+                                    .AddColumn(x => (x as BaseEntity).Id)
+                                    .BulkDelete()
+                                    .MatchTargetOn(x => (x as BaseEntity).Id)
+                                    .Commit(conn);
+                        }
+                        trans.Complete();
+                        return num;
+                    }
+                }
+                catch (Exception e)
+                {
+                    var entIds = ent.Select(x => (x as BaseEntity).Id).ToList();
+
+                    var containsMethod = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Count() == 2)?.MakeGenericMethod(typeof(string));
+                    var parameterExpression = Expression.Parameter(typeof(T), "x");
+                    var expr = Expression.Call(null, containsMethod, Expression.Constant(entIds), Expression.Property(parameterExpression, nameof(BaseEntity.Id)));
+                    var lambda = Expression.Lambda<Func<T, bool>>(expr, parameterExpression);
+                    num = Dbset.Where(lambda).Delete();
+                    return num;
+                }
+            }
+            return num;
+        }
+
+        public virtual T Add(T entity)
+        {
+            Dbset.Add(entity);
+            return entity;
+        }
+
+        public virtual T Update(T entity)
+        {
+            Dbset.AddOrUpdate(entity);
+            return entity;
+        }
+
+        public virtual T AddOrUpdate(T entity)
+        {
+            Dbset.AddOrUpdate(entity);
+            return entity;
+        }
+
+        public virtual void AddOrUpdate(params T[] entities)
+        {
+            Dbset.AddOrUpdate(entities);
+        }
+
+        public virtual T AddOrUpdate(Expression<Func<T, object>> identifierExpression, T entity)
+        {
+            Dbset.AddOrUpdate(identifierExpression, entity);
+            return entity;
+        }
+
+        public virtual void AddOrUpdate(Expression<Func<T, object>> identifierExpression, params T[] entities)
+        {
+            Dbset.AddOrUpdate(identifierExpression, entities);
+        }
+
+        public virtual void Delete(T entity)
+        {
+            Dbset.Remove(entity);
+        }
+
+        public virtual void Delete(Expression<Func<T, bool>> where)
+        {
+            var objects = Dbset.Where(where).AsEnumerable();
+            Dbset.RemoveRange(objects);
+        }
+
+        public virtual T GetById(long id)
+        {
+            var entity = Dbset.Find(id);
+            if (entity != null)
+                DataContext.Entry(entity).Reload();
+            return entity;
+        }
+
+        public virtual T GetById(string id)
+        {
+            var entity = Dbset.Find(id);
+            if (entity != null)
+                DataContext.Entry(entity).Reload();
+            return entity;
+        }
+
+        public virtual async Task<T> GetByIdAsync(string id)
+        {
+            var entity = await Dbset.FindAsync(id);
+            if (entity != null)
+                await DataContext.Entry(entity).ReloadAsync();
+            return entity;
+        }
+
+        public virtual T GetById(Guid id)
+        {
+            var entity = Dbset.Find(id);
+            if (entity != null)
+                DataContext.Entry(entity).Reload();
+            return entity;
+        }
+
+        public virtual IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes)
+        {
+            var query = AppendIncludes(Dbset, includes);
+
+            return query;
+        }
+
+        public virtual IQueryable<T> GetMany(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
+        {
+            var query = Dbset.AsExpandable().Where(where);
+            query = AppendIncludes(query, includes);
+
+            return query;
+        }
+
+        public virtual IPagedList<T> GetPage(Page page, Expression<Func<T, bool>> checkPermission, Expression<Func<T, bool>> where, Func<IQueryable<T>, IQueryable<T>> sortFunc, params Expression<Func<T, object>>[] includes)
+        {
+            var queryable = Dbset.AsExpandable();
+
+            var orderedQueryable = sortFunc != null ? sortFunc.Invoke(queryable) : queryable.OrderBy(x => 1);
+            var query = checkPermission == null ? (where == null ? orderedQueryable : orderedQueryable.Where(where)) : orderedQueryable.Where(checkPermission).Where(where);
+            query = AppendIncludes(query, includes);
+
+            var total = query.Count();
+            if (page.PageNumber <= 0 || page.PageSize <= 0)
+            {
+                page.PageNumber = 1;
+                page.PageSize = total == 0 ? 1 : total;
+            }
+
+            var results = query.GetPage(page).ToList();
+            return new StaticPagedList<T>(results, page.PageNumber, page.PageSize, total);
+        }
+
+
+        public virtual IPagedList<T> GetPage(Page page, params Expression<Func<T, object>>[] includes)
+        {
+            return GetPage(page, null, null, null, includes);
+        }
+
+        public virtual PagingQueryable<TCast> GetPage<TCast>(PagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
+        {
+            var page = new Page(filter.PageNumber, filter.PageSize);
+
+            var queryable = Dbset.AsExpandable();
+            if (checkPermission != null)
+                queryable = queryable.Where(checkPermission);
+
+            foreach (var expression in where)
+                queryable = queryable.Where(expression);
+
+            var castQuery = queryable.ProjectTo<TCast>(configurationProvider);
+
+            if (postWhere != null)
+                foreach (var expression in postWhere)
+                    castQuery = castQuery.Where(expression);
+
+            if (filter.Filters?.Any() ?? false)
+                castQuery = castQuery.Where(QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
+
+            var orderProperties = filter.OrderProperty?.Split(new[] { ',', '.', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
+
+            IOrderedQueryable<TCast> orderedQuery;
+
+            var distinctProperty = typeof(TCast).GetPropertyByName(filter.Distinct);
+            if (distinctProperty != null && distinctProperty.PropertyType.IsSimple())
+            {
+                castQuery = castQuery.DistinctByField(distinctProperty.Name).AsExpandable();
+                orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(distinctProperty.Name) : castQuery.OrderByWithNullLowPriority(distinctProperty.Name);
+            }
+            else
+            {
+                if (orderProperties.Any())
+                {
+                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(orderProperties.First()) : castQuery.OrderByWithNullLowPriority(orderProperties.First());
+                    orderProperties.RemoveAt(0);
+                    if (orderProperties.Any())
+                        orderedQuery = orderProperties.Aggregate(orderedQuery, (current, property) => filter.IsDesc ? current.ThenByDescendingWithNullLowPriority(property) : current.ThenByWithNullLowPriority(property));
+                    else
+                        orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
+                }
+                else
+                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority() : castQuery.OrderByWithNullLowPriority();
+            }
+            return new PagingQueryable<TCast>(orderedQuery, page);
+        }
+
+        public T Get(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
+        {
+            var query = Dbset.Where(where);
+            query = AppendIncludes(query, includes);
+
+            return query.FirstOrDefault();
+        }
+
+        public Task<T> GetAsync(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
+        {
+            var query = Dbset.Where(where);
+            query = AppendIncludes(query, includes);
+
+            return query.FirstOrDefaultAsync();
+        }
+
+        private IQueryable<T> AppendIncludes(IQueryable<T> query, IEnumerable<Expression<Func<T, object>>> includes)
+        {
+            return includes.Aggregate(query, (current, inc) => current.Include(inc));
+        }
+    }
+
+    public abstract class Repository
+    {
+        #region Responses
+
+        protected static ResultInfo Ok()
+        {
+            return new ResultInfo(HttpStatusCode.OK);
+        }
+
+        protected static ResultObjectInfo<T> Ok<T>(T resultObject)
+        {
+            return new ResultObjectInfo<T>(HttpStatusCode.OK, resultObject);
+        }
+
+        protected static ResultInfo Forbidden(string message = null)
+        {
+            return new ResultInfo(HttpStatusCode.Forbidden, message);
+        }
+
+        protected static ResultObjectInfo<T> Forbidden<T>(string message = null)
+        {
+            return new ResultObjectInfo<T>(HttpStatusCode.Forbidden, message);
+        }
+
+        protected static ResultInfo BadRequest(string message)
+        {
+            return new ResultInfo(HttpStatusCode.BadRequest, message);
+        }
+
+        protected static ResultObjectInfo<T> BadRequest<T>(string message)
+        {
+            return new ResultObjectInfo<T>(HttpStatusCode.BadRequest, message);
+        }
+
+        protected static ResultInfo NotFound(string message)
+        {
+            return new ResultInfo(HttpStatusCode.NotFound, message);
+        }
+
+        protected static ResultObjectInfo<T> NotFound<T>(string message)
+        {
+            return new ResultObjectInfo<T>(HttpStatusCode.NotFound, message);
+        }
+
+        protected static ResultInfo HttpStatusCodeResult(HttpStatusCode code, string message)
+        {
+            return new ResultInfo(code, message);
+        }
+
+        protected static ResultObjectInfo<T> HttpStatusCodeResult<T>(HttpStatusCode code, string message)
+        {
+            return new ResultObjectInfo<T>(code, message);
+        }
+
+        #endregion
+    }
+}
