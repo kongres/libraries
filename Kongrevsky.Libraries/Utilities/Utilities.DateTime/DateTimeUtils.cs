@@ -36,6 +36,12 @@
             return DateTime.TryParseExact(time, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var addTime) ? dateTime.Add(addTime.TimeOfDay) : dateTime;
         }
 
+        /// <summary>
+        /// Returns rounded DateTime by specified ticks
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="roundTicks"></param>
+        /// <returns></returns>
         public static DateTime Trim(this DateTime date, long roundTicks)
         {
             return new DateTime(date.Ticks - date.Ticks % roundTicks, date.Kind);
@@ -81,7 +87,7 @@
         }
 
         /// <summary>
-        /// Returns start Date of specified period
+        /// Returns start DateTime of specified period
         /// </summary>
         /// <param name="value"></param>
         /// <param name="periodType"></param>
@@ -113,7 +119,7 @@
         }
 
         /// <summary>
-        /// Returns end Date of specified period
+        /// Returns end DateTime of specified period
         /// </summary>
         /// <param name="value"></param>
         /// <param name="periodType"></param>

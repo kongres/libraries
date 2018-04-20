@@ -1,7 +1,8 @@
 ﻿namespace Utilities.EF6
 {
+    #region << Using >>
+
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Core;
@@ -9,24 +10,36 @@
     using System.Data.Entity.Core.Objects;
     using System.Data.Entity.Infrastructure;
     using System.Linq;
-    using System.Reflection;
-    using Utilities.Reflection;
     using System.Linq.Dynamic;
+
+    #endregion
 
     public static class DbContextUtils
     {
-        
-
+        /// <summary>
+        /// Returns Table name 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static string GetTableName<T>(this DbContext context) where T : class
         {
             var entitySet = GetEntitySet<T>(context);
             if (entitySet == null)
                 throw new Exception($"Unable to find entity set '{typeof(T).Name}' in edm metadata");
+
             //var tableName = GetStringProperty(entitySet, "Schema") + "." + GetStringProperty(entitySet, "Table");
             var tableName = GetStringProperty(entitySet, "Table");
             return tableName;
         }
 
+        /// <summary>
+        /// Returns Entity by specified Id
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static object FindRecordById<T>(this T context, string id) where T : DbContext
         {
             var dbContextType = context.GetType();
@@ -46,20 +59,26 @@
                     // ignored
                 }
             }
+
             return null;
         }
 
+        /// <summary>
+        /// Returns Entity by specified EntityKey
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="entityKey"></param>
+        /// <returns></returns>
         public static object FindRecordByEntityKey<T>(this T context, EntityKey entityKey) where T : DbContext
         {
             var sets = context.GetType().GetProperties()
-                .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
-                .ToList();
+                              .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                              .ToList();
 
             var set = sets.FirstOrDefault(x => x.Name == entityKey.EntitySetName);
 
-
             if (set != null)
-            {
                 try
                 {
                     var dbSet = set.GetValue(context, null);
@@ -75,17 +94,26 @@
                 {
                     // ignored
                 }
-            }
 
             var objectContext = ((IObjectContextAdapter)context).ObjectContext;
             return objectContext.GetObjectByKey(entityKey);
         }
 
+        /// <summary>
+        /// Returns all added relationships
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static IEnumerable<Tuple<object, object>> GetAddedRelationships(this DbContext context)
         {
             return GetRelationships(context, EntityState.Added, (e, i) => e.CurrentValues[i]);
         }
 
+        /// <summary>
+        /// Returns all deleted relationships
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public static IEnumerable<Tuple<object, object>> GetDeletedRelationships(this DbContext context)
         {
             return GetRelationships(context, EntityState.Deleted, (e, i) => e.OriginalValues[i]);
@@ -97,11 +125,11 @@
             var objectContext = ((IObjectContextAdapter)context).ObjectContext;
 
             return objectContext
-                    .ObjectStateManager
-                    .GetObjectStateEntries(relationshipState)
-                    .Where(e => e.IsRelationship)
-                    .Select(
-                            e => Tuple.Create(context.FindRecordByEntityKey((EntityKey)getValue(e, 0)), context.FindRecordByEntityKey((EntityKey)getValue(e, 1))));
+                   .ObjectStateManager
+                   .GetObjectStateEntries(relationshipState)
+                   .Where(e => e.IsRelationship)
+                   .Select(
+                           e => Tuple.Create(context.FindRecordByEntityKey((EntityKey)getValue(e, 0)), context.FindRecordByEntityKey((EntityKey)getValue(e, 1))));
         }
 
         private static string GetStringProperty(MetadataItem entitySet, string propertyName)
@@ -109,12 +137,14 @@
             MetadataProperty property;
             if (entitySet == null)
                 throw new ArgumentNullException(nameof(entitySet));
+
             if (entitySet.MetadataProperties.TryGetValue(propertyName, false, out property))
             {
                 string str;
                 if (property?.Value != null && (str = property.Value as string) != null && !string.IsNullOrEmpty(str))
                     return str;
             }
+
             return string.Empty;
         }
 
@@ -126,12 +156,12 @@
             var metadata = ((IObjectContextAdapter)context).ObjectContext.MetadataWorkspace;
 
             var entitySets = metadata.GetItemCollection(DataSpace.SSpace)
-                    .GetItems<EntityContainer>()
-                    .Single()
-                    .BaseEntitySets
-                    .OfType<EntitySet>()
-                    .Where(s => !s.MetadataProperties.Contains("Type") || s.MetadataProperties["Type"].ToString() == "Tables")
-                    .ToList();
+                                     .GetItems<EntityContainer>()
+                                     .Single()
+                                     .BaseEntitySets
+                                     .OfType<EntitySet>()
+                                     .Where(s => !s.MetadataProperties.Contains("Type") || s.MetadataProperties["Type"].ToString() == "Tables")
+                                     .ToList();
 
             var entitySet = entitySets.FirstOrDefault(t => t.Name == entityName) ?? entitySets.FirstOrDefault(t => t.Name == entityBaseName);
 
