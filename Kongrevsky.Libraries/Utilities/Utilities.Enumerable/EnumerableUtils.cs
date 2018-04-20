@@ -211,13 +211,28 @@
         }
 
         /// <summary>
-        /// Returns Page of the Queryable
+        /// Returns Page of the IEnumerable
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="queryable"></param>
         /// <param name="page"></param>
         /// <returns></returns>
         public static IEnumerable<T> GetPage<T>(this IEnumerable<T> queryable, Page page)
+        {
+            if (page.PageSize > 0 && page.PageNumber > 0)
+                return queryable.Skip(page.Skip).Take(page.PageSize);
+
+            return queryable;
+        }
+
+        /// <summary>
+        /// Returns Page of the IQueryable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="queryable"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public static IQueryable<T> GetPage<T>(this IQueryable<T> queryable, Page page)
         {
             if (page.PageSize > 0 && page.PageNumber > 0)
                 return queryable.Skip(page.Skip).Take(page.PageSize);

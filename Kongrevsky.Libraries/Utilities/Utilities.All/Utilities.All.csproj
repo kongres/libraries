@@ -15,7 +15,6 @@
     <ProjectReference Include="..\Utilities.Expression\Utilities.Expression.csproj" />
     <ProjectReference Include="..\Utilities.File\Utilities.File.csproj" />
     <ProjectReference Include="..\Utilities.Image\Utilities.Image.csproj" />
-    <ProjectReference Include="..\Utilities.Linq\Utilities.Linq.csproj" />
     <ProjectReference Include="..\Utilities.Math\Utilities.Math.csproj" />
     <ProjectReference Include="..\Utilities.Object\Utilities.Object.csproj" />
     <ProjectReference Include="..\Utilities.Queryable\Utilities.Queryable.csproj" />

@@ -6,20 +6,26 @@
     /// </summary>
     public class FileType
     {
+        #region Properties
+
         /*internal byte?[] Header { get; set; }    // most of the times we only need first 8 bytes, but sometimes extend for 16
         internal int HeaderOffset { get; set; }
         internal string Extension { get; set; }
         internal string Mime { get; set; }*/
 
         public byte?[] Header { get; set; }
+
         public int HeaderOffset { get; set; }
+
         public string Extension { get; set; }
+
         public string Mime { get; set; }
 
-        public FileType()
-        {
+        #endregion
 
-        }
+        #region Constructors
+
+        public FileType() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileType"/> class.
@@ -36,7 +42,6 @@
             HeaderOffset = 0;
         }
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FileType"/> struct.
         /// Takes the details of offset for the header
@@ -47,21 +52,22 @@
         /// <param name="mime">The description of MIME.</param>
         public FileType(byte?[] header, int offset, string extension, string mime)
         {
-            this.Header = null;
-            this.Header = header;
-            this.HeaderOffset = offset;
-            this.Extension = extension;
-            this.Mime = mime;
+            Header = null;
+            Header = header;
+            HeaderOffset = offset;
+            Extension = extension;
+            Mime = mime;
         }
 
+        #endregion
 
         public override bool Equals(object other)
         {
             if (!(other is FileType)) return false;
 
-            FileType otherType = (FileType)other;
+            var otherType = (FileType)other;
 
-            if (this.Extension == otherType.Extension && this.Mime == otherType.Mime) return true;
+            if (Extension == otherType.Extension && Mime == otherType.Mime) return true;
 
             return base.Equals(other);
         }
@@ -76,5 +82,4 @@
             return Extension;
         }
     }
-
 }

@@ -18,7 +18,7 @@
             _page = page;
 
             _totalItemCount = data.DeferredCount().FutureValue();
-            _queryable = Utilities.Queryable.QueryableUtils.GetPage(data, _page).Future();
+            _queryable = Utilities.Enumerable.EnumerableUtils.GetPage(data, _page).Future();
         }
 
         public Page Page => _page;

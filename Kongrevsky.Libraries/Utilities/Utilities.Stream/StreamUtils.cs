@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Utilities.Stream
+﻿namespace Utilities.Stream
 {
+    #region << Using >>
+
     using System.IO;
+
+    #endregion
 
     public static class StreamUtils
     {
+        /// <summary>
+        /// Returns stream from specified string
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static Stream ToStream(string s)
         {
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
             writer.Write(s);
             writer.Flush();
             stream.Position = 0;

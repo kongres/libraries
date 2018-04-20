@@ -14,7 +14,7 @@
             if (!enumType.IsEnum) throw new InvalidOperationException();
 
             var body = ((TEnum[])Enum.GetValues(enumType))
-                    .OrderBy(value => value.GetDescription())
+                    .OrderBy(value => value.GetDisplayName())
                     .Select((value, ordinal) => new { value, ordinal })
                     .Reverse()
                     .Aggregate((Expression)null, (next, item) => next == null ? (Expression)

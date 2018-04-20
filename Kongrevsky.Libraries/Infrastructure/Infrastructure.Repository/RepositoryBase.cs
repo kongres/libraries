@@ -25,8 +25,8 @@
     using Utilities.EF6;
     using Utilities.Enumerable.Models;
     using Utilities.Object;
-    using Utilities.Queryable;
     using Utilities.Reflection;
+    using Utilities.Enumerable;
     using Z.EntityFramework.Plus;
     using QueryableUtils = Infrastructure.Repository.Utils.QueryableUtils;
 

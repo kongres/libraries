@@ -94,7 +94,7 @@
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
-                        .OrderBy(value => value.GetDescription())
+                        .OrderBy(value => value.GetDisplayName())
                         .Select((value, ordinal) => new { value = (int)value, ordinal })
                         .Reverse()
                         .Aggregate((Expression)null,
@@ -113,7 +113,7 @@
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
-                        .OrderBy(value => value.GetDescription())
+                        .OrderBy(value => value.GetDisplayName())
                         .Select((value, ordinal) => new { value = (int)value, ordinal })
                         .Reverse()
                         .Aggregate((Expression)null,
@@ -171,7 +171,7 @@
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
-                        .OrderBy(value => value.GetDescription())
+                        .OrderBy(value => value.GetDisplayName())
                         .Select((value, ordinal) => new { value = (int)value, ordinal })
                         .Reverse()
                         .Aggregate((Expression)null,
@@ -190,7 +190,7 @@
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
-                        .OrderBy(value => value.GetDescription())
+                        .OrderBy(value => value.GetDisplayName())
                         .Select((value, ordinal) => new { value = (int)value, ordinal })
                         .Reverse()
                         .Aggregate((Expression)null,
@@ -383,20 +383,20 @@
                 }
                 if (property.PropertyType == typeof(int))
                 {
-                    if (!value.TryConvertType(out int intValue))
+                    if (!value.TryConvertToType(out int intValue))
                         return Expression.Constant(true);
                     return Expression.Equal(expProp, Expression.Constant(intValue));
                 }
                 if (property.PropertyType == typeof(int?))
                 {
-                    if (!value.TryConvertType(out int intValue))
+                    if (!value.TryConvertToType(out int intValue))
                         return Expression.Constant(true);
                     var memberExpression = expProp;
                     return Expression.And(Expression.Property(memberExpression, nameof(Nullable<double>.HasValue)), Expression.Equal(Expression.Property(memberExpression, nameof(Nullable<double>.Value)), Expression.Constant(intValue)));
                 }
                 if (property.PropertyType == typeof(double))
                 {
-                    if (!value.TryConvertType(out double intValue))
+                    if (!value.TryConvertToType(out double intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
                     var memberExpression = expProp;
@@ -404,7 +404,7 @@
                 }
                 if (property.PropertyType == typeof(double?))
                 {
-                    if (!value.TryConvertType(out double intValue))
+                    if (!value.TryConvertToType(out double intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
                     var memberExpression = expProp;
@@ -412,7 +412,7 @@
                 }
                 if (property.PropertyType == typeof(decimal))
                 {
-                    if (!value.TryConvertType(out decimal intValue))
+                    if (!value.TryConvertToType(out decimal intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(decimal) });
                     var memberExpression = expProp;
@@ -420,7 +420,7 @@
                 }
                 if (property.PropertyType == typeof(decimal?))
                 {
-                    if (!value.TryConvertType(out decimal intValue))
+                    if (!value.TryConvertToType(out decimal intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(decimal) });
                     var memberExpression = expProp;
@@ -428,7 +428,7 @@
                 }
                 if (property.PropertyType == typeof(float))
                 {
-                    if (!value.TryConvertType(out float intValue))
+                    if (!value.TryConvertToType(out float intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(float) });
                     var memberExpression = expProp;
@@ -436,7 +436,7 @@
                 }
                 if (property.PropertyType == typeof(float?))
                 {
-                    if (!value.TryConvertType(out float intValue))
+                    if (!value.TryConvertToType(out float intValue))
                         return Expression.Constant(true);
                     var methodInfo = typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(float) });
                     var memberExpression = expProp;
@@ -444,13 +444,13 @@
                 }
                 if (property.PropertyType == typeof(bool))
                 {
-                    if (!value.TryConvertType(out bool intValue))
+                    if (!value.TryConvertToType(out bool intValue))
                         return Expression.Constant(true);
                     return Expression.Equal(expProp, Expression.Constant(intValue));
                 }
                 if (property.PropertyType == typeof(bool?))
                 {
-                    if (!value.TryConvertType(out bool intValue))
+                    if (!value.TryConvertToType(out bool intValue))
                         return Expression.Constant(true);
                     return Expression.And(Expression.Property(expProp, nameof(Nullable<bool>.HasValue)), Expression.Equal(Expression.Property(expProp, nameof(Nullable<bool>.Value)), Expression.Constant(intValue)));
                 }
@@ -466,13 +466,13 @@
                 }
                 if (property.PropertyType.IsGenericType && (property.PropertyType.GetGenericArguments().FirstOrDefault()?.IsEnum ?? false))
                 {
-                    if (value.TryConvertType(property.PropertyType.GetGenericArguments().FirstOrDefault(), out var enumValue))
+                    if (value.TryConvertToType(property.PropertyType.GetGenericArguments().FirstOrDefault(), out var enumValue))
                         return Expression.And(Expression.Property(expProp, nameof(Nullable<bool>.HasValue)), Expression.Equal(Expression.Property(expProp, nameof(Nullable<bool>.Value)), Expression.Constant(enumValue)));
                     return Expression.Constant(true);
                 }
                 if (property.PropertyType.IsEnum)
                 {
-                    if (value.TryConvertType(property.PropertyType, out var enumValue))
+                    if (value.TryConvertToType(property.PropertyType, out var enumValue))
                         return Expression.Equal(expProp, Expression.Constant(enumValue));
                     return Expression.Constant(true);
                 }
