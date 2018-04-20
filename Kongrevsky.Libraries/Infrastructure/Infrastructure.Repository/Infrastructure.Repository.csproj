@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Utilities.Enumerable.csproj" />
     <ProjectReference Include="..\..\Utilities\Utilities.Expression\Utilities.Expression.csproj" />
     <ProjectReference Include="..\..\Utilities\Utilities.Object\Utilities.Object.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Queryable\Utilities.Queryable.csproj" />
     <ProjectReference Include="..\..\Utilities\Utilities.Reflection\Utilities.Reflection.csproj" />
     <ProjectReference Include="..\Infrastructure.Models\Infrastructure.Models.csproj" />
   </ItemGroup>

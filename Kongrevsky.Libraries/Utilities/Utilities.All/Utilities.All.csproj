@@ -17,7 +17,6 @@
     <ProjectReference Include="..\Utilities.Image\Utilities.Image.csproj" />
     <ProjectReference Include="..\Utilities.Math\Utilities.Math.csproj" />
     <ProjectReference Include="..\Utilities.Object\Utilities.Object.csproj" />
-    <ProjectReference Include="..\Utilities.Queryable\Utilities.Queryable.csproj" />
     <ProjectReference Include="..\Utilities.Reflection\Utilities.Reflection.csproj" />
     <ProjectReference Include="..\Utilities.Stream\Utilities.Stream.csproj" />
     <ProjectReference Include="..\Utilities.String\Utilities.String.csproj" />
