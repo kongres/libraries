@@ -1,4 +1,4 @@
-﻿namespace Utilities.Cryptography
+﻿namespace Kongrevsky.Utilities.Cryptography
 {
     #region << Using >>
 

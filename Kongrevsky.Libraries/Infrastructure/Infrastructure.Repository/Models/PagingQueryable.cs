@@ -5,9 +5,8 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Infrastructure.Repository.Utils;
-    using Utilities.Enumerable;
-    using Utilities.Enumerable.Models;
-    using Utilities.EF6;
+    using Kongrevsky.Utilities.Enumerable;
+    using Kongrevsky.Utilities.Enumerable.Models;
     using Z.EntityFramework.Plus;
 
     public class PagingQueryable<T>
@@ -18,7 +17,7 @@
             _page = page;
 
             _totalItemCount = data.DeferredCount().FutureValue();
-            _queryable = Utilities.Enumerable.EnumerableUtils.GetPage(data, _page).Future();
+            _queryable = EnumerableUtils.GetPage(data, _page).Future();
         }
 
         public Page Page => _page;

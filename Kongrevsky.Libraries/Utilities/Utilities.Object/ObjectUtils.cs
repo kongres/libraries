@@ -1,4 +1,4 @@
-﻿namespace Utilities.Object
+﻿namespace Kongrevsky.Utilities.Object
 {
     #region << Using >>
 

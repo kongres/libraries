@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <Copyright>Valikovsky Igor</Copyright>
+    <Description>Project for all Utilities</Description>
 
   </PropertyGroup>
 

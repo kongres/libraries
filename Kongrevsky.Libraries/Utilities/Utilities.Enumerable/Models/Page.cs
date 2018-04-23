@@ -1,4 +1,4 @@
-﻿namespace Utilities.Enumerable.Models
+﻿namespace Kongrevsky.Utilities.Enumerable.Models
 {
     public class Page
     {

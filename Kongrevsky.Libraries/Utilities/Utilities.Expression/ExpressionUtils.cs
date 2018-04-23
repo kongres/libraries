@@ -1,4 +1,4 @@
-﻿namespace Utilities.Expression
+﻿namespace Kongrevsky.Utilities.Expression
 {
     #region << Using >>
 

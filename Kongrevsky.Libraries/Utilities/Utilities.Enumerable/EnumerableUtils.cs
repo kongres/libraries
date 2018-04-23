@@ -1,11 +1,11 @@
-﻿namespace Utilities.Enumerable
+﻿namespace Kongrevsky.Utilities.Enumerable
 {
     #region << Using >>
 
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Utilities.Enumerable.Models;
+    using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion
 

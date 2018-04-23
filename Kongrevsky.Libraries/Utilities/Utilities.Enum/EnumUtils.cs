@@ -1,4 +1,4 @@
-﻿namespace Utilities.Enum
+﻿namespace Kongrevsky.Utilities.Enum
 {
     #region << Using >>
 

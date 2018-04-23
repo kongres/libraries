@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <Description>Utilities for Entity Framework 6</Description>
+    <Copyright>Valikovsky Igor</Copyright>
 
   </PropertyGroup>
 

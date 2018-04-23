@@ -3,7 +3,7 @@
     using System;
     using System.Linq;
     using System.Linq.Expressions;
-    using Utilities.Object;
+    using Kongrevsky.Utilities.Object;
 
     internal static class ExpressionUtils
     {

@@ -1,4 +1,4 @@
-﻿namespace Utilities.File.Mime
+﻿namespace Kongrevsky.Utilities.File.Mime
 {
     #region << Using >>
 

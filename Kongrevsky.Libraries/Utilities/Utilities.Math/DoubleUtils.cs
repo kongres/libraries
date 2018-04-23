@@ -1,4 +1,4 @@
-﻿namespace Utilities.Math
+﻿namespace Kongrevsky.Utilities.Math
 {
     #region << Using >>
 

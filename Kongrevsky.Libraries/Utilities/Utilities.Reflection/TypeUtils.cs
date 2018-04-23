@@ -1,4 +1,4 @@
-﻿namespace Utilities.Reflection
+﻿namespace Kongrevsky.Utilities.Reflection
 {
     #region << Using >>
 

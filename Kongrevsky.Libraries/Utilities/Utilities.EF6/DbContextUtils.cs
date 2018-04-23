@@ -1,4 +1,4 @@
-﻿namespace Utilities.EF6
+﻿namespace Kongrevsky.Utilities.EF6
 {
     #region << Using >>
 

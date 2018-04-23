@@ -1,4 +1,4 @@
-﻿namespace Utilities.Web
+﻿namespace Kongrevsky.Utilities.Web
 {
     #region << Using >>
 

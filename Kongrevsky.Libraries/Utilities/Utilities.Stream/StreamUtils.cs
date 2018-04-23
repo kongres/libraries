@@ -1,4 +1,4 @@
-﻿namespace Utilities.Stream
+﻿namespace Kongrevsky.Utilities.Stream
 {
     #region << Using >>
 

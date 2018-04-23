@@ -1,4 +1,4 @@
-﻿namespace Utilities.Assembly
+﻿namespace Kongrevsky.Utilities.Assembly
 {
     #region << Using >>
 

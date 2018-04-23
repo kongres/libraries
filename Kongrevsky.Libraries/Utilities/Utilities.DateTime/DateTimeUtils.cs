@@ -1,10 +1,10 @@
-﻿namespace Utilities.DateTime
+﻿namespace Kongrevsky.Utilities.DateTime
 {
     #region << Using >>
 
     using System;
     using System.Globalization;
-    using Utilities.DateTime.Models;
+    using Kongrevsky.Utilities.DateTime.Models;
 
     #endregion
 

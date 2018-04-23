@@ -1,4 +1,4 @@
-﻿namespace Utilities.String
+﻿namespace Kongrevsky.Utilities.String
 {
     #region << Using >>
 

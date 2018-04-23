@@ -1,4 +1,4 @@
-﻿namespace Utilities.Enumerable
+﻿namespace Kongrevsky.Utilities.Enumerable
 {
     #region << Using >>
 

@@ -1,4 +1,4 @@
-﻿namespace Utilities.File.Mime
+﻿namespace Kongrevsky.Utilities.File.Mime
 {
     /// <summary>
     /// Little data structure to hold information about file types. 

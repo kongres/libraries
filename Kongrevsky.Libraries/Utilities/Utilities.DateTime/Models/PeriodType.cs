@@ -1,4 +1,4 @@
-﻿namespace Utilities.DateTime.Models
+﻿namespace Kongrevsky.Utilities.DateTime.Models
 {
     #region << Using >>
 

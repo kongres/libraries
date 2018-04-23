@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Utilities.Reflection;
+    using Kongrevsky.Utilities.Reflection;
 
     internal class ObjectUtils
     {

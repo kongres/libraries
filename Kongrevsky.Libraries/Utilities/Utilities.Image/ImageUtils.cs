@@ -1,4 +1,4 @@
-﻿namespace Utilities.Image
+﻿namespace Kongrevsky.Utilities.Image
 {
     #region << Using >>
 

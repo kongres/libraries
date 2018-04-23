@@ -18,15 +18,15 @@
     using Infrastructure.Repository.Models;
     using Infrastructure.Repository.Triggers;
     using Infrastructure.Repository.Utils;
+    using Kongrevsky.Utilities.EF6;
+    using Kongrevsky.Utilities.Enumerable;
+    using Kongrevsky.Utilities.Enumerable.Models;
+    using Kongrevsky.Utilities.Object;
+    using Kongrevsky.Utilities.Reflection;
     using LinqKit;
     using PagedList;
     using SqlBulkTools;
     using SqlBulkTools.Enumeration;
-    using Utilities.EF6;
-    using Utilities.Enumerable.Models;
-    using Utilities.Object;
-    using Utilities.Reflection;
-    using Utilities.Enumerable;
     using Z.EntityFramework.Plus;
     using QueryableUtils = Infrastructure.Repository.Utils.QueryableUtils;
 
