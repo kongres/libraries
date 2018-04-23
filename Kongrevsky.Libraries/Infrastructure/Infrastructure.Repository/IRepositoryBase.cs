@@ -8,8 +8,8 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using Infrastructure.Repository.Models;
+    using Kongrevsky.Utilities.Enumerable.Models;
     using PagedList;
-    using Utilities.Enumerable.Models;
 
     public interface IRepositoryBase<T, DB> : IRepositoryBase<T> 
         where T : class

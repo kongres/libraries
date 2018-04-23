@@ -1,4 +1,4 @@
-﻿namespace Utilities.Assembly
+﻿namespace Kongrevsky.Utilities.Assembly
 {
     #region << Using >>
 
@@ -11,7 +11,7 @@
     public static class AssemblyUtil
     {
         /// <summary>
-        /// Get last building DateTime
+        /// Returns last building DateTime
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -30,7 +30,7 @@
         }
 
         /// <summary>
-        /// Get build number
+        /// Returns build number
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>

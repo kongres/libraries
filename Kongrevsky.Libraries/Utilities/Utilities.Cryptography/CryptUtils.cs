@@ -1,4 +1,4 @@
-﻿namespace Utilities.Cryptography
+﻿namespace Kongrevsky.Utilities.Cryptography
 {
     #region << Using >>
 
@@ -15,7 +15,7 @@
         #region Hash String
 
         /// <summary>
-        /// Get Sha256 hash from string
+        /// Returns Sha256 hash from string
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
@@ -50,7 +50,7 @@
         private const int DerivationIterations = 1000;
 
         /// <summary>
-        /// Encrypt string (AES)
+        /// Encrypts string (AES)
         /// </summary>
         /// <param name="plainText">Value</param>
         /// <param name="passPhrase">Encryption key</param>
@@ -93,7 +93,7 @@
         }
 
         /// <summary>
-        /// Decrypt encrypted string (AES)
+        /// Decrypts encrypted string (AES)
         /// </summary>
         /// <param name="cipherText">Encrypted string</param>
         /// <param name="passPhrase">Decryption key</param>
@@ -175,7 +175,7 @@
         }
 
         /// <summary>
-        /// Validate if a password will generate the passed in salt:hash.
+        /// Validates if a password will generate the passed in salt:hash.
         /// </summary>
         /// <param name="password">The password to validate.</param>
         /// <param name="saltHash">The "salt:hash" this password should generate.</param>

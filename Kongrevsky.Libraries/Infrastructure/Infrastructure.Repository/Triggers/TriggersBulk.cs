@@ -5,7 +5,7 @@
     using System.Data.Entity;
     using System.Linq;
     using CoContra;
-    using Utilities.Enumerable;
+    using Kongrevsky.Utilities.Enumerable;
 
     public static class TriggersBulk<TEntity, TDbContext> where TEntity : BaseEntity where TDbContext : DbContext
     {

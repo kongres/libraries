@@ -2,11 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-
+    <Description>Utilities for Math actions</Description>
+    <Copyright>Valikovsky Igor</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Reference Include="System.IO.Compression" />
-  </ItemGroup>
 
 </Project>

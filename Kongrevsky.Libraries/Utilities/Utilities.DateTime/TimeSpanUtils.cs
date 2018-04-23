@@ -1,10 +1,19 @@
-﻿namespace Utilities.DateTime
+﻿namespace Kongrevsky.Utilities.DateTime
 {
+    #region << Using >>
+
     using System;
     using System.Linq;
 
+    #endregion
+
     public static class TimeSpanUtils
     {
+        /// <summary>
+        /// Parses TimeSpan from string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static TimeSpan Parse(string str)
         {
             try
@@ -25,9 +34,8 @@
                         return new TimeSpan(list[0], list[1], list[2], list[3], list[4]);
                 }
             }
-            catch (Exception)
-            {
-            }
+            catch (Exception) { }
+
             return new TimeSpan();
         }
     }

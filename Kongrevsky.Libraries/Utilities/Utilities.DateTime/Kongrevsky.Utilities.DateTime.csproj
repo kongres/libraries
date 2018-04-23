@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <Description>Utilities for DateTime</Description>
+    <Copyright>Valikovsky Igor</Copyright>
 
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
-
 
 </Project>

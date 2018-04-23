@@ -1,10 +1,18 @@
-﻿namespace Utilities.Enumerable.Models
+﻿namespace Kongrevsky.Utilities.Enumerable.Models
 {
     public class Page
     {
+        #region Properties
+
         public int PageNumber { get; set; }
 
         public int PageSize { get; set; }
+
+        public int Skip => (PageNumber - 1) * PageSize;
+
+        #endregion
+
+        #region Constructors
 
         public Page()
         {
@@ -18,9 +26,6 @@
             PageSize = pageSize;
         }
 
-        public int Skip
-        {
-            get { return (PageNumber - 1) * PageSize; }
-        }
+        #endregion
     }
 }

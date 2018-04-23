@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
+    <Description>Utilities for Stream</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+
   </PropertyGroup>
 
 </Project>

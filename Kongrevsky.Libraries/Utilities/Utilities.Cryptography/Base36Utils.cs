@@ -1,4 +1,4 @@
-﻿namespace Utilities.Cryptography
+﻿namespace Kongrevsky.Utilities.Cryptography
 {
     #region << Using >>
 
@@ -20,7 +20,7 @@
         #region Public methods
 
         /// <summary>
-        /// Convert byte[] to Base36String
+        /// Converts byte[] to Base36String
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
@@ -50,7 +50,7 @@
         }
 
         /// <summary>
-        /// Convert Base36String to byte[]
+        /// Converts Base36String to byte[]
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

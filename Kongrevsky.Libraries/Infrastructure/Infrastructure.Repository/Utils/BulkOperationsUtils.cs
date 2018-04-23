@@ -15,7 +15,7 @@
                     continue;
 
                 var columnAttribute = attrs.First() as ColumnAttribute;
-                bulk.CustomColumnMapping(Utilities.Expression.ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                bulk.CustomColumnMapping(Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
             }
 
             return bulk;
