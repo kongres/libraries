@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities.Assembly\Kongrevsky.Utilities.Assembly.csproj" />
+    <ProjectReference Include="..\Utilities.Cryptography\Kongrevsky.Utilities.Cryptography.csproj" />
+    <ProjectReference Include="..\Utilities.DateTime\Kongrevsky.Utilities.DateTime.csproj" />
+    <ProjectReference Include="..\Utilities.EF6\Kongrevsky.Utilities.EF6.csproj" />
+    <ProjectReference Include="..\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
+    <ProjectReference Include="..\Utilities.Enum\Kongrevsky.Utilities.Enum.csproj" />
+    <ProjectReference Include="..\Utilities.Expression\Kongrevsky.Utilities.Expression.csproj" />
+    <ProjectReference Include="..\Utilities.File\Kongrevsky.Utilities.File.csproj" />
+    <ProjectReference Include="..\Utilities.Image\Kongrevsky.Utilities.Image.csproj" />
+    <ProjectReference Include="..\Utilities.Math\Kongrevsky.Utilities.Math.csproj" />
+    <ProjectReference Include="..\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
+    <ProjectReference Include="..\Utilities.Reflection\Kongrevsky.Utilities.Reflection.csproj" />
+    <ProjectReference Include="..\Utilities.Stream\Kongrevsky.Utilities.Stream.csproj" />
+    <ProjectReference Include="..\Utilities.String\Kongrevsky.Utilities.String.csproj" />
+    <ProjectReference Include="..\Utilities.Web\Kongrevsky.Utilities.Web.csproj" />
+  </ItemGroup>
+
+</Project>

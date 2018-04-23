@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Utilities.Reflection\Utilities.Reflection.csproj" />
+    <ProjectReference Include="..\Utilities.Reflection\Kongrevsky.Utilities.Reflection.csproj" />
   </ItemGroup>
 
 </Project>
