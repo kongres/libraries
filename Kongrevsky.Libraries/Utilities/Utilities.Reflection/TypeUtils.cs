@@ -19,7 +19,21 @@
         /// <returns></returns>
         public static PropertyInfo GetPropertyByName(this Type type, string name, bool isCaseIgnore = true)
         {
-            return type.GetProperties().FirstOrDefault(x => string.Equals(x.Name, name, isCaseIgnore ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture));
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            if (name.Contains("."))
+            {
+                var split = name.Split(new char[] { '.' }, 2);
+                var property = GetPropertyByName(type, split[0], isCaseIgnore);
+                if (property == null)
+                    return null;
+                return GetPropertyByName(property.PropertyType, split[1], isCaseIgnore);
+            }
+            else
+            {
+                return type.GetProperties().FirstOrDefault(x => string.Equals(x.Name, name, isCaseIgnore ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture));
+            }
         }
     }
 }

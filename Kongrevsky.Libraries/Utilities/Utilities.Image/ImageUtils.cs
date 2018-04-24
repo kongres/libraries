@@ -110,5 +110,27 @@
 
             return bmp;
         }
+
+        /// <summary>
+        /// Set background color for image
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static Image SetBackgroudColor(this Image image, Color color)
+        {
+            //create a Bitmap the size of the image provided  
+            var bmp = new Bitmap(image.Width, image.Height);
+
+            //create a graphics object from the image  
+            using (var gfx = Graphics.FromImage(bmp))
+            {
+                //clear image by color
+                gfx.Clear(color);
+                //now draw the image  
+                gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+            }
+            return bmp;
+        }
     }
 }

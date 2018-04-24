@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
 
     public class PagingModel<T> : PagingModel
     {
@@ -18,10 +19,17 @@
 
         public List<string> LoadProperties { get; set; }
 
-        public void SetItems(List<T> items)
+        public void SetItems(IEnumerable<T> items)
         {
-            Items = items;
+            Items = items.ToList();
         }
+
+        public void SetResult(IEnumerable<T> items, int totalItems, int totalPages)
+        {
+            SetItems(items);
+            SetTotals(totalItems, totalPages);
+        }
+
     }
 
     public class PagingModel

@@ -290,8 +290,7 @@
         {
             foreach (var source in str.Split(separator).ToList())
             {
-                int id;
-                if (int.TryParse(source, out id))
+                if (int.TryParse(source, out var id))
                     yield return id;
             }
         }
@@ -311,36 +310,6 @@
 
             var lastIndexOf = str.LastIndexOf(value, stringComparison);
             return firstIndexOf == lastIndexOf;
-        }
-
-        /// <summary>
-        /// Converts List of strings to List of property-value pairs
-        /// </summary>
-        /// <param name="conditions"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static List<List<KeyValuePair<PropertyInfo, string>>> ToPropertyValuePairs(this List<string> conditions, Type type)
-        {
-            const string separator = "==";
-            return conditions
-                   .Where(x => x.Contains(separator))
-                   .Select(x =>
-                           {
-                               var oneRow = x.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
-                               return oneRow.Select(c =>
-                                                    {
-                                                        var condition = c.Split(new[] { separator }, StringSplitOptions.None);
-
-                                                        var propertyName = condition.ElementAtOrDefault(0);
-                                                        var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
-                                                        var value = string.Join(separator, condition.Skip(1));
-                                                        return new KeyValuePair<PropertyInfo, string>(property, value);
-                                                    })
-                                            .Where(c => c.Key != null)
-                                            .ToList();
-                           })
-                   .Where(x => x.Any())
-                   .ToList();
         }
 
         /// <summary>

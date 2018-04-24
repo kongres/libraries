@@ -13,7 +13,7 @@
             {
                 action();
                 return null;
-            }, retryInterval, retryCount, isThrowException);
+            }, retryInterval, retryCount, isThrowException, actionOnException);
         }
 
         public static T Do<T>(Func<T> action, TimeSpan retryInterval, int retryCount = 5, bool isThrowException = true, Action<AggregateException> actionOnException = null)
