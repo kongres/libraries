@@ -24,8 +24,9 @@
         public FileManager(IOptions<FileManagerOptions> fileManagerOptions)
         {
             FileManagerOptions = fileManagerOptions.Value ?? throw new ArgumentNullException(nameof(fileManagerOptions));
-            if (string.IsNullOrEmpty(FileManagerOptions.RootPath) || !Directory.Exists(FileManagerOptions.RootPath))
+            if (string.IsNullOrEmpty(FileManagerOptions.RootPath))
                 throw new ArgumentNullException(nameof(FileManagerOptions.RootPath));
+            Directory.CreateDirectory(FileManagerOptions.RootPath);
         }
 
         public FileObject GetFile(string fileId, bool compress = false, string encryptPassword = null)
@@ -137,7 +138,7 @@
             if (string.IsNullOrEmpty(fileId))
                 throw new ArgumentException("FileId can't be null or empty", nameof(fileId));
 
-            var directoryPath = string.IsNullOrEmpty(FileManagerOptions.SubFolder) ? Path.Combine(FileManagerOptions.RootPath, fileId) : Path.Combine(FileManagerOptions.RootPath, FileManagerOptions.SubFolder, fileId);
+            var directoryPath = Path.Combine(FileManagerOptions.RootPath, fileId);
             return directoryPath;
         }
 

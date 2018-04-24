@@ -22,5 +22,11 @@
         {
             services.AddKongrevskyFileManager(configurationSection());
         }
+        public static void AddKongrevskyFileManager(this IServiceCollection services, Action<FileManagerOptions> configurationSection)
+        {
+            services.AddOptions();
+            services.Configure<FileManagerOptions>(configurationSection);
+            services.AddSingleton<IFileManager, FileManager>();
+        }
     }
 }
