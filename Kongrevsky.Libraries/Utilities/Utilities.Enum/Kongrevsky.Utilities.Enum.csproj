@@ -4,6 +4,8 @@
     <TargetFramework>net471</TargetFramework>
     <Description>Utilities for Enum</Description>
     <Copyright>Valikovsky Igor</Copyright>
+    <Authors>Valikovsky Igor</Authors>
+    <Company>Kongrevsky</Company>
 
   </PropertyGroup>
 

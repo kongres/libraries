@@ -4,6 +4,8 @@
     <TargetFramework>net471</TargetFramework>
     <Copyright>Valikovsky Igor</Copyright>
     <Description>Project for all Utilities</Description>
+    <Authors>Valikovsky Igor</Authors>
+    <Company>Kongrevsky</Company>
 
   </PropertyGroup>
 
