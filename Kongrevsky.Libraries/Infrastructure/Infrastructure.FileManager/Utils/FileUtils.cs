@@ -112,6 +112,11 @@
             return new FileStream(tempFileName, FileMode.Open, FileAccess.Read, FileShare.None, 1048576, FileOptions.DeleteOnClose);
         }
 
+        /// <summary>
+        /// Returns stream for compressed file
+        /// </summary>
+        /// <param name="inputFile"></param>
+        /// <returns></returns>
         public static Stream CompressFile(Stream inputFile)
         {
             var outputFile = new MemoryStream();
@@ -124,6 +129,11 @@
             return outputFile;
         }
 
+        /// <summary>
+        /// Returns stream for decompressed file
+        /// </summary>
+        /// <param name="inputFile"></param>
+        /// <returns></returns>
         public static Stream DecompressFile(Stream inputFile)
         {
             var outputFile = new MemoryStream();
@@ -136,6 +146,13 @@
             return outputFile;
         }
 
+        /// <summary>
+        /// Tries to save file and returns if process was successful
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileStream"></param>
+        /// <returns></returns>
         public static bool SaveFile(string directoryPath, string fileName, Stream fileStream)
         {
             try
@@ -160,12 +177,22 @@
             }
         }
 
+        /// <summary>
+        /// Detects if file exists
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static bool IsFileExists(string filePath)
         {
             var directory = new FileInfo(filePath);
             return directory.Exists;
         }
 
+        /// <summary>
+        /// Tries to delete file and returns if process was successful
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static bool DeleteFile(string filePath)
         {
             var fileInfo = new FileInfo(filePath);
@@ -184,12 +211,21 @@
             return true;
         }
 
+        /// <summary>
+        /// Creates directory if it doesn't exist
+        /// </summary>
+        /// <param name="directoryPath"></param>
         public static void CreateDirectoryIfNotExists(string directoryPath)
         {
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
         }
 
+        /// <summary>
+        /// Tries to delete and returns if process was successful
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <returns></returns>
         public static bool DeleteDirectory(string directoryPath)
         {
             var directory = new DirectoryInfo(directoryPath);
@@ -208,6 +244,11 @@
             return true;
         }
 
+        /// <summary>
+        /// Returns file size
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static string GetFormattedFileSize(long length)
         {
             var order = 0;
