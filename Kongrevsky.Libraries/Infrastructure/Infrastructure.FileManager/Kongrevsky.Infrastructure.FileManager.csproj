@@ -13,13 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Utilities\Utilities.Common\Kongrevsky.Utilities.Common.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.dependencyinjection.abstractions\2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\Utilities\Utilities.Common\Kongrevsky.Utilities.Common.csproj" />
   </ItemGroup>
 
 </Project>
