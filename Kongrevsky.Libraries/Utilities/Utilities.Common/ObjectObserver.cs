@@ -1,6 +1,7 @@
 ﻿namespace Kongrevsky.Utilities.Common
 {
-    using Kongrevsky.Utilities.DateTime;
+    #region << Using >>
+
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -8,32 +9,25 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Text;
-    using LinqKit;
+    using Kongrevsky.Utilities.DateTime;
     using Kongrevsky.Utilities.Object;
+    using LinqKit;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public class ObjectSyncObserver<TObj> where TObj : new()
+    #endregion
+
+    public class ObjectObserver<TObj> where TObj : new()
     {
+        #region Properties
+
         private TObj _object { get; }
 
-        public ObjectSyncObserver(TObj o)
-        {
-            this._object = o;
-            IsChanged = false;
-        }
-
-        public ObjectSyncObserver(TObj o, Action actionIfChanged)
-        {
-            this._object = o;
-            _actionIfChanged = actionIfChanged;
-            IsChanged = false;
-        }
-
         public bool IsLogChangedPropertiesEnabled { get; set; }
+
         public bool IsObfuscatorEnabled { get; set; }
 
-        public TObj Object => this._object;
+        public TObj Object => _object;
 
         public bool IsChanged { get; set; }
 
@@ -41,8 +35,50 @@
 
         private Action _actionIfChanged { get; }
 
+        #endregion
 
+        #region Constructors
 
+        public ObjectObserver(TObj o)
+        {
+            _object = o;
+            IsChanged = false;
+        }
+
+        public ObjectObserver(TObj o, Action actionIfChanged)
+        {
+            _object = o;
+            _actionIfChanged = actionIfChanged;
+            IsChanged = false;
+        }
+
+        #endregion
+
+        #region Nested Classes
+
+        public class ChangedPropertyItem
+        {
+            #region Properties
+
+            public string PropertyName { get; set; }
+
+            public Type PropertyType { get; set; }
+
+            public object OldValue { get; set; }
+
+            public object NewValue { get; set; }
+
+            #endregion
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Changes property of the object
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="propertyExpr"></param>
+        /// <param name="value"></param>
         public void Set<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr, TTarget value)
         {
             if (propertyExpr.Body is MemberExpression memberSelectorExpression)
@@ -58,6 +94,7 @@
                     {
                         if (((DateTime)(object)oldValue).Difference((DateTime)(object)handledValue) > TimeSpan.FromSeconds(1))
                             ActionIfDiff();
+
                         return;
                     }
 
@@ -73,6 +110,7 @@
                             if (!JToken.DeepEquals(JObject.FromObject(oldValue), JObject.FromObject(handledValue)))
                                 ActionIfDiff();
                         }
+
                         return;
                     }
 
@@ -91,27 +129,48 @@
 
                         if (IsLogChangedPropertiesEnabled)
                             ChangedProperties.Add(new ChangedPropertyItem()
-                            {
-                                PropertyName = property.Name,
-                                PropertyType = property.PropertyType,
-                                OldValue = oldValue,
-                                NewValue = handledValue
-                            });
+                                                  {
+                                                          PropertyName = property.Name,
+                                                          PropertyType = property.PropertyType,
+                                                          OldValue = oldValue,
+                                                          NewValue = handledValue
+                                                  });
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Changes property of the object
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="propertyExpr"></param>
+        /// <param name="value"></param>
         public void Set<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr, Func<TTarget> value)
         {
             Set(propertyExpr, value());
         }
+
+        /// <summary>
+        /// Changes property of the object
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="propertyExpr"></param>
+        /// <param name="value"></param>
+        /// <param name="handlerValue"></param>
         public void Set<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr, TTarget value, Func<TTarget, TTarget> handlerValue)
         {
             var handledValue = handlerValue != null && IsObfuscatorEnabled ? handlerValue.Invoke(value) : value;
             Set(propertyExpr, handledValue);
         }
 
+        /// <summary>
+        /// Changes property of the object
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="propertyExpr"></param>
+        /// <param name="value"></param>
+        /// <param name="handlerValue"></param>
         public void Set<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr, TTarget value, Func<TObj, TTarget> handlerValue)
         {
             var handledValue = handlerValue != null && IsObfuscatorEnabled ? handlerValue.Invoke(_object) : value;
@@ -138,24 +197,10 @@
                 str.AppendLine("Property Name | Old Value | New Value");
 
                 foreach (var changedPropertyItem in ChangedProperties)
-                {
                     str.AppendLine($"{changedPropertyItem.PropertyName} | {JsonConvert.SerializeObject(changedPropertyItem.OldValue)} | {JsonConvert.SerializeObject(changedPropertyItem.NewValue)}");
-                }
             }
-
-
 
             return str.ToString();
         }
-
-        public class ChangedPropertyItem
-        {
-            public string PropertyName { get; set; }
-            public Type PropertyType { get; set; }
-            public object OldValue { get; set; }
-            public object NewValue { get; set; }
-        }
-
     }
-
 }
