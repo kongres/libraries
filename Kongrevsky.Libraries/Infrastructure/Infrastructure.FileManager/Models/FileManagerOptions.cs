@@ -1,6 +1,6 @@
 ﻿namespace Kongrevsky.Infrastructure.FileManager.Models
 {
-    public class FileStorageConfig
+    public class FileManagerOptions
     {
         #region Properties
 

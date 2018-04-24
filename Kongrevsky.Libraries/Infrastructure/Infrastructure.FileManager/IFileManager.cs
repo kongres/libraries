@@ -2,7 +2,6 @@
 {
     #region << Using >>
 
-    using System;
     using System.IO;
     using Kongrevsky.Infrastructure.FileManager.Models;
 
@@ -10,18 +9,6 @@
 
     public interface IFileManager
     {
-        /// <summary>
-        /// Sets configurations
-        /// </summary>
-        /// <param name="fileStorageConfig"></param>
-        void SetConfigs(FileStorageConfig fileStorageConfig);
-
-        /// <summary>
-        /// Sets configurations
-        /// </summary>
-        /// <param name="configuration"></param>
-        void SetConfigs(Action<FileStorageConfig> configuration);
-
         /// <summary>
         /// Returns file
         /// </summary>

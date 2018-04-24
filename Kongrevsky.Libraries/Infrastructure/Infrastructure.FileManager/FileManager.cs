@@ -7,6 +7,7 @@
     using Kongrevsky.Infrastructure.FileManager.Models;
     using Kongrevsky.Infrastructure.FileManager.Utils;
     using Kongrevsky.Utilities.Common;
+    using Microsoft.Extensions.Options;
 
     #endregion
 
@@ -14,22 +15,17 @@
     {
         #region Properties
 
-        private FileStorageConfig _fileStorageConfig { get; set; } = new FileStorageConfig();
+        private FileManagerOptions FileManagerOptions { get; set; }
 
         #endregion
 
         #region Interface Implementations
 
-        public void SetConfigs(FileStorageConfig fileStorageConfig)
+        public FileManager(IOptions<FileManagerOptions> fileManagerOptions)
         {
-            _fileStorageConfig = fileStorageConfig ?? throw new ArgumentNullException(nameof(fileStorageConfig));
-            if (string.IsNullOrEmpty(_fileStorageConfig.RootPath) || !Directory.Exists(_fileStorageConfig.RootPath))
-                throw new ArgumentNullException(nameof(_fileStorageConfig.RootPath));
-        }
-
-        public void SetConfigs(Action<FileStorageConfig> configuration)
-        {
-            configuration(_fileStorageConfig);
+            FileManagerOptions = fileManagerOptions.Value ?? throw new ArgumentNullException(nameof(fileManagerOptions));
+            if (string.IsNullOrEmpty(FileManagerOptions.RootPath) || !Directory.Exists(FileManagerOptions.RootPath))
+                throw new ArgumentNullException(nameof(FileManagerOptions.RootPath));
         }
 
         public FileObject GetFile(string fileId, bool compress = false, string encryptPassword = null)
@@ -141,7 +137,7 @@
             if (string.IsNullOrEmpty(fileId))
                 throw new ArgumentException("FileId can't be null or empty", nameof(fileId));
 
-            var directoryPath = string.IsNullOrEmpty(_fileStorageConfig.SubFolder) ? Path.Combine(_fileStorageConfig.RootPath, fileId) : Path.Combine(_fileStorageConfig.RootPath, _fileStorageConfig.SubFolder, fileId);
+            var directoryPath = string.IsNullOrEmpty(FileManagerOptions.SubFolder) ? Path.Combine(FileManagerOptions.RootPath, fileId) : Path.Combine(FileManagerOptions.RootPath, FileManagerOptions.SubFolder, fileId);
             return directoryPath;
         }
 
