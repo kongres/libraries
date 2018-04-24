@@ -8,7 +8,7 @@
 
     public static class ActiveDirectoryExtensions
     {
-        public static void RegisterDefaultActiveDirectoryManager(this IServiceCollection services, bool isFake)
+        public static void AddKongrevskyActiveDirectoryManager(this IServiceCollection services, bool isFake)
         {
             if (isFake)
                 services.AddTransient<IActiveDirectoryManager, FakeActiveDirectoryManager>();

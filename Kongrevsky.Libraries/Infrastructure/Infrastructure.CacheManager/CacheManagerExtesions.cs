@@ -8,7 +8,7 @@
 
     public static class CacheManagerExtensions
     {
-        public static void RegisterDefaultCacheManager(this IServiceCollection services)
+        public static void AddKongrevskyCacheManager(this IServiceCollection services)
         {
             services.AddMemoryCache();
             services.AddSingleton<ICacheManager, CacheManager>();

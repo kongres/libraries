@@ -8,7 +8,7 @@
 
     public static class FileManagerExtensions
     {
-        public static void RegisterDefaultFileManager(this IServiceCollection services)
+        public static void AddKongrevskyFileManager(this IServiceCollection services)
         {
             services.AddSingleton<IFileManager, FileManager>();
         }
