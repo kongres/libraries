@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Utils
+﻿namespace Kongrevsky.Infrastructure.Repository.Utils
 {
     using System;
     using System.Collections;
@@ -8,8 +8,8 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Infrastructure.Repository.Attributes;
-    using Infrastructure.Repository.Models;
+    using Kongrevsky.Infrastructure.Repository.Attributes;
+    using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Expression;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
@@ -83,13 +83,13 @@
 
             if (property.PropertyType == typeof(string))
             {
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.OrderBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
             if (property.PropertyType.IsEnum)
             {
                 var enumType = property.PropertyType;
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -108,7 +108,7 @@
             if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
             {
                 var enumType = property.PropertyType.GenericTypeArguments[0];
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -160,13 +160,13 @@
 
             if (property.PropertyType == typeof(string))
             {
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.OrderByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
             if (property.PropertyType.IsEnum)
             {
                 var enumType = property.PropertyType;
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -185,7 +185,7 @@
             if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
             {
                 var enumType = property.PropertyType.GenericTypeArguments[0];
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -236,7 +236,7 @@
 
             if (property.PropertyType == typeof(string))
             {
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.ThenBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
             if (!property.PropertyType.IsNullable())
@@ -275,7 +275,7 @@
 
             if (property.PropertyType == typeof(string))
             {
-                var strExpr = Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.ThenByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
             if (!property.PropertyType.IsNullable())
@@ -480,33 +480,81 @@
                 return Expression.Constant(true);
             }
 
-            var expressions = conditionKeyPairs.Select(x => x.Select(c => GetExpression(c.Key, c.Value)));
+            var expressions = conditionKeyPairs.Select(x => x.Select(c => GetExpression(c.Property, c.Value)));
             var result = expressions.Select(x => x.Aggregate(Expression.Or)).Aggregate(Expression.And);
             return Expression.Lambda<Func<T, bool>>(result, parameter);
         }
 
-        public static List<List<KeyValuePair<PropertyInfo, string>>> ToPropertyValuePairs(List<string> conditions, Type type)
+        public static List<List<PropertyFilterItem>> ToPropertyValuePairs(List<string> conditions, Type type)
         {
-            string separator = "==";
+            const string separatorEqual = "==";
+            const string separatorFullEqual = "===";
             return conditions
-                    .Where(x => x.Contains(separator))
+                    .Where(x => x.Contains(separatorEqual))
                     .Select(x =>
+                    {
+                        var oneRow = x.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
+                        return oneRow.Select(c =>
+                        {
+                            string[] cond;
+                            string separator;
+                            if (c.Contains(separatorFullEqual))
                             {
-                                var oneRow = x.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
-                                return oneRow.Select(c =>
-                                                     {
-                                                         var cond = c.Split(new[] { separator }, StringSplitOptions.None);
+                                separator = separatorFullEqual;
+                                cond = c.Split(new[] { separatorFullEqual }, StringSplitOptions.None);
+                            }
+                            else if (c.Contains(separatorEqual))
+                            {
+                                separator = separatorEqual;
+                                cond = c.Split(new[] { separatorEqual }, StringSplitOptions.None);
+                            }
+                            else
+                            {
+                                return null;
+                            }
 
-                                                         var propertyName = cond.ElementAtOrDefault(0);
-                                                         var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
-                                                         var value = string.Join(separator, cond.Skip(1));
-                                                         return new KeyValuePair<PropertyInfo, string>(property, value);
-                                                     })
-                                        .Where(c => c.Key != null)
-                                        .ToList();
-                            })
+                            var propertyName = cond.ElementAtOrDefault(0);
+                            var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
+                            var value = string.Join(separator, cond.Skip(1));
+                            var propertyFilterItem = new PropertyFilterItem()
+                            {
+                                Property = property,
+                                Value = value
+                            };
+                            switch (separator)
+                            {
+                                case separatorEqual:
+                                    propertyFilterItem.Operation = OperationFilter.Equal;
+                                    break;
+                                case separatorFullEqual:
+                                    propertyFilterItem.Operation = OperationFilter.FullEqual;
+                                    break;
+                            }
+                            return propertyFilterItem;
+                        })
+                                .Where(c => c?.Property != null)
+                                .ToList();
+                    })
                     .Where(x => x.Any())
                     .ToList();
+        }
+
+        public class PropertyFilterItem
+        {
+            public PropertyFilterItem()
+            {
+                Operation = OperationFilter.Equal;
+            }
+
+            public PropertyInfo Property { get; set; }
+            public OperationFilter Operation { get; set; }
+            public string Value { get; set; }
+        }
+
+        public enum OperationFilter
+        {
+            Equal,
+            FullEqual
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Triggers {
+﻿namespace Kongrevsky.Infrastructure.Repository.Triggers {
     using System.Data.Entity;
 
     public interface IInsertedEntry<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext {

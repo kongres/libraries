@@ -43,11 +43,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Web", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources.Location", "Resources\Resources.Location\Resources.Location.csproj", "{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.All", "Infrastructure\Infrastructure.All\Infrastructure.All.csproj", "{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Models", "Infrastructure\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj", "{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Models", "Infrastructure\Infrastructure.Models\Infrastructure.Models.csproj", "{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Repository", "Infrastructure\Infrastructure.Repository\Infrastructure.Repository.csproj", "{BE78AD3C-8D3D-4AC6-9E53-33C7A0B9172A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Repository", "Infrastructure\Infrastructure.Repository\Kongrevsky.Infrastructure.Repository.csproj", "{BE78AD3C-8D3D-4AC6-9E53-33C7A0B9172A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Common", "Utilities\Utilities.Common\Kongrevsky.Utilities.Common.csproj", "{ECF036CB-5D67-440D-8EC4-D288472AD0B2}"
 EndProject
@@ -133,10 +131,6 @@ Global
 		{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -187,7 +181,6 @@ Global
 		{D4147482-EE79-4F4F-BF6A-D96191907B17} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{4DDE6D81-B42D-41CE-8483-B62E37856AFE} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{1B8B9CD1-E434-4022-ACB7-CA6634A5500B} = {6438C9E7-E6C2-4061-8CDC-074F1DA53B21}
-		{8A8F9525-E8DD-4C2D-AD0E-88CA747EC0FD} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{F0AF48A9-072B-4AB3-82AF-126A6FABF35C} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{BE78AD3C-8D3D-4AC6-9E53-33C7A0B9172A} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{ECF036CB-5D67-440D-8EC4-D288472AD0B2} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}

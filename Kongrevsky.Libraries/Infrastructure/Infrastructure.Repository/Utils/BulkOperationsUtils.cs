@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Utils
+﻿namespace Kongrevsky.Infrastructure.Repository.Utils
 {
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;

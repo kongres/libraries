@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Models
+﻿namespace Kongrevsky.Infrastructure.Repository.Models
 {
     using System.Collections.Generic;
     using System.ComponentModel;

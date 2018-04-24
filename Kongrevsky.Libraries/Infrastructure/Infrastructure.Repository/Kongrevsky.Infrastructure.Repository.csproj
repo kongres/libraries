@@ -9,6 +9,7 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
     <PackageReference Include="PagedList" Version="1.17.0" />
     <PackageReference Include="SqlBulkTools" Version="4.5.0" />
@@ -22,7 +23,8 @@
     <ProjectReference Include="..\..\Utilities\Utilities.Expression\Kongrevsky.Utilities.Expression.csproj" />
     <ProjectReference Include="..\..\Utilities\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
     <ProjectReference Include="..\..\Utilities\Utilities.Reflection\Kongrevsky.Utilities.Reflection.csproj" />
-    <ProjectReference Include="..\Infrastructure.Models\Infrastructure.Models.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.String\Kongrevsky.Utilities.String.csproj" />
+    <ProjectReference Include="..\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj" />
   </ItemGroup>
 
 </Project>

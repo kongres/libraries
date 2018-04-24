@@ -1,10 +1,10 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System;
     using System.Data.Entity;
     using System.Linq;
 
-    public interface IDatabaseFactory<T> : IDisposable where T : DbContext
+    public interface IKongrevskyDatabaseFactory<T> : IDisposable where T : KongrevskyDbContext
     {
         T Get();
 

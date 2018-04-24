@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System;
     using System.Collections.Generic;
@@ -14,40 +14,41 @@
     using System.Transactions;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using Infrastructure.Models;
-    using Infrastructure.Repository.Models;
-    using Infrastructure.Repository.Triggers;
-    using Infrastructure.Repository.Utils;
+    using Kongrevsky.Infrastructure.Models;
+    using Kongrevsky.Infrastructure.Repository.Models;
+    using Kongrevsky.Infrastructure.Repository.Triggers;
+    using Kongrevsky.Infrastructure.Repository.Utils;
     using Kongrevsky.Utilities.EF6;
-    using Kongrevsky.Utilities.Enumerable;
     using Kongrevsky.Utilities.Enumerable.Models;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
+    using Kongrevsky.Utilities.String;
     using LinqKit;
-    using PagedList;
     using SqlBulkTools;
     using SqlBulkTools.Enumeration;
     using Z.EntityFramework.Plus;
-    using QueryableUtils = Infrastructure.Repository.Utils.QueryableUtils;
 
-    public class RepositoryBase<T, DB> : Repository, IRepositoryBase<T, DB>
+    public class KongrevskyRepository<T, DB> : Repository, IKongrevskyRepository<T, DB>
         where T : class
-        where DB : DbContext
+        where DB : KongrevskyDbContext
     {
-        public RepositoryBase(IDatabaseFactory<DB> databaseFactory)
+        public KongrevskyRepository(IKongrevskyDatabaseFactory<DB> kongrevskyDatabaseFactory)
         {
-            _databaseFactory = databaseFactory;
+            _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
             Dbset = DataContext.Set<T>();
         }
 
         private static readonly object _lockObject = new object();
-        private IDatabaseFactory<DB> _databaseFactory { get; }
+        private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
         private DB _dataContext { get; set; }
 
         protected DbSet<T> Dbset { get; }
-        protected DB DataContext => _dataContext ?? (_dataContext = _databaseFactory.Get());
+        protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
         protected IQueryable<TSet> GetDbSet<TSet>() where TSet : class => DataContext.Set<TSet>().AsExpandable();
-        protected virtual string ConnectionString => DataContext.Database.Connection.ConnectionString;
+
+        private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
+
+        private string _connectionString;
 
         public virtual int BulkInsert<TSource>(List<TSource> entities) where TSource : BaseEntity
         {
@@ -59,16 +60,16 @@
                 TriggersBulk<TSource, DB>.RaiseInserting(entities, DataContext);
 
                 var config = new MapperConfiguration(conf =>
-                                                     {
-                                                         conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
-                                                                                                                      {
-                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                                                                                                                              return;
-                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                                                                                                                              return;
-                                                                                                                          c.Ignore();
-                                                                                                                      });
-                                                     });
+                {
+                    conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                    {
+                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                            return;
+                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                            return;
+                        c.Ignore();
+                    });
+                });
                 var mapper = config.CreateMapper();
 
                 var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
@@ -77,7 +78,7 @@
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
-                    using (var conn = new SqlConnection(ConnectionString))
+                    using (var conn = new SqlConnection(connectionString))
                     {
                         num = new BulkOperations().Setup<TSource>()
                                 .ForCollection(ent)
@@ -119,16 +120,16 @@
                 TriggersBulk<TSource, DB>.RaiseUpdating(entities, DataContext);
 
                 var config = new MapperConfiguration(conf =>
-                                                     {
-                                                         conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
-                                                                                                                      {
-                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                                                                                                                              return;
-                                                                                                                          if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                                                                                                                              return;
-                                                                                                                          c.Ignore();
-                                                                                                                      });
-                                                     });
+                {
+                    conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                    {
+                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                            return;
+                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                            return;
+                        c.Ignore();
+                    });
+                });
                 var mapper = config.CreateMapper();
 
                 var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
@@ -138,7 +139,7 @@
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
-                    using (var conn = new SqlConnection(ConnectionString))
+                    using (var conn = new SqlConnection(connectionString))
                     {
                         num = new BulkOperations().Setup<TSource>()
                                 .ForCollection(ent)
@@ -179,7 +180,7 @@
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
-                    using (var conn = new SqlConnection(ConnectionString))
+                    using (var conn = new SqlConnection(connectionString))
                     {
                         num = new BulkOperations().Setup<TSource>()
                                 .ForCollection(entities)
@@ -229,14 +230,13 @@
                 if (!ent.Any())
                     return num;
 
-
                 try
                 {
                     var bulk = new BulkOperations();
 
                     using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                     {
-                        using (var conn = new SqlConnection(ConnectionString))
+                        using (var conn = new SqlConnection(connectionString))
                         {
                             num = bulk.Setup<T>()
                                     .ForCollection(ent)
@@ -357,31 +357,6 @@
             return query;
         }
 
-        public virtual IPagedList<T> GetPage(Page page, Expression<Func<T, bool>> checkPermission, Expression<Func<T, bool>> where, Func<IQueryable<T>, IQueryable<T>> sortFunc, params Expression<Func<T, object>>[] includes)
-        {
-            var queryable = Dbset.AsExpandable();
-
-            var orderedQueryable = sortFunc != null ? sortFunc.Invoke(queryable) : queryable.OrderBy(x => 1);
-            var query = checkPermission == null ? (where == null ? orderedQueryable : orderedQueryable.Where(where)) : orderedQueryable.Where(checkPermission).Where(where);
-            query = AppendIncludes(query, includes);
-
-            var total = query.Count();
-            if (page.PageNumber <= 0 || page.PageSize <= 0)
-            {
-                page.PageNumber = 1;
-                page.PageSize = total == 0 ? 1 : total;
-            }
-
-            var results = query.GetPage(page).ToList();
-            return new StaticPagedList<T>(results, page.PageNumber, page.PageSize, total);
-        }
-
-
-        public virtual IPagedList<T> GetPage(Page page, params Expression<Func<T, object>>[] includes)
-        {
-            return GetPage(page, null, null, null, includes);
-        }
-
         public virtual PagingQueryable<TCast> GetPage<TCast>(PagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
         {
             var page = new Page(filter.PageNumber, filter.PageSize);
@@ -393,7 +368,7 @@
             foreach (var expression in where)
                 queryable = queryable.Where(expression);
 
-            var castQuery = queryable.ProjectTo<TCast>(configurationProvider);
+            var castQuery = queryable.ProjectTo<TCast>(configurationProvider).AsExpandable();
 
             if (postWhere != null)
                 foreach (var expression in postWhere)
@@ -402,7 +377,7 @@
             if (filter.Filters?.Any() ?? false)
                 castQuery = castQuery.Where(QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
 
-            var orderProperties = filter.OrderProperty?.Split(new[] { ',', '.', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
+            var orderProperties = filter.OrderProperty?.Split(new[] { ',', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
             IOrderedQueryable<TCast> orderedQuery;
 

@@ -1,9 +1,9 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System.Data.Entity;
     using System.Threading.Tasks;
 
-    public interface IUnitOfWork<T> where T : DbContext
+    public interface IKongrevskyUnitOfWork<T> where T : KongrevskyDbContext
     {
         void Commit();
 

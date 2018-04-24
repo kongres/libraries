@@ -1,12 +1,8 @@
-﻿namespace Infrastructure.Repository.Models
+﻿namespace Kongrevsky.Infrastructure.Repository.Models
 {
-    using Infrastructure.Repository.Attributes;
-
     public class ItemDto
     {
-        [AccessWithoutPermission]
         public string Id { get; set; }
-        [DefaultSortProperty]
         public string Name { get; set; }
     }
 }

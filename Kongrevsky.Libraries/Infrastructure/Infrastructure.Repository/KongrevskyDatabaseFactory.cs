@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System;
     using System.Data;
@@ -6,17 +6,17 @@
     using System.Linq;
     using System.Threading;
 
-    public class DatabaseFactory<T> : IDatabaseFactory<T> where T : DbContext, new()
+    public class KongrevskyDatabaseFactory<T> : IKongrevskyDatabaseFactory<T> where T : KongrevskyDbContext
     {
-        public DatabaseFactory(T dataContext)
+        public KongrevskyDatabaseFactory(T dataContext)
         {
-            _dataContext = dataContext;
+            _dataContext = dataContext ?? throw new ArgumentNullException(nameof(dataContext));
         }
 
         private T _dataContext { get; set; }
         public T Get()
         {
-            var context = _dataContext ?? (_dataContext = new T());
+            var context = _dataContext;
 
             var e = new Exception("Can't connect to DB " + typeof(T));
             for (int i = 0; i < 5; i++)

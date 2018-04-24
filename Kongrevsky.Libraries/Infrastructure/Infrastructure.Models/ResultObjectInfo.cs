@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Models
+﻿namespace Kongrevsky.Infrastructure.Models
 {
     using System.Net;
 

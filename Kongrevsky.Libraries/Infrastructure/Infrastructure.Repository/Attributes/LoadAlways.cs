@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Attributes
+﻿namespace Kongrevsky.Infrastructure.Repository.Attributes
 {
     using System;
 

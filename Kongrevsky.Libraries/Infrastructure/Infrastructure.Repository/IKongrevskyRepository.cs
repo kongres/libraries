@@ -1,22 +1,20 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using AutoMapper;
-    using Infrastructure.Repository.Models;
+    using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
-    using PagedList;
 
-    public interface IRepositoryBase<T, DB> : IRepositoryBase<T> 
+    public interface IKongrevskyRepository<T, DB> : IKongrevskyRepository<T> 
         where T : class
-        where DB : DbContext
+        where DB : KongrevskyDbContext
     { }
 
-    public interface IRepositoryBase<T> where T : class 
+    public interface IKongrevskyRepository<T> where T : class
     {
         int BulkInsert<TSource>(List<TSource> entities) where TSource : BaseEntity;
         int ClassicBulkInsert(List<T> entities);
@@ -41,9 +39,6 @@
         Task<T> GetAsync(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes);
         IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes);
         IQueryable<T> GetMany(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes);
-        IPagedList<T> GetPage(Page page, Expression<Func<T, bool>> checkPermission, Expression<Func<T, bool>> where, Func<IQueryable<T>, IQueryable<T>> sortFunc, params Expression<Func<T, object>>[] includes);
-        IPagedList<T> GetPage(Page page, params Expression<Func<T, object>>[] includes);
-
         PagingQueryable<TCast> GetPage<TCast>(PagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository.Triggers
+﻿namespace Kongrevsky.Infrastructure.Repository.Triggers
 {
     using System;
     using System.Collections.Generic;

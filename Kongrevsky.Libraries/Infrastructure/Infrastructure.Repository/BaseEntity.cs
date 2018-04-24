@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Repository
+﻿namespace Kongrevsky.Infrastructure.Repository
 {
     using System;
     using System.ComponentModel.DataAnnotations;
