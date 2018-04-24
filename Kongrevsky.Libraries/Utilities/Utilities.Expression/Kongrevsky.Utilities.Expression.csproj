@@ -7,4 +7,8 @@
 
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
+  </ItemGroup>
+
 </Project>

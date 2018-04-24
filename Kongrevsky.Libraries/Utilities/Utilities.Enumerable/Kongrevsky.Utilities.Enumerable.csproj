@@ -7,4 +7,12 @@
 
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.7.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities.Expression\Kongrevsky.Utilities.Expression.csproj" />
+    <ProjectReference Include="..\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
+  </ItemGroup>
 </Project>

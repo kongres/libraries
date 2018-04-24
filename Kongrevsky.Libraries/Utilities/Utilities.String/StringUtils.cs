@@ -247,6 +247,29 @@
             return false;
         }
 
+        public static bool IsValidArrayJson(this string strInput)
+        {
+            strInput = strInput.Trim();
+            if (strInput.StartsWith("[") && strInput.EndsWith("]")) //For array
+            {
+                try
+                {
+                    var obj = JArray.Parse(strInput);
+                    return true;
+                }
+                catch (JsonReaderException jex)
+                {
+                    //Exception in parsing json
+                    return false;
+                }
+                catch (Exception ex) //some other exception
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Trims nullable string
         /// </summary>

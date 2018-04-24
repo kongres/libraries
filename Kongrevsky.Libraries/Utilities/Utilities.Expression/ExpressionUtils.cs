@@ -1,5 +1,8 @@
 ﻿namespace Kongrevsky.Utilities.Expression
 {
+    using Kongrevsky.Utilities.Object;
+    using Kongrevsky.Utilities.Reflection;
+
     #region << Using >>
 
     using System;
@@ -35,8 +38,14 @@
         public static Expression<Func<T, Target>> ToLambda<T, Target>(string propertyName)
         {
             var parameter = Expression.Parameter(typeof(T));
-            var property = Expression.Property(parameter, propertyName);
-            var propAsObject = Expression.Convert(property, typeof(Target));
+
+            Expression body = parameter;
+            foreach (var member in propertyName.Split('.'))
+            {
+                body = Expression.Property(body, member);
+            }
+
+            var propAsObject = Expression.Convert(body, typeof(Target));
 
             return Expression.Lambda<Func<T, Target>>(propAsObject, parameter);
         }
@@ -54,6 +63,43 @@
             Expression convertedExpressionBody = Expression.Convert(inputExpression.Body, typeof(TReturn));
 
             return Expression.Lambda<Func<TInput, TReturn>>(convertedExpressionBody, inputExpression.Parameters);
+        }
+
+
+        public static Expression CreateMemberAccess(ParameterExpression parameter, string propertyName)
+        {
+            Expression body = parameter;
+            Type curType = parameter.Type;
+            foreach (var member in propertyName.Split('.'))
+            {
+                var property = curType.GetPropertyByName(member);
+                if (property == null)
+                    return body;
+                body = Expression.MakeMemberAccess(body, property);
+                curType = property.PropertyType;
+            }
+
+            return body;
+        }
+
+        public static Expression<Func<TSource, int>> DescriptionOrder<TSource, TEnum>(this Expression<Func<TSource, TEnum>> source)
+                where TEnum : struct
+        {
+            var enumType = typeof(TEnum);
+            if (!enumType.IsEnum) throw new InvalidOperationException();
+
+            var body = ((TEnum[])Enum.GetValues(enumType))
+                    .OrderBy(value => value.GetDisplayName())
+                    .Select((value, ordinal) => new { value, ordinal })
+                    .Reverse()
+                    .Aggregate((Expression)null, (next, item) => next == null ? (Expression)
+                                                         Expression.Constant(item.ordinal) :
+                                                         Expression.Condition(
+                                                                              Expression.Equal(source.Body, Expression.Constant(item.value)),
+                                                                              Expression.Constant(item.ordinal),
+                                                                              next));
+
+            return Expression.Lambda<Func<TSource, int>>(body, source.Parameters[0]);
         }
     }
 }

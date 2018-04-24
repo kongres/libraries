@@ -16,6 +16,7 @@
 
     public static class DbContextUtils
     {
+
         /// <summary>
         /// Returns Table name 
         /// </summary>

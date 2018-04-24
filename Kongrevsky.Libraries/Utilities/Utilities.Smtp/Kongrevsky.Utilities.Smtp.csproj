@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <Description>Utilities for SMTP</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+  </PropertyGroup>
+
+</Project>
