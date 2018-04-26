@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.String
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Web", "Utilities\Utilities.Web\Kongrevsky.Utilities.Web.csproj", "{4DDE6D81-B42D-41CE-8483-B62E37856AFE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources.Location", "Resources\Resources.Location\Resources.Location.csproj", "{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Resources.Location", "Resources\Resources.Location\Kongrevsky.Resources.Location.csproj", "{1B8B9CD1-E434-4022-ACB7-CA6634A5500B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Models", "Infrastructure\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj", "{F0AF48A9-072B-4AB3-82AF-126A6FABF35C}"
 EndProject

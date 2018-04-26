@@ -1,76 +1,73 @@
-﻿namespace Resources.Location.Services
+﻿namespace Kongrevsky.Resources.Location.Services
 {
+    #region << Using >>
+
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using Kongrevsky.Resources.Location.Models;
     using Newtonsoft.Json;
-    using Resources.Location.Models;
+
+    #endregion
 
     public class LocationService : ILocationService
     {
-        private List<City> cities { get; set; } = new List<City>();
+        #region Constants
+
+        private const string _citiesResourcePath = "Resource.Location.Resources.cities.json";
+
+        private const string _statesResourcePath = "Resource.Location.Resources.states.json";
+
+        private const string _countriesResourcePath = "Resource.Location.Resources.countries.json";
+
+        #endregion
+
+        #region Properties
 
         private List<City> _cities
         {
             get
             {
-                if (cities?.Any() ?? false)
-                    return cities;
+                if (this.citiesValue == null || !this.citiesValue.Any())
+                    this.citiesValue = _tryRetrieveEmbeddedList<City>(_citiesResourcePath);
 
-                var assembly = Assembly.GetExecutingAssembly();
-                var citiesFilePath = "Resource.Location.Resources.cities.json";
-                using (var ctFile = new StreamReader(assembly.GetManifestResourceStream(citiesFilePath)))
-                {
-                    string ctContent = ctFile.ReadToEnd();
-                    cities = JsonConvert.DeserializeObject<List<City>>(ctContent);
-                }
-
-                return cities;
+                return this.citiesValue;
             }
         }
-
-        private List<State> states { get; set; } = new List<State>();
 
         private List<State> _states
         {
             get
             {
-                if (states?.Any() ?? false)
-                    return states;
+                if (this.statesValue == null || !this.statesValue.Any())
+                    this.statesValue = _tryRetrieveEmbeddedList<State>(_statesResourcePath);
 
-                var assembly = Assembly.GetExecutingAssembly();
-                var countriesFilePath = "Resource.Location.Resources.countries.json";
-                using (var ctFile = new StreamReader(assembly.GetManifestResourceStream(countriesFilePath)))
-                {
-                    string ctContent = ctFile.ReadToEnd();
-                    states = JsonConvert.DeserializeObject<List<State>>(ctContent);
-                }
-
-                return states;
+                return this.statesValue;
             }
         }
-
-        private List<Country> countries { get; set; } = new List<Country>();
 
         private List<Country> _countries
         {
             get
             {
-                if (countries?.Any() ?? false)
-                    return countries;
+                if (this.countriesValue == null || !this.countriesValue.Any())
+                    this.countriesValue = _tryRetrieveEmbeddedList<Country>(_countriesResourcePath);
 
-                var assembly = Assembly.GetExecutingAssembly();
-                var countriesFilePath = "Resource.Location.Resources.countries.json";
-                using (var ctFile = new StreamReader(assembly.GetManifestResourceStream(countriesFilePath)))
-                {
-                    string ctContent = ctFile.ReadToEnd();
-                    countries = JsonConvert.DeserializeObject<List<Country>>(ctContent);
-                }
-
-                return countries;
+                return this.countriesValue;
             }
         }
+
+        private List<City> citiesValue;
+
+        private List<Country> countriesValue;
+
+        private List<State> statesValue;
+
+        #endregion
+
+        #region Interface Implementations
 
         public List<City> GetAllCities()
         {
@@ -80,7 +77,7 @@
         public List<City> GetCitiesByCountryAndState(string countryId, string stateId = null, string search = null)
         {
             return _cities.Where(x => (string.IsNullOrWhiteSpace(countryId) || x.CountryId == countryId) && (string.IsNullOrWhiteSpace(stateId) || x.StateId == stateId))
-                    .Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
+                          .Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
         }
 
         public List<State> GetAllStates()
@@ -90,18 +87,40 @@
 
         public List<State> GetStatesByCountry(string countryId, string search = null)
         {
-            return _states.Where(x => string.IsNullOrWhiteSpace(countryId) || x.CountryId == countryId).Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
+            return _states.Where(x => string.IsNullOrWhiteSpace(countryId) || x.CountryId == countryId)
+                          .Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
         }
 
-
-        public List<Country> GetAllContries()
+        public List<Country> GetAllCountries()
         {
             return _countries;
         }
 
-        public List<Country> GetContries(string search)
+        public List<Country> GetCountries(string search)
         {
             return _countries.Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search) || x.Code.Contains(search)).ToList();
+        }
+
+        #endregion
+
+        List<T> _tryRetrieveEmbeddedList<T>(string resourcePath)
+        {
+            try
+            {
+                List<T> result;
+                var assembly = Assembly.GetExecutingAssembly();
+                using (var ctFile = new StreamReader(assembly.GetManifestResourceStream(resourcePath) ?? throw new InvalidOperationException("Resource not found")))
+                {
+                    var ctContent = ctFile.ReadToEnd();
+                    result = JsonConvert.DeserializeObject<List<T>>(ctContent);
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                return new List<T>();
+            }
         }
     }
 }
