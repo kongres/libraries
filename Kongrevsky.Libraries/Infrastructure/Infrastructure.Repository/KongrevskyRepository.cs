@@ -391,6 +391,9 @@
             {
                 if (orderProperties.Any())
                 {
+                    orderProperties.AddRange(_dataContext.GetKeyNames<T>());
+                    orderProperties = orderProperties.Distinct(new GenericCompare<string>(x => x.ToLowerInvariant())).ToList();
+
                     orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(orderProperties.First()) : castQuery.OrderByWithNullLowPriority(orderProperties.First());
                     orderProperties.RemoveAt(0);
                     if (orderProperties.Any())
@@ -399,7 +402,16 @@
                         orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
                 }
                 else
+                {
+                    orderProperties.AddRange(_dataContext.GetKeyNames<T>());
+                    orderProperties = orderProperties.Distinct(new GenericCompare<string>(x => x.ToLowerInvariant())).ToList();
+
                     orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority() : castQuery.OrderByWithNullLowPriority();
+                    if (orderProperties.Any())
+                        orderedQuery = orderProperties.Aggregate(orderedQuery, (current, property) => filter.IsDesc ? current.ThenByDescendingWithNullLowPriority(property) : current.ThenByWithNullLowPriority(property));
+                    else
+                        orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
+                }
             }
             return new PagingQueryable<TCast>(orderedQuery, page);
         }
