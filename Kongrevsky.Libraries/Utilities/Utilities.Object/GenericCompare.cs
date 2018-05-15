@@ -4,6 +4,7 @@
 
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
 
     #endregion
 
@@ -17,9 +18,9 @@
 
         #region Constructors
 
-        public GenericCompare(Func<T, object> expr)
+        public GenericCompare(Expression<Func<T, object>> expr)
         {
-            _expr = expr;
+            _expr = expr.Compile();
         }
 
         #endregion

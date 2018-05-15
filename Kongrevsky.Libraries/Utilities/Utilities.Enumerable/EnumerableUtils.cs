@@ -3,6 +3,7 @@
     #region << Using >>
 
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using Kongrevsky.Utilities.Enumerable.Models;
@@ -80,7 +81,7 @@
                 return true;
 
             var obj = func.Invoke(firstOrDefault);
-            return list.All(x => obj.Equals(func.Invoke(x)));
+            return list.All(x => (obj == null && func.Invoke(x) == null) || (obj != null && obj.Equals(func.Invoke(x))));
         }
 
         /// <summary>
@@ -268,6 +269,25 @@
                 return (int)Math.Ceiling((double)enumerable.Count() / pageSize);
 
             return 1;
+        }
+
+        /// <summary>
+        /// Change type of Enumerable Items
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="newItemType"></param>
+        /// <returns></returns>
+        public static IEnumerable ChangeType(this IEnumerable source, Type newItemType)
+        {
+            var listType = typeof(List<>);
+            Type[] typeArgs = { newItemType };
+            var genericListType = listType.MakeGenericType(typeArgs);
+            var typedList = (IList)Activator.CreateInstance(genericListType);
+            foreach (var item in source)
+            {
+                typedList.Add(item);
+            }
+            return typedList;
         }
     }
 }
