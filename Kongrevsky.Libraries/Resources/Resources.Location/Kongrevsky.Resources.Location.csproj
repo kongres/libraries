@@ -16,4 +16,8 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Repository\Kongrevsky.Infrastructure.Repository.csproj" />
+  </ItemGroup>
 </Project>
