@@ -8,6 +8,9 @@
     using System.Linq;
     using System.Reflection;
     using Kongrevsky.Resources.Location.Models;
+    using Kongrevsky.Utilities.Enumerable;
+    using Kongrevsky.Utilities.Enumerable.Models;
+    using Kongrevsky.Utilities.String;
     using Newtonsoft.Json;
 
     #endregion
@@ -74,10 +77,20 @@
             return _cities;
         }
 
-        public List<City> GetCitiesByCountryAndState(string countryId, string stateId = null, string search = null)
+        public CityPaging GetCities(CityPaging filter)
         {
-            return _cities.Where(x => (string.IsNullOrWhiteSpace(countryId) || x.CountryId == countryId) && (string.IsNullOrWhiteSpace(stateId) || x.StateId == stateId))
-                          .Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
+            var search = filter.Search.SplitBySpaces();
+
+            var cities = _cities.Where(x => (filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId) &&
+                                            (filter.StateId.IsNullOrWhiteSpace() || x.StateId == filter.StateId))
+                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)))
+                                .OrderBy(filter.OrderProperty, filter.IsDesc)
+                                .ToList();
+
+            filter.SetResult(cities.GetPage(new Page(filter.PageNumber, filter.PageSize)),
+                             cities.Count, cities.GetPageCount(filter.PageSize));
+
+            return filter;
         }
 
         public List<State> GetAllStates()
@@ -85,10 +98,19 @@
             return _states;
         }
 
-        public List<State> GetStatesByCountry(string countryId, string search = null)
+        public StatePaging GetStates(StatePaging filter)
         {
-            return _states.Where(x => string.IsNullOrWhiteSpace(countryId) || x.CountryId == countryId)
-                          .Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search)).ToList();
+            var search = filter.Search.SplitBySpaces();
+
+            var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
+                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)))
+                                .OrderBy(filter.OrderProperty, filter.IsDesc)
+                                .ToList();
+
+            filter.SetResult(states.GetPage(new Page(filter.PageNumber, filter.PageSize)),
+                             states.Count, states.GetPageCount(filter.PageSize));
+
+            return filter;
         }
 
         public List<Country> GetAllCountries()
@@ -96,9 +118,18 @@
             return _countries;
         }
 
-        public List<Country> GetCountries(string search)
+        public CountryPaging GetCountries(CountryPaging filter)
         {
-            return _countries.Where(x => string.IsNullOrWhiteSpace(search) || x.Name.Contains(search) || x.Code.Contains(search)).ToList();
+            var search = filter.Search.SplitBySpaces();
+
+            var countries = _countries.Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)) || search.Any(r => x.Code.Contains(r)))
+                                      .OrderBy(filter.OrderProperty, filter.IsDesc)
+                                      .ToList();
+
+            filter.SetResult(countries.GetPage(new Page(filter.PageNumber, filter.PageSize)),
+                             countries.Count, countries.GetPageCount(filter.PageSize));
+
+            return filter;
         }
 
         #endregion

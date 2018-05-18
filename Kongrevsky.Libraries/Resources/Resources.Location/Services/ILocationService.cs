@@ -18,11 +18,9 @@
         /// <summary>
         /// Returns list of cities by specified filters
         /// </summary>
-        /// <param name="countryId"></param>
-        /// <param name="stateId"></param>
-        /// <param name="search"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        List<City> GetCitiesByCountryAndState(string countryId, string stateId = null, string search = null);
+        CityPaging GetCities(CityPaging filter);
 
         /// <summary>
         /// Returns list of all states
@@ -31,12 +29,11 @@
         List<State> GetAllStates();
 
         /// <summary>
-        /// Returns state by specified filters
+        /// Returns list of states by specified filters
         /// </summary>
-        /// <param name="countryId"></param>
-        /// <param name="search"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        List<State> GetStatesByCountry(string countryId, string search = null);
+        StatePaging GetStates(StatePaging filter);
 
         /// <summary>
         /// Returns list of all countries
@@ -47,8 +44,8 @@
         /// <summary>
         /// Returns list of countries by specified filter
         /// </summary>
-        /// <param name="search"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        List<Country> GetCountries(string search);
+        CountryPaging GetCountries(CountryPaging filter);
     }
 }

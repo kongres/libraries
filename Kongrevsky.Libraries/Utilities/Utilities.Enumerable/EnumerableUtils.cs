@@ -289,5 +289,25 @@
             }
             return typedList;
         }
+
+        /// <summary>
+        /// Orders IEnumerable by property name if IEnumerable item type has such property
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="iEnumerable"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="isDesc"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> iEnumerable, string propertyName, bool isDesc)
+        {
+            var propertyInfo = typeof(T).GetProperty(propertyName);
+
+            if (propertyInfo == null)
+                return iEnumerable;
+
+            return isDesc ?
+                           iEnumerable.OrderByDescending(x => propertyInfo.GetValue(x, null)) :
+                           iEnumerable.OrderBy(x => propertyInfo.GetValue(x, null));
+        }
     }
 }
