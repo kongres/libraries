@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using AutoMapper;
+    using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 

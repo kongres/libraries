@@ -2,7 +2,7 @@
 {
     #region << Using >>
 
-    using Kongrevsky.Infrastructure.Repository.Models;
+    using Kongrevsky.Infrastructure.Models;
 
     #endregion
 
