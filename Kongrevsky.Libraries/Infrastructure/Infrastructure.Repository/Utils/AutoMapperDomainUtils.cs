@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using AutoMapper;
+    using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Attributes;
-    using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
 

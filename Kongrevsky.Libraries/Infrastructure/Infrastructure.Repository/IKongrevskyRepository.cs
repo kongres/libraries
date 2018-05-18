@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using AutoMapper;
+    using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 
@@ -16,13 +17,16 @@
 
     public interface IKongrevskyRepository<T> where T : class
     {
-        int BulkInsert<TSource>(List<TSource> entities) where TSource : BaseEntity;
+        int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
         int ClassicBulkInsert(List<T> entities);
-        int BulkUpdate<TSource>(List<TSource> entities) where TSource : BaseEntity;
+
+        int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
         int ClassicBulkUpdate(List<T> entities);
-        int BulkDelete<TSource>(List<TSource> entities) where TSource : BaseEntity;
-        int BulkDelete<TSource>(Expression<Func<TSource, bool>> where) where TSource : BaseEntity;
+
+        int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
+        int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true);
         int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null);
+
         T Add(T entity);
         T Update(T entity);
         T AddOrUpdate(T entity);

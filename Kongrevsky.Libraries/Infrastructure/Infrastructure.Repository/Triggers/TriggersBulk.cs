@@ -1,13 +1,20 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Triggers
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+
     using CoContra;
     using Kongrevsky.Utilities.Enumerable;
+    using Kongrevsky.Utilities.Expression;
 
-    public static class TriggersBulk<TEntity, TDbContext> where TEntity : BaseEntity where TDbContext : DbContext
+    using LinqKit;
+
+    public static class TriggersBulk<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext
     {
         private static readonly CovariantAction<IInsertingEntry<TEntity, TDbContext>> inserting = new CovariantAction<IInsertingEntry<TEntity, TDbContext>>();
         private static readonly CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>> bulkInserting = new CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>>();
@@ -126,8 +133,9 @@
             bulkInserting.Invoke(new BulkInsertingEntry<TEntity, TDbContext>(list, dbContext));
         }
 
-        public static void RaiseUpdating(IEnumerable<TEntity> entities, TDbContext dbContext)
+        public static void RaiseUpdating(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
         {
+            var funcIdentificator = identificator.Compile();
             var list = entities.ToList();
             if (!list.Any())
                 return;
@@ -135,14 +143,14 @@
             var originals = new List<TEntity>();
             foreach (var chunk in list.ChunkBy(1000))
             {
-                var keys = chunk.Select(x => x.Id).ToList();
-                originals.AddRange(dbContext.Set<TEntity>().AsNoTracking().Where(x => keys.Contains(x.Id)).ToList());
+                originals.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
 
             var eventParams = new List<BulkUpdatingEntity<TEntity>>();
             foreach (var entity in list)
             {
-                var original = originals.FirstOrDefault(x => x.Id == entity.Id);
+                var id = funcIdentificator(entity);
+                var original = originals.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
                 updating.Invoke(new UpdatingEntry<TEntity, TDbContext>(original, entity, dbContext));
@@ -151,8 +159,9 @@
             bulkUpdating.Invoke(new BulkUpdatingEntry<TEntity, TDbContext>(eventParams, dbContext));
         }
 
-        public static void RaiseDeleting(IEnumerable<TEntity> entities, TDbContext dbContext)
+        public static void RaiseDeleting(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
         {
+            var funcIdentificator = identificator.Compile();
             var list = entities.ToList();
             if (!list.Any())
                 return;
@@ -160,18 +169,31 @@
             var deletingEntities = new List<TEntity>();
             foreach (var chunk in list.ChunkBy(1000))
             {
-                var keys = chunk.Select(x => x.Id).ToList();
-                deletingEntities.AddRange(dbContext.Set<TEntity>().AsNoTracking().Where(x => keys.Contains(x.Id)).ToList());
+                deletingEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
 
             foreach (var entity in list)
             {
-                var original = deletingEntities.FirstOrDefault(x => x.Id == entity.Id);
+                var id = funcIdentificator(entity);
+                var original = deletingEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
                 deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(original, dbContext));
             }
             bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(deletingEntities, dbContext));
+        }
+
+        public static void RaiseDeleting(IEnumerable<TEntity> entities, TDbContext dbContext)
+        {
+            var list = entities.Where(x => x != null).ToList();
+            if (!list.Any())
+                return;
+
+            foreach (var entity in list)
+            {
+                deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(entity, dbContext));
+            }
+            bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(list, dbContext));
         }
 
         public static void RaiseInsertFailed(IEnumerable<TEntity> entities, TDbContext dbContext)
@@ -189,8 +211,9 @@
             deleteFailed.Invoke(entities, dbContext);
         }
 
-        public static void RaiseInserted(IEnumerable<TEntity> entities, TDbContext dbContext)
+        public static void RaiseInserted(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
         {
+            var funcIdentificator = identificator.Compile();
             var list = entities.ToList();
             if (!list.Any())
                 return;
@@ -198,13 +221,13 @@
             var insertedEntities = new List<TEntity>();
             foreach (var chunk in list.ChunkBy(1000))
             {
-                var keys = chunk.Select(x => x.Id).ToList();
-                insertedEntities.AddRange(dbContext.Set<TEntity>().AsNoTracking().Where(x => keys.Contains(x.Id)).ToList());
+                insertedEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
 
             foreach (var entity in list)
             {
-                var original = insertedEntities.FirstOrDefault(x => x.Id == entity.Id);
+                var id = funcIdentificator(entity);
+                var original = insertedEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
                 inserted.Invoke(new InsertedEntry<TEntity, TDbContext>(original, dbContext));
@@ -212,8 +235,9 @@
             bulkInserted.Invoke(new BulkInsertedEntry<TEntity, TDbContext>(insertedEntities, dbContext));
         }
 
-        public static void RaiseUpdated(IEnumerable<TEntity> entities, TDbContext dbContext)
+        public static void RaiseUpdated(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
         {
+            var funcIdentificator = identificator.Compile();
             var list = entities.ToList();
             if (!list.Any())
                 return;
@@ -221,13 +245,13 @@
             var updatedEntities = new List<TEntity>();
             foreach (var chunk in list.ChunkBy(1000))
             {
-                var keys = chunk.Select(x => x.Id).ToList();
-                updatedEntities.AddRange(dbContext.Set<TEntity>().AsNoTracking().Where(x => keys.Contains(x.Id)).ToList());
+                updatedEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
 
             foreach (var entity in list)
             {
-                var original = updatedEntities.FirstOrDefault(x => x.Id == entity.Id);
+                var id = funcIdentificator(entity);
+                var original = updatedEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
                 updated.Invoke(new UpdatedEntry<TEntity, TDbContext>(original, dbContext));
@@ -243,6 +267,25 @@
             foreach (var entity in list)
                 deleted.Invoke(new DeletedEntry<TEntity, TDbContext>(entity, dbContext));
             bulkDeleted.Invoke(new BulkDeletedEntry<TEntity, TDbContext>(list, dbContext));
+        }
+
+        private static IQueryable<TEntity> QueryableContains(IQueryable<TEntity> queryable, IEnumerable<TEntity> list, Expression<Func<TEntity, object>> identificator)
+        {
+            var idType = identificator.Body.Type;
+            var parameter = Expression.Parameter(typeof(TEntity), "x");
+
+            var selectedList = list.Select(identificator.Compile()).ToList().ChangeType(idType);
+            var containsMethod = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().FirstOrDefault(m => m.Name == nameof(Enumerable.Contains) && m.GetParameters().Count() == 2)?.MakeGenericMethod(idType);
+
+            Expression expression;
+
+            if (containsMethod == null)
+                expression = Expression.Constant(true);
+            else
+                expression = Expression.Call(null, containsMethod, Expression.Constant(selectedList), Expression.Invoke(identificator.ToExpression(), parameter));
+
+            var compExpr = Expression.Lambda<Func<TEntity, bool>>(expression, parameter);
+            return queryable.Where(compExpr);
         }
     }
 }

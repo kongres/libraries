@@ -65,6 +65,21 @@
             return Expression.Lambda<Func<TInput, TReturn>>(convertedExpressionBody, inputExpression.Parameters);
         }
 
+        /// <summary>
+        /// Converts expression to untyped format
+        /// </summary>
+        /// <typeparam name="TInput"></typeparam>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static Expression ToExpression<TInput, TOutput>(this Expression<Func<TInput, TOutput>> expression)
+        {
+            var memberName = ((MemberExpression)expression.Body).Member.Name;
+
+            var param = Expression.Parameter(typeof(TInput));
+            var field = Expression.Property(param, memberName);
+            return Expression.Lambda(field, param);
+        }
 
         public static Expression CreateMemberAccess(ParameterExpression parameter, string propertyName)
         {

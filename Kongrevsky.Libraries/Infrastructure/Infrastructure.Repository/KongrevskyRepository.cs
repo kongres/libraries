@@ -50,18 +50,21 @@
 
         private string _connectionString;
 
-        public virtual int BulkInsert<TSource>(List<TSource> entities) where TSource : BaseEntity
+        public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
         {
             if (!entities.Any())
                 return 0;
 
             lock (_lockObject)
             {
-                TriggersBulk<TSource, DB>.RaiseInserting(entities, DataContext);
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseInserting(entities, DataContext);
+                }
 
                 var config = new MapperConfiguration(conf =>
                 {
-                    conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                    conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
                     {
                         if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
                             return;
@@ -72,28 +75,31 @@
                 });
                 var mapper = config.CreateMapper();
 
-                var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
-                var ent = mapper.Map<List<TSource>>(distEnts);
+                var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
+                var ent = mapper.Map<List<T>>(distEnts);
 
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
                     using (var conn = new SqlConnection(connectionString))
                     {
-                        num = new BulkOperations().Setup<TSource>()
+                        num = new BulkOperations().Setup<T>()
                                 .ForCollection(ent)
-                                .WithTable(DataContext.GetTableName<TSource>())
+                                .WithTable(DataContext.GetTableName<T>())
                                 .AddAllColumns()
                                 .DetectColumnWithCustomColumnName()
                                 .BulkInsert()
-                                .SetIdentityColumn(x => x.Id, ColumnDirectionType.Input)
+                                .SetIdentityColumn(identificator, ColumnDirectionType.Input)
                                 .Commit(conn);
                     }
 
                     trans.Complete();
-
                 }
-                TriggersBulk<TSource, DB>.RaiseInserted(entities, DataContext);
+
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseInserted(entities, DataContext, identificator);
+                }
                 return num;
             }
         }
@@ -110,18 +116,21 @@
             return entities.Count;
         }
 
-        public virtual int BulkUpdate<TSource>(List<TSource> entities) where TSource : BaseEntity
+        public virtual int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
         {
             if (!entities.Any())
                 return 0;
 
             lock (_lockObject)
             {
-                TriggersBulk<TSource, DB>.RaiseUpdating(entities, DataContext);
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseUpdating(entities, DataContext, identificator);
+                }
 
                 var config = new MapperConfiguration(conf =>
                 {
-                    conf.CreateMap<TSource, TSource>().MaxDepth(1).ForAllMembers(c =>
+                    conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
                     {
                         if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
                             return;
@@ -132,30 +141,35 @@
                 });
                 var mapper = config.CreateMapper();
 
-                var distEnts = entities.Distinct(new GenericCompare<TSource>(x => x.Id)).ToList();
-                var ent = mapper.Map<List<TSource>>(distEnts);
-                ent.ForEach(x => x.DateModified = DateTime.UtcNow);
+                var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
+                var ent = mapper.Map<List<T>>(distEnts);
+                //ent.ForEach(x => x.DateModified = DateTime.UtcNow);
 
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
                     using (var conn = new SqlConnection(connectionString))
                     {
-                        num = new BulkOperations().Setup<TSource>()
+                        num = new BulkOperations().Setup<T>()
                                 .ForCollection(ent)
-                                .WithTable(DataContext.GetTableName<TSource>())
+                                .WithTable(DataContext.GetTableName<T>())
                                 .AddAllColumns()
                                 .BulkUpdate()
-                                .MatchTargetOn(x => x.Id)
+                                .MatchTargetOn(identificator)
                                 .Commit(conn);
                     }
 
                     trans.Complete();
                 }
-                TriggersBulk<TSource, DB>.RaiseUpdated(entities, DataContext);
+
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseUpdated(entities, DataContext, identificator);
+                }
                 return num;
             }
         }
+
 
         public virtual int ClassicBulkUpdate(List<T> entities)
         {
@@ -169,43 +183,61 @@
             return entities.Count;
         }
 
-        public virtual int BulkDelete<TSource>(List<TSource> entities) where TSource : BaseEntity
+        public virtual int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
         {
             if (!entities.Any())
                 return 0;
 
             lock (_lockObject)
             {
-                TriggersBulk<TSource, DB>.RaiseDeleting(entities, DataContext);
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseDeleting(entities, DataContext, identificator);
+                }
+
                 int num;
                 using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
                     using (var conn = new SqlConnection(connectionString))
                     {
-                        num = new BulkOperations().Setup<TSource>()
+                        num = new BulkOperations().Setup<T>()
                                 .ForCollection(entities)
-                                .WithTable(DataContext.GetTableName<TSource>())
-                                .AddColumn(x => x.Id)
+                                .WithTable(DataContext.GetTableName<T>())
+                                .AddColumn(identificator)
                                 .BulkDelete()
-                                .MatchTargetOn(x => x.Id)
+                                .MatchTargetOn(identificator)
                                 .Commit(conn);
                     }
 
                     trans.Complete();
                 }
-                TriggersBulk<TSource, DB>.RaiseDeleted(entities, DataContext);
+
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseDeleted(entities, DataContext);
+                }
+
                 return num;
             }
         }
 
-        public virtual int BulkDelete<TSource>(Expression<Func<TSource, bool>> where) where TSource : BaseEntity
+        public virtual int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true)
         {
             lock (_lockObject)
             {
-                var entities = DataContext.Set<TSource>().Where(where).ToList();
-                TriggersBulk<TSource, DB>.RaiseDeleting(entities, DataContext);
-                var bulkDelete = DataContext.Set<TSource>().Where(where).Delete();
-                TriggersBulk<TSource, DB>.RaiseDeleted(entities, DataContext);
+                var entities = DataContext.Set<T>().Where(where).ToList();
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseDeleting(entities, DataContext);
+                }
+
+                var bulkDelete = DataContext.Set<T>().Where(where).Delete();
+
+                if (fireTriggers)
+                {
+                    TriggersBulk<T, DB>.RaiseDeleted(entities, DataContext);
+                }
+
                 return bulkDelete;
             }
         }
