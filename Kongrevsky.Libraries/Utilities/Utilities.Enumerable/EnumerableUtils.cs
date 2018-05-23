@@ -300,6 +300,9 @@
         /// <returns></returns>
         public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> iEnumerable, string propertyName, bool isDesc)
         {
+            if (iEnumerable == null || string.IsNullOrWhiteSpace(propertyName))
+                return iEnumerable;
+
             var propertyInfo = typeof(T).GetProperty(propertyName);
 
             if (propertyInfo == null)
