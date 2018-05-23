@@ -19,11 +19,11 @@
     {
         #region Constants
 
-        private const string _citiesResourcePath = "Resource.Location.Resources.cities.json";
+        private const string _citiesResourcePath = "Kongrevsky.Resources.Location.Resources.cities.json";
 
-        private const string _statesResourcePath = "Resource.Location.Resources.states.json";
+        private const string _statesResourcePath = "Kongrevsky.Resources.Location.Resources.states.json";
 
-        private const string _countriesResourcePath = "Resource.Location.Resources.countries.json";
+        private const string _countriesResourcePath = "Kongrevsky.Resources.Location.Resources.countries.json";
 
         #endregion
 
