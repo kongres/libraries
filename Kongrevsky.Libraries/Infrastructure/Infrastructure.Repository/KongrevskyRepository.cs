@@ -389,7 +389,7 @@
             return query;
         }
 
-        public virtual PagingQueryable<TCast> GetPage<TCast>(PagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
+        public virtual PagingQueryable<TCast> GetPage<TCast>(KongrevskyPagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> @where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
         {
             var page = new Page(filter.PageNumber, filter.PageSize);
 

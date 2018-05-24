@@ -10,7 +10,6 @@
 
     public class PagingQueryable<T>
     {
-
         public PagingQueryable(IQueryable<T> queryable, Page page)
         {
             _page = page;
@@ -51,13 +50,12 @@
         {
             return _queryable.GetPage(_page);
         }
-
-        public class PageResult<T>
-        {
-            public IEnumerable<T> Items { get; set; }
-            public int TotalItemCount { get; set; }
-            public int PageCount { get; set; }
-        }
     }
 
+    public class PageResult<T>
+    {
+        public IEnumerable<T> Items { get; set; }
+        public int TotalItemCount { get; set; }
+        public int PageCount { get; set; }
+    }
 }

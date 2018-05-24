@@ -5,4 +5,8 @@
 
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
+  </ItemGroup>
+
 </Project>
