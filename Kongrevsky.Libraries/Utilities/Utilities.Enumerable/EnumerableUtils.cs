@@ -294,23 +294,35 @@
         /// Orders IEnumerable by property name if IEnumerable item type has such property
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="iEnumerable"></param>
+        /// <param name="enumerable"></param>
         /// <param name="propertyName"></param>
         /// <param name="isDesc"></param>
         /// <returns></returns>
-        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> iEnumerable, string propertyName, bool isDesc)
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> enumerable, string propertyName, bool isDesc)
         {
-            if (iEnumerable == null || string.IsNullOrWhiteSpace(propertyName))
-                return iEnumerable;
+            if (enumerable == null || string.IsNullOrWhiteSpace(propertyName))
+                return enumerable;
 
             var propertyInfo = typeof(T).GetProperty(propertyName);
 
             if (propertyInfo == null)
-                return iEnumerable;
+                return enumerable;
 
             return isDesc ?
-                           iEnumerable.OrderByDescending(x => propertyInfo.GetValue(x, null)) :
-                           iEnumerable.OrderBy(x => propertyInfo.GetValue(x, null));
+                           enumerable.OrderByDescending(x => propertyInfo.GetValue(x, null)) :
+                           enumerable.OrderBy(x => propertyInfo.GetValue(x, null));
+        }
+
+        /// <summary>
+        /// Does a list contain all values of another list?
+        /// </summary>
+        /// <typeparam name="T">list value type</typeparam>
+        /// <param name="containingList">the larger list we're checking in</param>
+        /// <param name="lookupList">the list to look for in the containing list</param>
+        /// <returns>true if it has everything</returns>
+        public static bool ContainsAll<T>(this IEnumerable<T> containingList, IEnumerable<T> lookupList)
+        {
+            return !lookupList.Except(containingList).Any();
         }
     }
 }
