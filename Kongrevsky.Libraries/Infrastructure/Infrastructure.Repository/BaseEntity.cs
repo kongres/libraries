@@ -11,9 +11,21 @@
             Id = Guid.NewGuid().ToString("N");
         }
 
+        /// <summary>
+        /// Set new Id for the entity
+        /// </summary>
+        /// <param name="id"></param>
         public void SetId(string id)
         {
             Id = id;
+        }
+
+        /// <summary>
+        /// Generate new Id for the entity
+        /// </summary>
+        public void ResetId()
+        {
+            Id = Guid.NewGuid().ToString("N");
         }
 
         [Key]
