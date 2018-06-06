@@ -332,7 +332,7 @@
             {
                 while (!string.IsNullOrEmpty(inputText) && inputText.StartsWith(value, comparisonType))
                 {
-                    inputText = inputText.Substring(value.Length - 1);
+                    inputText = inputText.Substring(value.Length);
                 }
             }
 
