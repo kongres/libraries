@@ -10,7 +10,7 @@
     public static class EnumUtils
     {
         /// <summary>
-        /// Returns Enum value
+        ///     Returns Enum value with CamelCase format
         /// </summary>
         /// <param name="enumValue"></param>
         /// <returns></returns>

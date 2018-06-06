@@ -57,6 +57,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.FileManager", "Infrastructure\Infrastructure.FileManager\Kongrevsky.Infrastructure.FileManager.csproj", "{013870B0-6F1C-4416-954A-763484F83AC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.Web", "Infrastructure\Kongrevsky.Infrastructure.Web\Kongrevsky.Infrastructure.Web.csproj", "{F3D07AB2-C797-4016-AD19-129748A36B42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{013870B0-6F1C-4416-954A-763484F83AC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{013870B0-6F1C-4416-954A-763484F83AC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{013870B0-6F1C-4416-954A-763484F83AC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3D07AB2-C797-4016-AD19-129748A36B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3D07AB2-C797-4016-AD19-129748A36B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3D07AB2-C797-4016-AD19-129748A36B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3D07AB2-C797-4016-AD19-129748A36B42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,6 +194,7 @@ Global
 		{5AF3C4FC-E048-42DA-8786-CA9D8547A4CF} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{9C3AF277-7AEE-49E0-8D3B-56831DC1E4A7} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{013870B0-6F1C-4416-954A-763484F83AC2} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{F3D07AB2-C797-4016-AD19-129748A36B42} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D46F8133-0CD3-457B-A289-439722F553A8}
