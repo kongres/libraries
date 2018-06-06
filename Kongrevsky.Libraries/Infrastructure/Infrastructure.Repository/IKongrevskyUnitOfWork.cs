@@ -5,8 +5,8 @@
 
     public interface IKongrevskyUnitOfWork<T> where T : KongrevskyDbContext
     {
-        void Commit();
+        void Commit(bool fireTriggers = true);
 
-        Task CommitAsync();
+        Task CommitAsync(bool fireTriggers = true);
     }
 }

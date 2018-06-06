@@ -6,6 +6,7 @@
     using AutoMapper;
     using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Attributes;
+    using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
 
@@ -31,7 +32,7 @@
             return attrs.Any(x => x.AttributeType == typeof(AccessWithoutPermissionAttribute));
         }
 
-        public static IMappingExpression<TSource, TDestination> LoadProperties<TSource, TDestination>(this IMappingExpression<TSource, TDestination> expression, PagingModel<TDestination> filter)
+        public static IMappingExpression<TSource, TDestination> LoadProperties<TSource, TDestination>(this IMappingExpression<TSource, TDestination> expression, RepositoryPagingModel<TDestination> filter)
         {
             var destType = typeof(TDestination);
 

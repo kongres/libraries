@@ -18,7 +18,7 @@
         }
 
         private object _lockObject { get; }
-        private AsyncLock _lockObjectAsync { get;  }
+        private AsyncLock _lockObjectAsync { get; }
         private T Database => _database ?? (_database = _kongrevskyDatabaseFactory.Get());
         private IKongrevskyDatabaseFactory<T> _kongrevskyDatabaseFactory { get; }
         private T _database { get; set; }
@@ -28,20 +28,30 @@
         public static Action<IEnumerable<Tuple<object, object>>> AddedAfterSaveChanges { get; set; }
         public static Action<IEnumerable<Tuple<object, object>>> RemovedAfterSaveChanges { get; set; }
 
-        public void Commit()
+        public void Commit(bool fireTriggers = true)
         {
             lock (_lockObject)
             {
-                var addedRelationships = Database.GetAddedRelationships().ToList();
-                var deletedRelationships = Database.GetDeletedRelationships().ToList();
+                if (fireTriggers)
+                {
+                    var addedRelationships = Database.GetAddedRelationships().ToList();
+                    var deletedRelationships = Database.GetDeletedRelationships().ToList();
 
-                AddedBeforeSaveChanges?.Invoke(addedRelationships);
-                RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
+                    AddedBeforeSaveChanges?.Invoke(addedRelationships);
+                    RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
-                Database.SaveChanges();
+                    Database.SaveChanges();
 
-                AddedAfterSaveChanges?.Invoke(addedRelationships);
-                RemovedAfterSaveChanges?.Invoke(deletedRelationships);
+                    AddedAfterSaveChanges?.Invoke(addedRelationships);
+                    RemovedAfterSaveChanges?.Invoke(deletedRelationships);
+                }
+                else
+                {
+                    Database.TriggersEnabled = false;
+                    Database.SaveChanges();
+                    Database.TriggersEnabled = true;
+                }
+
                 // if you get an exception when try commit changes in db you can use the following try block to catch exception
                 //try
                 //{
@@ -60,20 +70,30 @@
             }
         }
 
-        public async Task CommitAsync()
+        public async Task CommitAsync(bool fireTriggers = true)
         {
             using (await _lockObjectAsync.LockAsync())
             {
-                var addedRelationships = Database.GetAddedRelationships().ToList();
-                var deletedRelationships = Database.GetDeletedRelationships().ToList();
+                if (fireTriggers)
+                {
+                    var addedRelationships = Database.GetAddedRelationships().ToList();
+                    var deletedRelationships = Database.GetDeletedRelationships().ToList();
 
-                AddedBeforeSaveChanges?.Invoke(addedRelationships);
-                RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
+                    AddedBeforeSaveChanges?.Invoke(addedRelationships);
+                    RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
-                await Database.SaveChangesAsync(Task.Factory.CancellationToken);
+                    await Database.SaveChangesAsync(Task.Factory.CancellationToken);
 
-                AddedAfterSaveChanges?.Invoke(addedRelationships);
-                RemovedAfterSaveChanges?.Invoke(deletedRelationships);
+                    AddedAfterSaveChanges?.Invoke(addedRelationships);
+                    RemovedAfterSaveChanges?.Invoke(deletedRelationships);
+                }
+                else
+                {
+                    Database.TriggersEnabled = false;
+                    await Database.SaveChangesAsync(Task.Factory.CancellationToken);
+                    Database.TriggersEnabled = true;
+                }
+
                 // if you get an exception when try commit changes in db you can use the following try block to catch exception
                 //try
                 //{

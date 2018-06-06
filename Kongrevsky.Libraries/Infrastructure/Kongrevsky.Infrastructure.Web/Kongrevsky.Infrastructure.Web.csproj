@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.0" />
+    <PackageReference Include="FluentValidation" Version="7.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Enum\Kongrevsky.Utilities.Enum.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.File\Kongrevsky.Utilities.File.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
+    <ProjectReference Include="..\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj" />
+  </ItemGroup>
+
+</Project>

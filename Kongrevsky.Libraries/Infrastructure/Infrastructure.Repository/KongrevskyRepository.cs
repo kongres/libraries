@@ -1,5 +1,7 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
@@ -28,27 +30,31 @@
     using SqlBulkTools.Enumeration;
     using Z.EntityFramework.Plus;
 
+    #endregion
+
     public class KongrevskyRepository<T, DB> : Repository, IKongrevskyRepository<T, DB>
-        where T : class
-        where DB : KongrevskyDbContext
+            where T : class
+            where DB : KongrevskyDbContext
     {
+        private static readonly object _lockObject = new object();
+
+        private string _connectionString;
+
         public KongrevskyRepository(IKongrevskyDatabaseFactory<DB> kongrevskyDatabaseFactory)
         {
             _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
             Dbset = DataContext.Set<T>();
         }
 
-        private static readonly object _lockObject = new object();
         private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
+
         private DB _dataContext { get; set; }
 
         protected DbSet<T> Dbset { get; }
+
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
-        protected IQueryable<TSet> GetDbSet<TSet>() where TSet : class => DataContext.Set<TSet>().AsExpandable();
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
-
-        private string _connectionString;
 
         public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
         {
@@ -63,16 +69,16 @@
                 }
 
                 var config = new MapperConfiguration(conf =>
-                {
-                    conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
-                    {
-                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                            return;
-                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                            return;
-                        c.Ignore();
-                    });
-                });
+                                                     {
+                                                         conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
+                                                                                                          {
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                                                                                                                  return;
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                                                                                                                  return;
+                                                                                                              c.Ignore();
+                                                                                                          });
+                                                     });
                 var mapper = config.CreateMapper();
 
                 var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
@@ -100,6 +106,7 @@
                 {
                     TriggersBulk<T, DB>.RaiseInserted(entities, DataContext, identificator);
                 }
+
                 return num;
             }
         }
@@ -129,16 +136,16 @@
                 }
 
                 var config = new MapperConfiguration(conf =>
-                {
-                    conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
-                    {
-                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                            return;
-                        if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                            return;
-                        c.Ignore();
-                    });
-                });
+                                                     {
+                                                         conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
+                                                                                                          {
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
+                                                                                                                  return;
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
+                                                                                                                  return;
+                                                                                                              c.Ignore();
+                                                                                                          });
+                                                     });
                 var mapper = config.CreateMapper();
 
                 var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
@@ -166,10 +173,10 @@
                 {
                     TriggersBulk<T, DB>.RaiseUpdated(entities, DataContext, identificator);
                 }
+
                 return num;
             }
         }
-
 
         public virtual int ClassicBulkUpdate(List<T> entities)
         {
@@ -278,6 +285,7 @@
                                     .MatchTargetOn(x => (x as BaseEntity).Id)
                                     .Commit(conn);
                         }
+
                         trans.Complete();
                         return num;
                     }
@@ -294,6 +302,7 @@
                     return num;
                 }
             }
+
             return num;
         }
 
@@ -389,7 +398,7 @@
             return query;
         }
 
-        public virtual PagingQueryable<TCast> GetPage<TCast>(PagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
+        public virtual PagingQueryable<TCast> GetPage<TCast>(RepositoryPagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> @where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
         {
             var page = new Page(filter.PageNumber, filter.PageSize);
 
@@ -445,6 +454,7 @@
                         orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
                 }
             }
+
             return new PagingQueryable<TCast>(orderedQuery, page);
         }
 
@@ -463,6 +473,8 @@
 
             return query.FirstOrDefaultAsync();
         }
+
+        protected IQueryable<TSet> GetDbSet<TSet>() where TSet : class => DataContext.Set<TSet>().AsExpandable();
 
         private IQueryable<T> AppendIncludes(IQueryable<T> query, IEnumerable<Expression<Func<T, object>>> includes)
         {

@@ -11,7 +11,7 @@
     public static class AssemblyUtil
     {
         /// <summary>
-        /// Returns last building DateTime
+        ///     Returns last building DateTime
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -30,7 +30,7 @@
         }
 
         /// <summary>
-        /// Returns build number
+        ///     Returns build number
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>

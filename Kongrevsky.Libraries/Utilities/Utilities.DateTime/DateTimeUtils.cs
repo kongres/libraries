@@ -3,6 +3,7 @@
     #region << Using >>
 
     using System;
+    using System.Data.SqlTypes;
     using System.Globalization;
     using Kongrevsky.Utilities.DateTime.Models;
 
@@ -242,6 +243,20 @@
             return dateTime1 > dateTime2 ?
                            dateTime1 - dateTime2 :
                            dateTime2 - dateTime1;
+        }
+
+        /// <summary>
+        /// Return <see cref="SqlDateTime.MinValue"/> if <paramref name="sqlDateTime"/> is less than <see cref="SqlDateTime.MinValue"/>
+        /// And return <see cref="SqlDateTime.MaxValue"/> if <paramref name="sqlDateTime"/> is greater than <see cref="SqlDateTime.MaxValue"/>
+        /// </summary>
+        /// <returns></returns>
+        public static DateTime CutDateTimeForSql(this DateTime sqlDateTime)
+        {
+            if (sqlDateTime < (DateTime)SqlDateTime.MinValue)
+                return (DateTime)SqlDateTime.MinValue;
+            if (sqlDateTime > (DateTime)SqlDateTime.MaxValue)
+                return (DateTime)SqlDateTime.MaxValue;
+            return sqlDateTime;
         }
     }
 }
