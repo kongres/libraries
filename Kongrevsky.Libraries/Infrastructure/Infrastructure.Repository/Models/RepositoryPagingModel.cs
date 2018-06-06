@@ -7,9 +7,9 @@
 
     #endregion
 
-    public class KongrevskyPagingModel<T> : PagingModel<T>
+    public class RepositoryPagingModel<T> : PagingModel<T>
     {
-        public KongrevskyPagingModel()
+        public RepositoryPagingModel()
         {
             LoadProperties = new List<string>();
             Filters = new List<string>();
@@ -18,12 +18,12 @@
         public List<string> LoadProperties { get; set; }
 
         /// <summary>
-        /// Item: "propertyName1==value1||propertyName2==value2" or "propertyName==" (to check for null or empty)
+        ///     Item: "propertyName1==value1||propertyName2==value2" or "propertyName==" (to check for null or empty)
         /// </summary>
         public List<string> Filters { get; set; }
 
         /// <summary>
-        /// Distinct result by this field
+        ///     Distinct result by this field
         /// </summary>
         public string Distinct { get; set; }
     }

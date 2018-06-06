@@ -11,14 +11,27 @@
     using System.Data.Entity.Infrastructure;
     using System.Linq;
     using System.Linq.Dynamic;
+    using System.Linq.Expressions;
 
     #endregion
 
     public static class DbContextUtils
     {
+        /// <summary>
+        ///     Removes collection of entities got by predicate from the context underlying the set with each entity being put into
+        ///     the Deleted state such that it will be deleted from the database when SaveChanges is called.
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="set">An <see cref="T:System.Linq.IQueryable`1" /> to filter to delete.</param>
+        /// <param name="where">A function to test each element for a condition</param>
+        public static void RemoveRange<TEntity>(this DbSet<TEntity> set, Expression<Func<TEntity, bool>> where) where TEntity : class
+        {
+            var entities = set.Where(where).ToList();
+            set.RemoveRange(entities);
+        }
 
         /// <summary>
-        /// Returns Table name 
+        ///     Returns Table name
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="context"></param>
@@ -35,7 +48,7 @@
         }
 
         /// <summary>
-        /// Returns Entity by specified Id
+        ///     Returns Entity by specified Id
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="context"></param>
@@ -65,7 +78,7 @@
         }
 
         /// <summary>
-        /// Returns Entity by specified EntityKey
+        ///     Returns Entity by specified EntityKey
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="context"></param>
@@ -74,8 +87,8 @@
         public static object FindRecordByEntityKey<T>(this T context, EntityKey entityKey) where T : DbContext
         {
             var sets = context.GetType().GetProperties()
-                              .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
-                              .ToList();
+                    .Where(p => p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                    .ToList();
 
             var set = sets.FirstOrDefault(x => x.Name == entityKey.EntitySetName);
 
@@ -101,7 +114,7 @@
         }
 
         /// <summary>
-        /// Returns all added relationships
+        ///     Returns all added relationships
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -111,7 +124,7 @@
         }
 
         /// <summary>
-        /// Returns all deleted relationships
+        ///     Returns all deleted relationships
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -126,11 +139,11 @@
             var objectContext = ((IObjectContextAdapter)context).ObjectContext;
 
             return objectContext
-                   .ObjectStateManager
-                   .GetObjectStateEntries(relationshipState)
-                   .Where(e => e.IsRelationship)
-                   .Select(
-                           e => Tuple.Create(context.FindRecordByEntityKey((EntityKey)getValue(e, 0)), context.FindRecordByEntityKey((EntityKey)getValue(e, 1))));
+                    .ObjectStateManager
+                    .GetObjectStateEntries(relationshipState)
+                    .Where(e => e.IsRelationship)
+                    .Select(
+                            e => Tuple.Create(context.FindRecordByEntityKey((EntityKey)getValue(e, 0)), context.FindRecordByEntityKey((EntityKey)getValue(e, 1))));
         }
 
         private static string GetStringProperty(MetadataItem entitySet, string propertyName)
@@ -157,12 +170,12 @@
             var metadata = ((IObjectContextAdapter)context).ObjectContext.MetadataWorkspace;
 
             var entitySets = metadata.GetItemCollection(DataSpace.SSpace)
-                                     .GetItems<EntityContainer>()
-                                     .Single()
-                                     .BaseEntitySets
-                                     .OfType<EntitySet>()
-                                     .Where(s => !s.MetadataProperties.Contains("Type") || s.MetadataProperties["Type"].ToString() == "Tables")
-                                     .ToList();
+                    .GetItems<EntityContainer>()
+                    .Single()
+                    .BaseEntitySets
+                    .OfType<EntitySet>()
+                    .Where(s => !s.MetadataProperties.Contains("Type") || s.MetadataProperties["Type"].ToString() == "Tables")
+                    .ToList();
 
             var entitySet = entitySets.FirstOrDefault(t => t.Name == entityName) ?? entitySets.FirstOrDefault(t => t.Name == entityBaseName);
 

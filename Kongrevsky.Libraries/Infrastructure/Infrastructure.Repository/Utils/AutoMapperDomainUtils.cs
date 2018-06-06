@@ -32,7 +32,7 @@
             return attrs.Any(x => x.AttributeType == typeof(AccessWithoutPermissionAttribute));
         }
 
-        public static IMappingExpression<TSource, TDestination> LoadProperties<TSource, TDestination>(this IMappingExpression<TSource, TDestination> expression, KongrevskyPagingModel<TDestination> filter)
+        public static IMappingExpression<TSource, TDestination> LoadProperties<TSource, TDestination>(this IMappingExpression<TSource, TDestination> expression, RepositoryPagingModel<TDestination> filter)
         {
             var destType = typeof(TDestination);
 
