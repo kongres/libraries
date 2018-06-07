@@ -9,4 +9,8 @@
 
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kongrevsky.Utilities.DateTime" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="LinqKit" Version="1.1.15" />
   </ItemGroup>
