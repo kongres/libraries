@@ -1,12 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-
+    <AssemblyName>Kongrevsky.Infrastructure.Models</AssemblyName>
+    <PackageId>Kongrevsky.Infrastructure.Models</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Authors>Valikovsky Igor</Authors>
+    <Description>Infrastructure Common Models</Description>
+    <Copyright>Valikovsky Igor</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
-  </ItemGroup>
 
 </Project>
