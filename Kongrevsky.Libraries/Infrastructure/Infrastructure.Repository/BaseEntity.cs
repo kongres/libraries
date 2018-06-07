@@ -1,8 +1,12 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System;
     using System.ComponentModel.DataAnnotations;
     using EntityFramework.Triggers;
+
+    #endregion
 
     public class BaseEntity : BaseEntityWithoutKey
     {
@@ -11,8 +15,11 @@
             Id = Guid.NewGuid().ToString("N");
         }
 
+        [Key]
+        public string Id { get; private set; }
+
         /// <summary>
-        /// Set new Id for the entity
+        ///     Set new Id for the entity
         /// </summary>
         /// <param name="id"></param>
         public void SetId(string id)
@@ -21,15 +28,12 @@
         }
 
         /// <summary>
-        /// Generate new Id for the entity
+        ///     Generate new Id for the entity
         /// </summary>
         public void ResetId()
         {
             Id = Guid.NewGuid().ToString("N");
         }
-
-        [Key]
-        public string Id { get; private set; }
     }
 
     public class BaseEntityWithoutKey

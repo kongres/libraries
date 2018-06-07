@@ -1,9 +1,10 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Attributes
 {
+    #region << Using >>
+
     using System;
 
-    public class DefaultSortPropertyAttribute : Attribute
-    {
-        
-    }
+    #endregion
+
+    public class DefaultSortPropertyAttribute : Attribute { }
 }

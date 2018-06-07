@@ -1,10 +1,13 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System;
     using System.Data;
-    using System.Data.Entity;
     using System.Linq;
     using System.Threading;
+
+    #endregion
 
     public class KongrevskyDatabaseFactory<T> : IKongrevskyDatabaseFactory<T> where T : KongrevskyDbContext
     {
@@ -14,6 +17,7 @@
         }
 
         private T _dataContext { get; set; }
+
         public T Get()
         {
             var context = _dataContext;
@@ -36,8 +40,10 @@
                 {
                     e = exc;
                 }
+
                 Thread.Sleep(1000);
             }
+
             throw e;
         }
 

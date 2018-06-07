@@ -1,12 +1,15 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using EntityFramework.Triggers;
     using Kongrevsky.Utilities.EF6;
     using Nito.AsyncEx;
+
+    #endregion
 
     public class KongrevskyUnitOfWork<T> : IKongrevskyUnitOfWork<T> where T : KongrevskyDbContext
     {
@@ -18,14 +21,21 @@
         }
 
         private object _lockObject { get; }
+
         private AsyncLock _lockObjectAsync { get; }
+
         private T Database => _database ?? (_database = _kongrevskyDatabaseFactory.Get());
+
         private IKongrevskyDatabaseFactory<T> _kongrevskyDatabaseFactory { get; }
+
         private T _database { get; set; }
 
         public static Action<IEnumerable<Tuple<object, object>>> AddedBeforeSaveChanges { get; set; }
+
         public static Action<IEnumerable<Tuple<object, object>>> RemovedBeforeSaveChanges { get; set; }
+
         public static Action<IEnumerable<Tuple<object, object>>> AddedAfterSaveChanges { get; set; }
+
         public static Action<IEnumerable<Tuple<object, object>>> RemovedAfterSaveChanges { get; set; }
 
         public void Commit(bool fireTriggers = true)

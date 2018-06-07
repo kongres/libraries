@@ -1,5 +1,7 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Infrastructure
 {
+    #region << Using >>
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
@@ -7,12 +9,13 @@
     using System.Linq;
     using System.Reflection;
 
+    #endregion
+
     /// <summary>
-    /// Convention to support binding private or protected properties to EF columns.
+    ///     Convention to support binding private or protected properties to EF columns.
     /// </summary>
     public class NonPublicColumnAttributeConvention : Convention
     {
-
         public NonPublicColumnAttributeConvention()
         {
             Types().Having(NonPublicProperties)

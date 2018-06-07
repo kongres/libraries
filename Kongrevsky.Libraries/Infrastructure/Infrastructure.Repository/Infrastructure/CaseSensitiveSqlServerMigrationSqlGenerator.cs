@@ -1,9 +1,13 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Infrastructure
 {
+    #region << Using >>
+
     using System.Data.Entity.Migrations.Model;
     using System.Data.Entity.SqlServer;
     using Kongrevsky.Infrastructure.Repository.Attributes;
     using Kongrevsky.Utilities.String;
+
+    #endregion
 
     public class CaseSensitiveSqlServerMigrationSqlGenerator : SqlServerMigrationSqlGenerator
     {

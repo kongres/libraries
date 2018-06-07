@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
@@ -9,6 +9,11 @@
     <PackageReference Include="AutoMapper" Version="7.0.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
+    <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
     <PackageReference Include="PagedList" Version="1.17.0" />
@@ -16,15 +21,4 @@
     <PackageReference Include="LinqKit" Version="1.1.15" />
     <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.8.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Utilities\Utilities.EF6\Kongrevsky.Utilities.EF6.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Expression\Kongrevsky.Utilities.Expression.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Reflection\Kongrevsky.Utilities.Reflection.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.String\Kongrevsky.Utilities.String.csproj" />
-    <ProjectReference Include="..\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj" />
-  </ItemGroup>
-
 </Project>

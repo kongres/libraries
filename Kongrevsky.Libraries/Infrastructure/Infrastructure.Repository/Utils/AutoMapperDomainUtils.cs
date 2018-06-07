@@ -1,14 +1,17 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Utils
 {
+    #region << Using >>
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using AutoMapper;
-    using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Attributes;
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
+
+    #endregion
 
     public static class AutoMapperDomainUtils
     {
@@ -19,10 +22,7 @@
 
         public static IConfigurationProvider GetConfigurationProvider(Action<IMapperConfigurationExpression> configure)
         {
-            var config = new MapperConfiguration(conf =>
-                                                 {
-                                                     configure?.Invoke(conf);
-                                                 });
+            var config = new MapperConfiguration(conf => { configure?.Invoke(conf); });
             return config;
         }
 
@@ -71,14 +71,14 @@
                         properties.Add(orderProperty.Name);
                 }
             }
+
             var orderPropertyDefault = infos.FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
             if (orderPropertyDefault != null && !properties.Contains(orderPropertyDefault.Name, new GenericCompare<string>(x => x.ToLowerInvariant())))
                 properties.Add(orderPropertyDefault.Name);
 
-
             if (filter.Filters?.Any() ?? false)
             {
-                var propertyValuePairs = QueryableUtils.ToPropertyValuePairs(filter.Filters,destType);
+                var propertyValuePairs = QueryableUtils.ToPropertyValuePairs(filter.Filters, destType);
                 properties.AddRange(propertyValuePairs.SelectMany(x => x.Select(c => c.Property.Name)));
             }
 
