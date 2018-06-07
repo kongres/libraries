@@ -1,7 +1,11 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Infrastructure
 {
+    #region << Using >>
+
     using System.Data.Entity;
     using System.Data.Entity.SqlServer;
+
+    #endregion
 
     public class KongrevskyDbContextConfig : DbConfiguration
     {
@@ -13,7 +17,7 @@
 
         public static void SetConfiguration()
         {
-            DbConfiguration.SetConfiguration(new KongrevskyDbContextConfig());
+            SetConfiguration(new KongrevskyDbContextConfig());
         }
     }
 }

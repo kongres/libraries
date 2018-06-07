@@ -1,7 +1,10 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
-    using System.Data.Entity;
+    #region << Using >>
+
     using System.Threading.Tasks;
+
+    #endregion
 
     public interface IKongrevskyUnitOfWork<T> where T : KongrevskyDbContext
     {

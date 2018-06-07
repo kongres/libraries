@@ -1,8 +1,13 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Utils
 {
+    #region << Using >>
+
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
+    using Kongrevsky.Utilities.Expression;
     using SqlBulkTools;
+
+    #endregion
 
     internal static class BulkOperationsUtils
     {
@@ -15,7 +20,7 @@
                     continue;
 
                 var columnAttribute = attrs.First() as ColumnAttribute;
-                bulk.CustomColumnMapping(Kongrevsky.Utilities.Expression.ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                bulk.CustomColumnMapping(ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
             }
 
             return bulk;

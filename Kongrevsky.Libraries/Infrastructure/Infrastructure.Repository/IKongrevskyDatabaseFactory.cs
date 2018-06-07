@@ -1,8 +1,11 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System;
-    using System.Data.Entity;
     using System.Linq;
+
+    #endregion
 
     public interface IKongrevskyDatabaseFactory<T> : IDisposable where T : KongrevskyDbContext
     {

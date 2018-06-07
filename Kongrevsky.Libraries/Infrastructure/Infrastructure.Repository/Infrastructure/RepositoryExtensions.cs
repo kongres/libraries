@@ -1,8 +1,12 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Infrastructure
 {
+    #region << Using >>
+
     using System;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
+
+    #endregion
 
     public static class RepositoryExtensions
     {

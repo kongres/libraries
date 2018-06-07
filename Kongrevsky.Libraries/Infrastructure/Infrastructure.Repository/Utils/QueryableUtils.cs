@@ -1,5 +1,7 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Utils
 {
+    #region << Using >>
+
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -15,8 +17,17 @@
     using Kongrevsky.Utilities.Reflection;
     using LinqKit;
 
+    #endregion
+
     internal static class QueryableUtils
     {
+        public enum OperationFilter
+        {
+            Equal,
+
+            FullEqual
+        }
+
         public static IOrderedQueryable<T> OrderByDescendingWithNullLowPriority<T, Target>(this IQueryable<T> queryable, Expression<Func<T, Target>> expression)
         {
             if (typeof(Target) == typeof(string))
@@ -86,6 +97,7 @@
                 var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.OrderBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
+
             if (property.PropertyType.IsEnum)
             {
                 var enumType = property.PropertyType;
@@ -99,12 +111,13 @@
                         .Reverse()
                         .Aggregate((Expression)null,
                                    (next, item) => next == null
-                                       ? (Expression)
-                                       Expression.Constant(item.ordinal)
-                                       : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
+                                           ? (Expression)
+                                           Expression.Constant(item.ordinal)
+                                           : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
                 var expr = Expression.Lambda<Func<T, int>>(body, strExpr.Parameters[0]);
                 return queryable.OrderBy(expr);
             }
+
             if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
             {
                 var enumType = property.PropertyType.GenericTypeArguments[0];
@@ -118,12 +131,13 @@
                         .Reverse()
                         .Aggregate((Expression)null,
                                    (next, item) => next == null
-                                       ? (Expression)
-                                       Expression.Constant(item.ordinal)
-                                       : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
+                                           ? (Expression)
+                                           Expression.Constant(item.ordinal)
+                                           : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
                 var expr = Expression.Lambda<Func<T, int>>(body, strExpr.Parameters[0]);
                 return queryable.OrderBy(x => strExpr.Invoke(x) == null).ThenBy(expr);
             }
+
             if (!property.PropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
@@ -163,6 +177,7 @@
                 var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.OrderByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
+
             if (property.PropertyType.IsEnum)
             {
                 var enumType = property.PropertyType;
@@ -176,12 +191,13 @@
                         .Reverse()
                         .Aggregate((Expression)null,
                                    (next, item) => next == null
-                                       ? (Expression)
-                                       Expression.Constant(item.ordinal)
-                                       : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
+                                           ? (Expression)
+                                           Expression.Constant(item.ordinal)
+                                           : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
                 var expr = Expression.Lambda<Func<T, int>>(body, strExpr.Parameters[0]);
                 return queryable.OrderByDescending(expr);
             }
+
             if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
             {
                 var enumType = property.PropertyType.GenericTypeArguments[0];
@@ -195,12 +211,13 @@
                         .Reverse()
                         .Aggregate((Expression)null,
                                    (next, item) => next == null
-                                       ? (Expression)
-                                       Expression.Constant(item.ordinal)
-                                       : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
+                                           ? (Expression)
+                                           Expression.Constant(item.ordinal)
+                                           : Expression.Condition(Expression.Equal(strExpr.Body, Expression.Constant(item.value)), Expression.Constant(item.ordinal), next));
                 var expr = Expression.Lambda<Func<T, int>>(body, strExpr.Parameters[0]);
                 return queryable.OrderByDescending(x => strExpr.Invoke(x) == null).ThenByDescending(expr);
             }
+
             if (!property.PropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
@@ -239,6 +256,7 @@
                 var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.ThenBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
+
             if (!property.PropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
@@ -278,6 +296,7 @@
                 var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
                 return queryable.ThenByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
+
             if (!property.PropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
@@ -337,7 +356,6 @@
             if (!conditionKeyPairs.Any())
                 return Expression.Lambda<Func<T, bool>>(Expression.Constant(true), parameter);
 
-
             Expression GetExpression(PropertyInfo property, string value)
             {
                 var expProp = Expression.Property(parameter, property.Name);
@@ -353,6 +371,7 @@
                             return Expression.Constant(true);
                         return Expression.Equal(Expression.Call(null, countMethod, expProp), Expression.Constant(0));
                     }
+
                     return Expression.Equal(expProp, Expression.Constant(null, property.PropertyType));
                 }
 
@@ -360,6 +379,7 @@
                 {
                     return Expression.Call(expProp, typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) }), Expression.Constant(value, typeof(string)));
                 }
+
                 if (property.PropertyType == typeof(DateTime))
                 {
                     if (!DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset intValueOffset))
@@ -370,6 +390,7 @@
                     var callDateDiff = Expression.Call(null, dateDiff, Expression.Constant(day), Expression.Convert(expProp, typeof(DateTime?)), Expression.Convert(Expression.Constant(intValue), typeof(DateTime?)));
                     return Expression.Equal(callDateDiff, Expression.Convert(Expression.Constant(0), typeof(int?)));
                 }
+
                 if (property.PropertyType == typeof(DateTime?))
                 {
                     if (!DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset intValueOffset))
@@ -381,12 +402,14 @@
                     var callDateDiff = Expression.Call(null, dateDiff, Expression.Constant(day), Expression.Convert(expProp, typeof(DateTime?)), Expression.Convert(Expression.Constant(intValue), typeof(DateTime?)));
                     return Expression.And(hasValue, Expression.Equal(callDateDiff, Expression.Convert(Expression.Constant(0), typeof(int?))));
                 }
+
                 if (property.PropertyType == typeof(int))
                 {
                     if (!value.TryConvertToType(out int intValue))
                         return Expression.Constant(true);
                     return Expression.Equal(expProp, Expression.Constant(intValue));
                 }
+
                 if (property.PropertyType == typeof(int?))
                 {
                     if (!value.TryConvertToType(out int intValue))
@@ -394,6 +417,7 @@
                     var memberExpression = expProp;
                     return Expression.And(Expression.Property(memberExpression, nameof(Nullable<double>.HasValue)), Expression.Equal(Expression.Property(memberExpression, nameof(Nullable<double>.Value)), Expression.Constant(intValue)));
                 }
+
                 if (property.PropertyType == typeof(double))
                 {
                     if (!value.TryConvertToType(out double intValue))
@@ -402,6 +426,7 @@
                     var memberExpression = expProp;
                     return Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(memberExpression, Expression.Constant(intValue))), Expression.Constant((double)0.1));
                 }
+
                 if (property.PropertyType == typeof(double?))
                 {
                     if (!value.TryConvertToType(out double intValue))
@@ -410,6 +435,7 @@
                     var memberExpression = expProp;
                     return Expression.And(Expression.Property(memberExpression, nameof(Nullable<double>.HasValue)), Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(Expression.Property(memberExpression, nameof(Nullable<double>.Value)), Expression.Constant(intValue))), Expression.Constant((double)0.1)));
                 }
+
                 if (property.PropertyType == typeof(decimal))
                 {
                     if (!value.TryConvertToType(out decimal intValue))
@@ -418,6 +444,7 @@
                     var memberExpression = expProp;
                     return Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(memberExpression, Expression.Constant(intValue))), Expression.Constant((decimal)0.1));
                 }
+
                 if (property.PropertyType == typeof(decimal?))
                 {
                     if (!value.TryConvertToType(out decimal intValue))
@@ -426,6 +453,7 @@
                     var memberExpression = expProp;
                     return Expression.And(Expression.Property(memberExpression, nameof(Nullable<decimal>.HasValue)), Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(Expression.Property(memberExpression, nameof(Nullable<decimal>.Value)), Expression.Constant(intValue))), Expression.Constant((decimal)0.1)));
                 }
+
                 if (property.PropertyType == typeof(float))
                 {
                     if (!value.TryConvertToType(out float intValue))
@@ -434,6 +462,7 @@
                     var memberExpression = expProp;
                     return Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(memberExpression, Expression.Constant(intValue))), Expression.Constant((float)0.1));
                 }
+
                 if (property.PropertyType == typeof(float?))
                 {
                     if (!value.TryConvertToType(out float intValue))
@@ -442,18 +471,21 @@
                     var memberExpression = expProp;
                     return Expression.And(Expression.Property(memberExpression, nameof(Nullable<float>.HasValue)), Expression.LessThanOrEqual(Expression.Call(null, methodInfo, Expression.Subtract(Expression.Property(memberExpression, nameof(Nullable<float>.Value)), Expression.Constant(intValue))), Expression.Constant((float)0.1)));
                 }
+
                 if (property.PropertyType == typeof(bool))
                 {
                     if (!value.TryConvertToType(out bool intValue))
                         return Expression.Constant(true);
                     return Expression.Equal(expProp, Expression.Constant(intValue));
                 }
+
                 if (property.PropertyType == typeof(bool?))
                 {
                     if (!value.TryConvertToType(out bool intValue))
                         return Expression.Constant(true);
                     return Expression.And(Expression.Property(expProp, nameof(Nullable<bool>.HasValue)), Expression.Equal(Expression.Property(expProp, nameof(Nullable<bool>.Value)), Expression.Constant(intValue)));
                 }
+
                 if (property.PropertyType.GetInterfaces().Any(x => x == typeof(IEnumerable)) && property.PropertyType.GetGenericArguments().FirstOrDefault() == typeof(ItemDto))
                 {
                     var parameterExpression = Expression.Parameter(typeof(ItemDto), "i");
@@ -464,12 +496,14 @@
                         return Expression.Constant(true);
                     return Expression.Call(null, anyMethod, expProp, anyExpr);
                 }
+
                 if (property.PropertyType.IsGenericType && (property.PropertyType.GetGenericArguments().FirstOrDefault()?.IsEnum ?? false))
                 {
                     if (value.TryConvertToType(property.PropertyType.GetGenericArguments().FirstOrDefault(), out var enumValue))
                         return Expression.And(Expression.Property(expProp, nameof(Nullable<bool>.HasValue)), Expression.Equal(Expression.Property(expProp, nameof(Nullable<bool>.Value)), Expression.Constant(enumValue)));
                     return Expression.Constant(true);
                 }
+
                 if (property.PropertyType.IsEnum)
                 {
                     if (value.TryConvertToType(property.PropertyType, out var enumValue))
@@ -492,49 +526,50 @@
             return conditions
                     .Where(x => x.Contains(separatorEqual))
                     .Select(x =>
-                    {
-                        var oneRow = x.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
-                        return oneRow.Select(c =>
-                        {
-                            string[] cond;
-                            string separator;
-                            if (c.Contains(separatorFullEqual))
                             {
-                                separator = separatorFullEqual;
-                                cond = c.Split(new[] { separatorFullEqual }, StringSplitOptions.None);
-                            }
-                            else if (c.Contains(separatorEqual))
-                            {
-                                separator = separatorEqual;
-                                cond = c.Split(new[] { separatorEqual }, StringSplitOptions.None);
-                            }
-                            else
-                            {
-                                return null;
-                            }
+                                var oneRow = x.Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries);
+                                return oneRow.Select(c =>
+                                                     {
+                                                         string[] cond;
+                                                         string separator;
+                                                         if (c.Contains(separatorFullEqual))
+                                                         {
+                                                             separator = separatorFullEqual;
+                                                             cond = c.Split(new[] { separatorFullEqual }, StringSplitOptions.None);
+                                                         }
+                                                         else if (c.Contains(separatorEqual))
+                                                         {
+                                                             separator = separatorEqual;
+                                                             cond = c.Split(new[] { separatorEqual }, StringSplitOptions.None);
+                                                         }
+                                                         else
+                                                         {
+                                                             return null;
+                                                         }
 
-                            var propertyName = cond.ElementAtOrDefault(0);
-                            var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
-                            var value = string.Join(separator, cond.Skip(1));
-                            var propertyFilterItem = new PropertyFilterItem()
-                            {
-                                Property = property,
-                                Value = value
-                            };
-                            switch (separator)
-                            {
-                                case separatorEqual:
-                                    propertyFilterItem.Operation = OperationFilter.Equal;
-                                    break;
-                                case separatorFullEqual:
-                                    propertyFilterItem.Operation = OperationFilter.FullEqual;
-                                    break;
-                            }
-                            return propertyFilterItem;
-                        })
-                                .Where(c => c?.Property != null)
-                                .ToList();
-                    })
+                                                         var propertyName = cond.ElementAtOrDefault(0);
+                                                         var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
+                                                         var value = string.Join(separator, cond.Skip(1));
+                                                         var propertyFilterItem = new PropertyFilterItem()
+                                                                                  {
+                                                                                          Property = property,
+                                                                                          Value = value
+                                                                                  };
+                                                         switch (separator)
+                                                         {
+                                                             case separatorEqual:
+                                                                 propertyFilterItem.Operation = OperationFilter.Equal;
+                                                                 break;
+                                                             case separatorFullEqual:
+                                                                 propertyFilterItem.Operation = OperationFilter.FullEqual;
+                                                                 break;
+                                                         }
+
+                                                         return propertyFilterItem;
+                                                     })
+                                        .Where(c => c?.Property != null)
+                                        .ToList();
+                            })
                     .Where(x => x.Any())
                     .ToList();
         }
@@ -547,15 +582,10 @@
             }
 
             public PropertyInfo Property { get; set; }
+
             public OperationFilter Operation { get; set; }
+
             public string Value { get; set; }
         }
-
-        public enum OperationFilter
-        {
-            Equal,
-            FullEqual
-        }
     }
-
 }

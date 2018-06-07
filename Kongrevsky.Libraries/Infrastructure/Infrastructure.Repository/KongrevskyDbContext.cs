@@ -1,5 +1,7 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository
 {
+    #region << Using >>
+
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     using System.Data.Entity.ModelConfiguration.Conventions;
@@ -9,16 +11,18 @@
     using Kongrevsky.Infrastructure.Repository.Infrastructure;
     using Kongrevsky.Utilities.Object;
 
+    #endregion
+
     public class KongrevskyDbContext : DbContextWithTriggers
     {
-        public string ConnectionString { get; set; }
-
         public KongrevskyDbContext(string connectionString)
                 : base(connectionString)
         {
             ConnectionString = connectionString;
             Configure();
         }
+
+        public string ConnectionString { get; set; }
 
         private void Configure()
         {

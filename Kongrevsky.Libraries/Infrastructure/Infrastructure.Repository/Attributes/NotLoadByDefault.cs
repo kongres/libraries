@@ -1,8 +1,10 @@
-﻿namespace Kongrevsky.Infrastructure.Repository.Attributes {
+﻿namespace Kongrevsky.Infrastructure.Repository.Attributes
+{
+    #region << Using >>
+
     using System;
 
-    public class NotLoadByDefault : Attribute
-    {
+    #endregion
 
-    }
+    public class NotLoadByDefault : Attribute { }
 }
