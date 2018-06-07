@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
@@ -8,9 +8,5 @@
     <Company>Kongrevsky</Company>
 
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
-  </ItemGroup>
 
 </Project>

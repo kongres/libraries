@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{6438C9E7-E6C2-4061-8CDC-074F1DA53B21}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.All", "Utilities\Utilities.All\Kongrevsky.Utilities.All.csproj", "{4C4BF5D2-0895-4E1A-8268-94354DFA71EA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Assembly", "Utilities\Utilities.Assembly\Kongrevsky.Utilities.Assembly.csproj", "{AF8988B7-AB8B-434B-9DB1-BFD0FDAEBC6F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Cryptography", "Utilities\Utilities.Cryptography\Kongrevsky.Utilities.Cryptography.csproj", "{BDE56298-C008-443A-BF57-8261E3862586}"
@@ -57,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.FileManager", "Infrastructure\Infrastructure.FileManager\Kongrevsky.Infrastructure.FileManager.csproj", "{013870B0-6F1C-4416-954A-763484F83AC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.Web", "Infrastructure\Kongrevsky.Infrastructure.Web\Kongrevsky.Infrastructure.Web.csproj", "{F3D07AB2-C797-4016-AD19-129748A36B42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Web", "Infrastructure\Kongrevsky.Infrastructure.Web\Kongrevsky.Infrastructure.Web.csproj", "{F3D07AB2-C797-4016-AD19-129748A36B42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +63,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C4BF5D2-0895-4E1A-8268-94354DFA71EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C4BF5D2-0895-4E1A-8268-94354DFA71EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C4BF5D2-0895-4E1A-8268-94354DFA71EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C4BF5D2-0895-4E1A-8268-94354DFA71EA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF8988B7-AB8B-434B-9DB1-BFD0FDAEBC6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF8988B7-AB8B-434B-9DB1-BFD0FDAEBC6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF8988B7-AB8B-434B-9DB1-BFD0FDAEBC6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -170,7 +164,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{4C4BF5D2-0895-4E1A-8268-94354DFA71EA} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{AF8988B7-AB8B-434B-9DB1-BFD0FDAEBC6F} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{BDE56298-C008-443A-BF57-8261E3862586} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{BE378087-374E-4030-8286-7B2C8B817211} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
