@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
@@ -7,11 +7,6 @@
     <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Utilities.DateTime\Kongrevsky.Utilities.DateTime.csproj" />
-    <ProjectReference Include="..\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
