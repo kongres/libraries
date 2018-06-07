@@ -2,7 +2,6 @@
 {
     #region << Using >>
 
-    using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion

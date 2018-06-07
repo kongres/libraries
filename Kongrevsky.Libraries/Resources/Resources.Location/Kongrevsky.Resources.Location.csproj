@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
@@ -14,12 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Infrastructure\Infrastructure.Models\Kongrevsky.Infrastructure.Models.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
-    <ProjectReference Include="..\..\Utilities\Utilities.String\Kongrevsky.Utilities.String.csproj" />
-  </ItemGroup>
 </Project>
