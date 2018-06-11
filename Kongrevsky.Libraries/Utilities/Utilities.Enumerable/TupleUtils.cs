@@ -10,6 +10,22 @@
 
     public static class TupleUtils
     {
+        private static bool isTupleTypesStraight(Type item1Type, Type item2Type, Type type1, Type type2)
+        {
+            return item1Type == type1 && item2Type == type2 ||
+                   item1Type.BaseType == type1 && item2Type == type2 ||
+                   item1Type == type1 && item2Type.BaseType == type2 ||
+                   item1Type.BaseType == type1 && item2Type.BaseType == type2;
+        }
+
+        private static bool isTupleTypesReverse(Type item1Type, Type item2Type, Type type1, Type type2)
+        {
+            return item1Type == type2 && item2Type == type1 ||
+                   item1Type.BaseType == type2 && item2Type == type1 ||
+                   item1Type == type2 && item2Type.BaseType == type1 ||
+                   item1Type.BaseType == type2 && item2Type.BaseType == type1;
+        }
+
         /// <summary>
         /// Detects if Tuple values are provide specified types
         /// </summary>
@@ -19,7 +35,12 @@
         /// <returns></returns>
         public static bool IsTypes(this Tuple<object, object> tuple, Type type1, Type type2)
         {
-            return tuple.Item1.GetType().BaseType == type1 && tuple.Item2.GetType().BaseType == type2 || tuple.Item1.GetType().BaseType == type2 && tuple.Item2.GetType().BaseType == type1;
+            var item1Type = tuple.Item1.GetType();
+            var item2Type = tuple.Item2.GetType();
+
+            return isTupleTypesStraight(item1Type, item2Type, type1, type2) ||
+                   isTupleTypesReverse(item1Type, item2Type, type1, type2);
+
         }
 
         /// <summary>
@@ -31,10 +52,16 @@
         /// <returns></returns>
         public static Tuple<T1, T2> ConvertToTuple<T1, T2>(this Tuple<object, object> tuple)
         {
-            if (tuple.Item1.GetType().BaseType == typeof(T1) && tuple.Item2.GetType().BaseType == typeof(T2))
+            var item1Type = tuple.Item1.GetType();
+            var item2Type = tuple.Item2.GetType();
+
+            var type1 = typeof(T1);
+            var type2 = typeof(T2);
+
+            if (isTupleTypesStraight(item1Type, item2Type, type1, type2))
                 return new Tuple<T1, T2>((T1)tuple.Item1, (T2)tuple.Item2);
 
-            if (tuple.Item1.GetType().BaseType == typeof(T2) && tuple.Item2.GetType().BaseType == typeof(T1))
+            if (isTupleTypesReverse(item1Type, item2Type, type1, type2))
                 return new Tuple<T1, T2>((T1)tuple.Item2, (T2)tuple.Item1);
 
             return null;
