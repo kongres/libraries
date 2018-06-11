@@ -19,7 +19,7 @@
 
     #endregion
 
-    internal static class QueryableUtils
+    public static class QueryableUtils
     {
         public enum OperationFilter
         {
@@ -86,24 +86,32 @@
                 return queryable.OrderByDescendingWithNullLowPriority(propertyName);
 
             var type = typeof(T);
-            var property = type.GetProperties().FirstOrDefault(x => !string.IsNullOrEmpty(propertyName) && string.Equals(x.Name, propertyName, StringComparison.InvariantCultureIgnoreCase))
-                           ?? type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+
+            PropertyInfo property = null;
+            if (!string.IsNullOrEmpty(propertyName))
+                property = type.GetPropertyByName(propertyName);
+            if (property == null)
+            {
+                property = type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+                propertyName = property?.Name;
+            }
 
             if (property == null)
                 return queryable.OrderBy(x => true);
 
-            if (property.PropertyType == typeof(string))
+            var propertyPropertyType = property.PropertyType;
+
+            if (propertyPropertyType == typeof(string))
             {
-                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(propertyName);
                 return queryable.OrderBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
 
-            if (property.PropertyType.IsEnum)
+            if (propertyPropertyType.IsEnum)
             {
-                var enumType = property.PropertyType;
-                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(propertyName);
 
-                var enumValues = Enum.GetValues(enumType);
+                var enumValues = Enum.GetValues(propertyPropertyType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
                         .OrderBy(value => value.GetDisplayName())
@@ -118,10 +126,10 @@
                 return queryable.OrderBy(expr);
             }
 
-            if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
+            if (propertyPropertyType.IsGenericType && propertyPropertyType.GenericTypeArguments[0].IsEnum)
             {
-                var enumType = property.PropertyType.GenericTypeArguments[0];
-                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
+                var enumType = propertyPropertyType.GenericTypeArguments[0];
+                var strExpr = ExpressionUtils.ToLambda<T, int>(propertyName);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -138,26 +146,26 @@
                 return queryable.OrderBy(x => strExpr.Invoke(x) == null).ThenBy(expr);
             }
 
-            if (!property.PropertyType.IsNullable())
+            if (!propertyPropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
                 var orderByExp = Expression.Lambda(propertyAccess, parameter);
-                var resultExp = Expression.Call(typeof(Queryable), "OrderBy", new[] { type, property.PropertyType }, queryable.Expression, Expression.Quote(orderByExp));
+                var resultExp = Expression.Call(typeof(Queryable), "OrderBy", new[] { type, propertyPropertyType }, queryable.Expression, Expression.Quote(orderByExp));
                 return (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(resultExp);
             }
             else
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
 
-                var orderByExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, property.PropertyType)), parameter);
+                var orderByExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, propertyPropertyType)), parameter);
                 var orderBy = Expression.Call(typeof(Queryable), "OrderBy", new[] { type, orderByExp.Body.Type }, queryable.Expression, Expression.Quote(orderByExp));
 
                 var orderedQueryable = (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(orderBy);
 
                 var thenByExp = Expression.Lambda(propertyAccess, parameter);
-                var thenBy = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, property.PropertyType }, orderedQueryable.Expression, Expression.Quote(thenByExp));
+                var thenBy = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, propertyPropertyType }, orderedQueryable.Expression, Expression.Quote(thenByExp));
 
                 return (IOrderedQueryable<T>)orderedQueryable.Provider.CreateQuery<T>(thenBy);
             }
@@ -166,24 +174,32 @@
         public static IOrderedQueryable<T> OrderByDescendingWithNullLowPriority<T>(this IQueryable<T> queryable, string propertyName = null)
         {
             var type = typeof(T);
-            var property = type.GetProperties().FirstOrDefault(x => !string.IsNullOrEmpty(propertyName) && string.Equals(x.Name, propertyName, StringComparison.InvariantCultureIgnoreCase))
-                           ?? type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+
+            PropertyInfo property = null;
+            if (!string.IsNullOrEmpty(propertyName))
+                property = type.GetPropertyByName(propertyName);
+            if (property == null)
+            {
+                property = type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+                propertyName = property?.Name;
+            }
 
             if (property == null)
                 return queryable.OrderByDescending(x => true);
 
-            if (property.PropertyType == typeof(string))
+            var propertyPropertyType = property.PropertyType;
+
+            if (propertyPropertyType == typeof(string))
             {
-                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(propertyName);
                 return queryable.OrderByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
 
-            if (property.PropertyType.IsEnum)
+            if (propertyPropertyType.IsEnum)
             {
-                var enumType = property.PropertyType;
-                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, int>(propertyName);
 
-                var enumValues = Enum.GetValues(enumType);
+                var enumValues = Enum.GetValues(propertyPropertyType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
                 var body = objs
                         .OrderBy(value => value.GetDisplayName())
@@ -198,10 +214,10 @@
                 return queryable.OrderByDescending(expr);
             }
 
-            if (property.PropertyType.IsGenericType && property.PropertyType.GenericTypeArguments[0].IsEnum)
+            if (propertyPropertyType.IsGenericType && propertyPropertyType.GenericTypeArguments[0].IsEnum)
             {
-                var enumType = property.PropertyType.GenericTypeArguments[0];
-                var strExpr = ExpressionUtils.ToLambda<T, int>(property.Name);
+                var enumType = propertyPropertyType.GenericTypeArguments[0];
+                var strExpr = ExpressionUtils.ToLambda<T, int>(propertyName);
 
                 var enumValues = Enum.GetValues(enumType);
                 var objs = enumValues.Cast<object>().Select((t, i) => enumValues.GetValue(i)).ToList();
@@ -218,26 +234,26 @@
                 return queryable.OrderByDescending(x => strExpr.Invoke(x) == null).ThenByDescending(expr);
             }
 
-            if (!property.PropertyType.IsNullable())
+            if (!propertyPropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
                 var orderByExp = Expression.Lambda(propertyAccess, parameter);
-                var resultExp = Expression.Call(typeof(Queryable), "OrderByDescending", new[] { type, property.PropertyType }, queryable.Expression, Expression.Quote(orderByExp));
+                var resultExp = Expression.Call(typeof(Queryable), "OrderByDescending", new[] { type, propertyPropertyType }, queryable.Expression, Expression.Quote(orderByExp));
                 return (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(resultExp);
             }
             else
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
 
-                var orderByDescendingExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, property.PropertyType)), parameter);
+                var orderByDescendingExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, propertyPropertyType)), parameter);
                 var orderByDescending = Expression.Call(typeof(Queryable), "OrderByDescending", new[] { type, orderByDescendingExp.Body.Type }, queryable.Expression, Expression.Quote(orderByDescendingExp));
 
                 var orderedQueryable = (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(orderByDescending);
 
                 var thenByDescendingExp = Expression.Lambda(propertyAccess, parameter);
-                var thenByDescending = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, property.PropertyType }, orderedQueryable.Expression, Expression.Quote(thenByDescendingExp));
+                var thenByDescending = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, propertyPropertyType }, orderedQueryable.Expression, Expression.Quote(thenByDescendingExp));
 
                 return (IOrderedQueryable<T>)orderedQueryable.Provider.CreateQuery<T>(thenByDescending);
             }
@@ -246,37 +262,47 @@
         public static IOrderedQueryable<T> ThenByWithNullLowPriority<T>(this IOrderedQueryable<T> queryable, string propertyName = null)
         {
             var type = typeof(T);
-            var property = type.GetProperties().FirstOrDefault(x => !string.IsNullOrEmpty(propertyName) && string.Equals(x.Name, propertyName, StringComparison.InvariantCultureIgnoreCase))
-                           ?? type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+
+            PropertyInfo property = null;
+            if (!string.IsNullOrEmpty(propertyName))
+                property = type.GetPropertyByName(propertyName);
+            if (property == null)
+            {
+                property = type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+                propertyName = property?.Name;
+            }
+
             if (property == null)
                 return queryable.ThenBy(x => true);
 
-            if (property.PropertyType == typeof(string))
+            var propertyPropertyType = property.PropertyType;
+
+            if (propertyPropertyType == typeof(string))
             {
-                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(propertyName);
                 return queryable.ThenBy(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenBy(strExpr);
             }
 
-            if (!property.PropertyType.IsNullable())
+            if (!propertyPropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
                 var orderByExp = Expression.Lambda(propertyAccess, parameter);
-                var resultExp = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, property.PropertyType }, queryable.Expression, Expression.Quote(orderByExp));
+                var resultExp = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, propertyPropertyType }, queryable.Expression, Expression.Quote(orderByExp));
                 return (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(resultExp);
             }
             else
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
 
-                var orderByExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, property.PropertyType)), parameter);
+                var orderByExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, propertyPropertyType)), parameter);
                 var orderBy = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, orderByExp.Body.Type }, queryable.Expression, Expression.Quote(orderByExp));
 
                 var orderedQueryable = (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(orderBy);
 
                 var thenByExp = Expression.Lambda(propertyAccess, parameter);
-                var thenBy = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, property.PropertyType }, orderedQueryable.Expression, Expression.Quote(thenByExp));
+                var thenBy = Expression.Call(typeof(Queryable), "ThenBy", new[] { type, propertyPropertyType }, orderedQueryable.Expression, Expression.Quote(thenByExp));
 
                 return (IOrderedQueryable<T>)orderedQueryable.Provider.CreateQuery<T>(thenBy);
             }
@@ -285,38 +311,47 @@
         public static IOrderedQueryable<T> ThenByDescendingWithNullLowPriority<T>(this IOrderedQueryable<T> queryable, string propertyName = null)
         {
             var type = typeof(T);
-            var property = type.GetProperties().FirstOrDefault(x => !string.IsNullOrEmpty(propertyName) && string.Equals(x.Name, propertyName, StringComparison.InvariantCultureIgnoreCase))
-                           ?? type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+
+            PropertyInfo property = null;
+            if (!string.IsNullOrEmpty(propertyName))
+                property = type.GetPropertyByName(propertyName);
+            if (property == null)
+            {
+                property = type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(typeof(DefaultSortPropertyAttribute), true).Any());
+                propertyName = property?.Name;
+            }
 
             if (property == null)
                 return queryable.ThenByDescending(x => true);
 
-            if (property.PropertyType == typeof(string))
+            var propertyPropertyType = property.PropertyType;
+
+            if (propertyPropertyType == typeof(string))
             {
-                var strExpr = ExpressionUtils.ToLambda<T, string>(property.Name);
+                var strExpr = ExpressionUtils.ToLambda<T, string>(propertyName);
                 return queryable.ThenByDescending(x => string.IsNullOrEmpty(strExpr.Invoke(x))).ThenByDescending(strExpr);
             }
 
-            if (!property.PropertyType.IsNullable())
+            if (!propertyPropertyType.IsNullable())
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
                 var orderByExp = Expression.Lambda(propertyAccess, parameter);
-                var resultExp = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, property.PropertyType }, queryable.Expression, Expression.Quote(orderByExp));
+                var resultExp = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, propertyPropertyType }, queryable.Expression, Expression.Quote(orderByExp));
                 return (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(resultExp);
             }
             else
             {
                 var parameter = Expression.Parameter(type);
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+                var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
 
-                var orderByDescendingExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, property.PropertyType)), parameter);
+                var orderByDescendingExp = Expression.Lambda<Func<T, bool>>(Expression.Equal(propertyAccess, Expression.Constant(null, propertyPropertyType)), parameter);
                 var orderByDescending = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, orderByDescendingExp.Body.Type }, queryable.Expression, Expression.Quote(orderByDescendingExp));
 
                 var orderedQueryable = (IOrderedQueryable<T>)queryable.Provider.CreateQuery<T>(orderByDescending);
 
                 var thenByDescendingExp = Expression.Lambda(propertyAccess, parameter);
-                var thenByDescending = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, property.PropertyType }, orderedQueryable.Expression, Expression.Quote(thenByDescendingExp));
+                var thenByDescending = Expression.Call(typeof(Queryable), "ThenByDescending", new[] { type, propertyPropertyType }, orderedQueryable.Expression, Expression.Quote(thenByDescendingExp));
 
                 return (IOrderedQueryable<T>)orderedQueryable.Provider.CreateQuery<T>(thenByDescending);
             }
@@ -330,7 +365,8 @@
                 return queryable;
 
             var parameter = Expression.Parameter(type);
-            var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+            var propertyAccess = ExpressionUtils.CreateMemberAccess(parameter, propertyName);
+
             var groupByExp = Expression.Lambda(propertyAccess, parameter);
             var groupByQueryable = queryable.Provider.CreateQuery(Expression.Call(typeof(Queryable), "GroupBy", new[] { type, property.PropertyType }, queryable.Expression, Expression.Quote(groupByExp)));
 
@@ -356,8 +392,12 @@
             if (!conditionKeyPairs.Any())
                 return Expression.Lambda<Func<T, bool>>(Expression.Constant(true), parameter);
 
-            Expression GetExpression(PropertyInfo property, string value)
+            Expression GetExpression(PropertyFilterItem item)
             {
+                var property = item.Property;
+                var value = item.Value;
+                var operation = item.Operation;
+
                 var expProp = Expression.Property(parameter, property.Name);
 
                 if (string.IsNullOrEmpty(value) && property.PropertyType.IsNullable())
@@ -377,7 +417,10 @@
 
                 if (property.PropertyType == typeof(string))
                 {
-                    return Expression.Call(expProp, typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) }), Expression.Constant(value, typeof(string)));
+                    if (operation == OperationFilter.FullEqual)
+                        return Expression.Equal(expProp, Expression.Constant(value, typeof(string)));
+                    if (operation == OperationFilter.Equal)
+                        return Expression.Call(expProp, typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) }), Expression.Constant(value, typeof(string)));
                 }
 
                 if (property.PropertyType == typeof(DateTime))
@@ -514,7 +557,7 @@
                 return Expression.Constant(true);
             }
 
-            var expressions = conditionKeyPairs.Select(x => x.Select(c => GetExpression(c.Property, c.Value)));
+            var expressions = conditionKeyPairs.Select(x => x.Select(c => GetExpression(c)));
             var result = expressions.Select(x => x.Aggregate(Expression.Or)).Aggregate(Expression.And);
             return Expression.Lambda<Func<T, bool>>(result, parameter);
         }

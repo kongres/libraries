@@ -26,12 +26,6 @@
             return config;
         }
 
-        public static bool HasAccessWithoutPermission<Source, Target, Obj>(this IMemberConfigurationExpression<Source, Target, Obj> expression)
-        {
-            var attrs = expression.DestinationMember.CustomAttributes;
-            return attrs.Any(x => x.AttributeType == typeof(AccessWithoutPermissionAttribute));
-        }
-
         public static IMappingExpression<TSource, TDestination> LoadProperties<TSource, TDestination>(this IMappingExpression<TSource, TDestination> expression, RepositoryPagingModel<TDestination> filter)
         {
             var destType = typeof(TDestination);
