@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using Kongrevsky.Infrastructure.Repository.Models;
+    using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion

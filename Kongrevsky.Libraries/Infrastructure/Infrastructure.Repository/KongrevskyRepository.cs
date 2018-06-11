@@ -9,6 +9,7 @@
     using System.Data.Entity.Migrations;
     using System.Data.SqlClient;
     using System.Linq;
+    using System.Linq.Dynamic;
     using System.Linq.Expressions;
     using System.Net;
     using System.Reflection;
@@ -21,6 +22,7 @@
     using Kongrevsky.Infrastructure.Repository.Triggers;
     using Kongrevsky.Infrastructure.Repository.Utils;
     using Kongrevsky.Utilities.EF6;
+    using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
@@ -416,7 +418,7 @@
                     castQuery = castQuery.Where(expression);
 
             if (filter.Filters?.Any() ?? false)
-                castQuery = castQuery.Where(QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
+                castQuery = castQuery.Where(Utils.QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
 
             var orderProperties = filter.OrderProperty?.Split(new[] { ',', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
