@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <RootNamespace>Kongrevsky.Utilities.Tests</RootNamespace>
+    <Authors>Dmitry Savchenko</Authors>
+    <Company>Kongrevsky</Company>
+    <Description>Unit tests for Cryptography, DateTime, Enum, Enumerable, Math, Object, String, Web Utils</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Utilities\Utilities.Cryptography\Kongrevsky.Utilities.Cryptography.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.DateTime\Kongrevsky.Utilities.DateTime.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Enumerable\Kongrevsky.Utilities.Enumerable.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Enum\Kongrevsky.Utilities.Enum.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Math\Kongrevsky.Utilities.Math.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Object\Kongrevsky.Utilities.Object.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.String\Kongrevsky.Utilities.String.csproj" />
+    <ProjectReference Include="..\..\Utilities\Utilities.Web\Kongrevsky.Utilities.Web.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+</Project>
