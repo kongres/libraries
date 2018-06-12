@@ -1,1 +1,1 @@
-# labraries
+# libraries
