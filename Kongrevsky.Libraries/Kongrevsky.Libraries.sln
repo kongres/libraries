@@ -57,6 +57,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Web", "Infrastructure\Kongrevsky.Infrastructure.Web\Kongrevsky.Infrastructure.Web.csproj", "{F3D07AB2-C797-4016-AD19-129748A36B42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3FD16F33-A9EB-40C9-8C38-B073370FC1E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Tests", "Tests\Kongrevsky.Utilities.Tests\Kongrevsky.Utilities.Tests.csproj", "{59248785-42CC-477A-9476-5A26DD0AF0B8}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.Web.LetsEncrypt", "Infrastructure\Kongrevsky.Infrastructure.Web.LetsEncrypt\Kongrevsky.Infrastructure.Web.LetsEncrypt.csproj", "{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704}"
 EndProject
 Global
@@ -161,6 +165,10 @@ Global
 		{F3D07AB2-C797-4016-AD19-129748A36B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3D07AB2-C797-4016-AD19-129748A36B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3D07AB2-C797-4016-AD19-129748A36B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59248785-42CC-477A-9476-5A26DD0AF0B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59248785-42CC-477A-9476-5A26DD0AF0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59248785-42CC-477A-9476-5A26DD0AF0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59248785-42CC-477A-9476-5A26DD0AF0B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -194,6 +202,7 @@ Global
 		{9C3AF277-7AEE-49E0-8D3B-56831DC1E4A7} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{013870B0-6F1C-4416-954A-763484F83AC2} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{F3D07AB2-C797-4016-AD19-129748A36B42} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{59248785-42CC-477A-9476-5A26DD0AF0B8} = {3FD16F33-A9EB-40C9-8C38-B073370FC1E4}
 		{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
