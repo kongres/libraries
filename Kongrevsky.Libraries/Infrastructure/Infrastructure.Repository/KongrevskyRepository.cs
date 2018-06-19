@@ -40,19 +40,18 @@
     {
         private static readonly object _lockObject = new object();
 
-        private string _connectionString;
+        private string _connectionString => DataContext.ConnectionString;
 
         public KongrevskyRepository(IKongrevskyDatabaseFactory<DB> kongrevskyDatabaseFactory)
         {
             _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
-            Dbset = DataContext.Set<T>();
         }
 
         private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
 
         private DB _dataContext { get; set; }
 
-        protected DbSet<T> Dbset { get; }
+        protected DbSet<T> Dbset => DataContext.Set<T>();
 
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
 
