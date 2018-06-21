@@ -17,6 +17,8 @@
 
     public class LocationService : ILocationService
     {
+        private LocationServiceOptions _options { get; set; } = new LocationServiceOptions() { StringComparison = StringComparison.InvariantCultureIgnoreCase };
+
         #region Constants
 
         private const string _citiesResourcePath = "Kongrevsky.Resources.Location.Resources.cities.json";
@@ -72,6 +74,11 @@
 
         #region Interface Implementations
 
+        public void SetOptions(LocationServiceOptions options)
+        {
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+        }
+
         public List<City> GetAllCities()
         {
             return _cities;
@@ -83,7 +90,7 @@
 
             var cities = _cities.Where(x => (filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId) &&
                                             (filter.StateId.IsNullOrWhiteSpace() || x.StateId == filter.StateId))
-                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)))
+                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)))
                                 .OrderBy(filter.OrderProperty, filter.IsDesc)
                                 .ToList();
 
@@ -103,7 +110,7 @@
             var search = filter.Search.SplitBySpaces();
 
             var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
-                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)))
+                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)))
                                 .OrderBy(filter.OrderProperty, filter.IsDesc)
                                 .ToList();
 
@@ -122,7 +129,7 @@
         {
             var search = filter.Search.SplitBySpaces();
 
-            var countries = _countries.Where(x => !search.Any() || search.Any(r => x.Name.Contains(r)) || search.Any(r => x.Code.Contains(r)))
+            var countries = _countries.Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)) || search.Any(r => x.Code.Contains(r, _options.StringComparison)))
                                       .OrderBy(filter.OrderProperty, filter.IsDesc)
                                       .ToList();
 
