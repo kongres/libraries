@@ -10,6 +10,12 @@
     public interface ILocationService
     {
         /// <summary>
+        /// Set Options of the LocationService
+        /// </summary>
+        /// <param name="options"></param>
+        void SetOptions(LocationServiceOptions options);
+
+        /// <summary>
         /// Returns list of all cities
         /// </summary>
         /// <returns></returns>
