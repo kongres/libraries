@@ -141,7 +141,7 @@
                 return;
 
             var originals = new List<TEntity>();
-            foreach (var chunk in list.ChunkBy(1000))
+            foreach (var chunk in list.ChunkBy(500))
             {
                 originals.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
@@ -167,7 +167,7 @@
                 return;
 
             var deletingEntities = new List<TEntity>();
-            foreach (var chunk in list.ChunkBy(1000))
+            foreach (var chunk in list.ChunkBy(500))
             {
                 deletingEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
@@ -219,7 +219,7 @@
                 return;
 
             var insertedEntities = new List<TEntity>();
-            foreach (var chunk in list.ChunkBy(1000))
+            foreach (var chunk in list.ChunkBy(500))
             {
                 insertedEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }
@@ -243,7 +243,7 @@
                 return;
 
             var updatedEntities = new List<TEntity>();
-            foreach (var chunk in list.ChunkBy(1000))
+            foreach (var chunk in list.ChunkBy(500))
             {
                 updatedEntities.AddRange(QueryableContains(dbContext.Set<TEntity>().AsNoTracking().AsExpandable(), chunk, identificator).ToList());
             }

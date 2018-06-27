@@ -4,6 +4,8 @@
 
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.Data.Entity.Validation;
     using System.Linq;
     using System.Threading.Tasks;
     using Kongrevsky.Utilities.EF6;
@@ -50,7 +52,18 @@
                     AddedBeforeSaveChanges?.Invoke(addedRelationships);
                     RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
-                    Database.SaveChanges();
+                    try
+                    {
+                        Database.SaveChanges();
+                    }
+                    catch (DbEntityValidationException dbEx)
+                    {
+                        var exceptions = new List<Exception>();
+                        foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                            exceptions.Add(new Exception($"Property: {validationError.PropertyName} Error: {validationError.ErrorMessage}"));
+                        throw new AggregateException("Validation failed for one or more entities. See InnerExceptions.", exceptions);
+                    }
 
                     AddedAfterSaveChanges?.Invoke(addedRelationships);
                     RemovedAfterSaveChanges?.Invoke(deletedRelationships);
@@ -63,20 +76,7 @@
                 }
 
                 // if you get an exception when try commit changes in db you can use the following try block to catch exception
-                //try
-                //{
-                //    Database.SaveChangesWithTriggers();
-                //}
-                //catch (DbEntityValidationException dbEx)
-                //{
-                //    foreach (var validationErrors in dbEx.EntityValidationErrors)
-                //    {
-                //        foreach (var validationError in validationErrors.ValidationErrors)
-                //        {
-                //            // check error
-                //        }
-                //    }
-                //}
+               
             }
         }
 
@@ -92,7 +92,18 @@
                     AddedBeforeSaveChanges?.Invoke(addedRelationships);
                     RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
-                    await Database.SaveChangesAsync(Task.Factory.CancellationToken);
+                    try
+                    {
+                        await Database.SaveChangesAsync(Task.Factory.CancellationToken);
+                    }
+                    catch (DbEntityValidationException dbEx)
+                    {
+                        var exceptions = new List<Exception>();
+                        foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                            exceptions.Add(new Exception($"Property: {validationError.PropertyName} Error: {validationError.ErrorMessage}"));
+                        throw new AggregateException("Validation failed for one or more entities. See InnerExceptions.", exceptions);
+                    }
 
                     AddedAfterSaveChanges?.Invoke(addedRelationships);
                     RemovedAfterSaveChanges?.Invoke(deletedRelationships);
@@ -103,22 +114,6 @@
                     await Database.SaveChangesAsync(Task.Factory.CancellationToken);
                     Database.TriggersEnabled = true;
                 }
-
-                // if you get an exception when try commit changes in db you can use the following try block to catch exception
-                //try
-                //{
-                //    await Database.SaveChangesAsync(Task.Factory.CancellationToken);
-                //}
-                //catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
-                //{
-                //    foreach (var validationErrors in dbEx.EntityValidationErrors)
-                //    {
-                //        foreach (var validationError in validationErrors.ValidationErrors)
-                //        {
-                //            // check error
-                //        }
-                //    }
-                //}
             }
         }
     }

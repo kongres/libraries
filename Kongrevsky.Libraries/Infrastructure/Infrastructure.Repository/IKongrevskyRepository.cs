@@ -20,19 +20,19 @@
 
     public interface IKongrevskyRepository<T> where T : class
     {
-        int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
+        int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
 
         int ClassicBulkInsert(List<T> entities);
 
-        int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
+        int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
 
         int ClassicBulkUpdate(List<T> entities);
 
-        int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true);
+        int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
 
         int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true);
 
-        int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null);
+        int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null, int batchSize = 5000, int bulkCopyTimeout = 600);
 
         T Add(T entity);
 
