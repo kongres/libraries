@@ -9,7 +9,6 @@
     using System.Data.Entity.Migrations;
     using System.Data.SqlClient;
     using System.Linq;
-    using System.Linq.Dynamic;
     using System.Linq.Expressions;
     using System.Net;
     using System.Reflection;
@@ -31,6 +30,7 @@
     using SqlBulkTools;
     using SqlBulkTools.Enumeration;
     using Z.EntityFramework.Plus;
+    using QueryableUtils = Utils.QueryableUtils;
 
     #endregion
 
@@ -40,12 +40,12 @@
     {
         private static readonly object _lockObject = new object();
 
-        private string _connectionString => DataContext.ConnectionString;
-
         public KongrevskyRepository(IKongrevskyDatabaseFactory<DB> kongrevskyDatabaseFactory)
         {
             _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
         }
+
+        private string _connectionString => DataContext.ConnectionString;
 
         private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
 
@@ -57,7 +57,7 @@
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
 
-        public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
+        public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
         {
             if (!entities.Any())
                 return 0;
@@ -93,6 +93,7 @@
                         num = new BulkOperations().Setup<T>()
                                 .ForCollection(ent)
                                 .WithTable(DataContext.GetTableName<T>())
+                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                 .AddAllColumns()
                                 .DetectColumnWithCustomColumnName()
                                 .BulkInsert()
@@ -124,7 +125,7 @@
             return entities.Count;
         }
 
-        public virtual int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
+        public virtual int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
         {
             if (!entities.Any())
                 return 0;
@@ -161,6 +162,7 @@
                         num = new BulkOperations().Setup<T>()
                                 .ForCollection(ent)
                                 .WithTable(DataContext.GetTableName<T>())
+                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                 .AddAllColumns()
                                 .BulkUpdate()
                                 .MatchTargetOn(identificator)
@@ -191,7 +193,7 @@
             return entities.Count;
         }
 
-        public virtual int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true)
+        public virtual int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
         {
             if (!entities.Any())
                 return 0;
@@ -211,6 +213,7 @@
                         num = new BulkOperations().Setup<T>()
                                 .ForCollection(entities)
                                 .WithTable(DataContext.GetTableName<T>())
+                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                 .AddColumn(identificator)
                                 .BulkDelete()
                                 .MatchTargetOn(identificator)
@@ -250,7 +253,7 @@
             }
         }
 
-        public virtual int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null)
+        public virtual int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null, int batchSize = 5000, int bulkCopyTimeout = 600)
         {
             var num = 0;
             lock (_lockObject)
@@ -258,7 +261,13 @@
                 if (!typeof(BaseEntity).IsAssignableFrom(typeof(T)))
                     return num;
 
-                var records = (where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).ToList();
+                var query = (where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).OrderBy(x => x.Key);
+                var pageSize = 1000;
+                var pageCount = query.GetPageCount(pageSize);
+                var records = new List<IGrouping<Ts, T>>();
+
+                for (var i = 1; i <= pageCount; i++)
+                    records.AddRange(query.GetPage(new Page(i, pageSize)));
 
                 var ent = new List<T>();
                 foreach (var group in records)
@@ -281,6 +290,7 @@
                             num = bulk.Setup<T>()
                                     .ForCollection(ent)
                                     .WithTable(DataContext.GetTableName<T>())
+                                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                     .AddColumn(x => (x as BaseEntity).Id)
                                     .BulkDelete()
                                     .MatchTargetOn(x => (x as BaseEntity).Id)
@@ -303,8 +313,6 @@
                     return num;
                 }
             }
-
-            return num;
         }
 
         public virtual T Add(T entity)
@@ -417,7 +425,7 @@
                     castQuery = castQuery.Where(expression);
 
             if (filter.Filters?.Any() ?? false)
-                castQuery = castQuery.Where(Utils.QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
+                castQuery = castQuery.Where(QueryableUtils.FiltersToLambda<TCast>(filter.Filters));
 
             var orderProperties = filter.OrderProperty?.Split(new[] { ',', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
