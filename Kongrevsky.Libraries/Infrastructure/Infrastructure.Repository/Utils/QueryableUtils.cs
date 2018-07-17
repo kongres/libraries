@@ -398,7 +398,7 @@
                 var value = item.Value;
                 var operation = item.Operation;
 
-                var expProp = Expression.Property(parameter, property.Name);
+                var expProp = ExpressionUtils.CreateMemberAccess(parameter, item.PropertyName);
 
                 if (string.IsNullOrEmpty(value) && property.PropertyType.IsNullable())
                 {
@@ -557,7 +557,7 @@
                 return Expression.Constant(true);
             }
 
-            var expressions = conditionKeyPairs.Select(x => x.Select(c => GetExpression(c)));
+            var expressions = conditionKeyPairs.Select(x => x.Select(GetExpression));
             var result = expressions.Select(x => x.Aggregate(Expression.Or)).Aggregate(Expression.And);
             return Expression.Lambda<Func<T, bool>>(result, parameter);
         }
@@ -591,11 +591,12 @@
                                                          }
 
                                                          var propertyName = cond.ElementAtOrDefault(0);
-                                                         var property = type.GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.CurrentCultureIgnoreCase));
+                                                         var property = type.GetPropertyByName(propertyName);
                                                          var value = string.Join(separator, cond.Skip(1));
                                                          var propertyFilterItem = new PropertyFilterItem()
                                                                                   {
                                                                                           Property = property,
+                                                                                          PropertyName = propertyName,
                                                                                           Value = value
                                                                                   };
                                                          switch (separator)
@@ -626,9 +627,12 @@
 
             public PropertyInfo Property { get; set; }
 
+            public string PropertyName { get; set; }
+
             public OperationFilter Operation { get; set; }
 
             public string Value { get; set; }
+
         }
     }
 }
