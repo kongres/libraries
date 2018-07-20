@@ -8,10 +8,11 @@
 
     public class StatePaging : PagingModel<State>
     {
-        #region Properties
-
         public string CountryId { get; set; }
 
-        #endregion
+        /// <summary>
+        ///     If specified then used instead of <see cref="CountryId" />
+        /// </summary>
+        public string CountryName { get; set; }
     }
 }
