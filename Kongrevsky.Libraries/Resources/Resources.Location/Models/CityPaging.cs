@@ -12,7 +12,17 @@
 
         public string CountryId { get; set; }
 
+        /// <summary>
+        ///     If specified then used instead of <see cref="CountryId" />
+        /// </summary>
+        public string CountryName { get; set; }
+
         public string StateId { get; set; }
+
+        /// <summary>
+        ///     If specified then used instead of <see cref="StateId" />
+        /// </summary>
+        public string StateName { get; set; }
 
         #endregion
     }

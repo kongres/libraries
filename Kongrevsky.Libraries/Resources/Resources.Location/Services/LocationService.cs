@@ -87,6 +87,19 @@
         public CityPaging GetCities(CityPaging filter)
         {
             var search = filter.Search.SplitBySpaces();
+            if (!filter.CountryName.IsNullOrEmpty())
+            {
+                var country = _countries.FirstOrDefault(x => string.Equals(x.Name, filter.CountryName, _options.StringComparison));
+                if (country != null)
+                    filter.CountryId = country.Code;
+            }
+
+            if (!filter.StateName.IsNullOrEmpty())
+            {
+                var state = _states.FirstOrDefault(x => string.Equals(x.Name, filter.StateName, _options.StringComparison));
+                if (state != null)
+                    filter.StateId = state.Name;
+            }
 
             var cities = _cities.Where(x => (filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId) &&
                                             (filter.StateId.IsNullOrWhiteSpace() || x.StateId == filter.StateId))
@@ -108,6 +121,12 @@
         public StatePaging GetStates(StatePaging filter)
         {
             var search = filter.Search.SplitBySpaces();
+            if (!filter.CountryName.IsNullOrEmpty())
+            {
+                var country = _countries.FirstOrDefault(x => string.Equals(x.Name, filter.CountryName, _options.StringComparison));
+                if (country != null)
+                    filter.CountryId = country.Code;
+            }
 
             var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
                                 .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)))
