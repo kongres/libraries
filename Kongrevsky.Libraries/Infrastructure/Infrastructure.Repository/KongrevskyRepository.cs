@@ -261,13 +261,16 @@
                 if (!typeof(BaseEntity).IsAssignableFrom(typeof(T)))
                     return num;
 
-                var query = (where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).OrderBy(x => x.Key);
-                var pageSize = 1000;
-                var pageCount = query.GetPageCount(pageSize);
                 var records = new List<IGrouping<Ts, T>>();
 
-                for (var i = 1; i <= pageCount; i++)
-                    records.AddRange(query.GetPage(new Page(i, pageSize)));
+                try
+                {
+                    records.AddRange((where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).ToList());
+                }
+                catch (Exception e)
+                {
+                    records.AddRange((where == null ? Dbset : Dbset.Where(where)).ToList().GroupBy(expression.Compile()).Where(x => x.Count() > 1).ToList());
+                }
 
                 var ent = new List<T>();
                 foreach (var group in records)
