@@ -6,6 +6,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion
@@ -273,7 +274,7 @@
             if (enumerable == null || string.IsNullOrWhiteSpace(propertyName))
                 return enumerable;
 
-            var propertyInfo = typeof(T).GetProperty(propertyName);
+            var propertyInfo = typeof(T).GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
             if (propertyInfo == null)
                 return enumerable;
