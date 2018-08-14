@@ -16,7 +16,7 @@
     using System.Transactions;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
-    using DelegateDecompiler;
+    using DelegateDecompiler.EntityFramework;
     using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Infrastructure.Repository.Triggers;
@@ -51,14 +51,14 @@
         private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
 
         private DB _dataContext { get; set; }
-
+        
         protected DbSet<T> DbsetRaw => DataContext.Set<T>();
 
-        protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable(ExpressionOptimizer.visit).Decompile();
+        protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable(ExpressionOptimizer.visit).DecompileAsync();
 
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
 
-        protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().Decompile() : DataContext.Set<TSet>();
+        protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().DecompileAsync() : DataContext.Set<TSet>();
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
 
