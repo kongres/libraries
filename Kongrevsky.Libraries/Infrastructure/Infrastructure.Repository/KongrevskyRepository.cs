@@ -16,6 +16,7 @@
     using System.Transactions;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
+    using DelegateDecompiler;
     using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Infrastructure.Repository.Triggers;
@@ -51,9 +52,13 @@
 
         private DB _dataContext { get; set; }
 
-        protected DbSet<T> Dbset => DataContext.Set<T>();
+        protected DbSet<T> DbsetRaw => DataContext.Set<T>();
+
+        protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable(ExpressionOptimizer.visit).Decompile();
 
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
+
+        protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().Decompile() : DataContext.Set<TSet>();
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
 
@@ -320,52 +325,52 @@
 
         public virtual T Add(T entity)
         {
-            Dbset.Add(entity);
+            DbsetRaw.Add(entity);
             return entity;
         }
 
         public virtual T Update(T entity)
         {
-            Dbset.AddOrUpdate(entity);
+            DbsetRaw.AddOrUpdate(entity);
             return entity;
         }
 
         public virtual T AddOrUpdate(T entity)
         {
-            Dbset.AddOrUpdate(entity);
+            DbsetRaw.AddOrUpdate(entity);
             return entity;
         }
 
         public virtual void AddOrUpdate(params T[] entities)
         {
-            Dbset.AddOrUpdate(entities);
+            DbsetRaw.AddOrUpdate(entities);
         }
 
         public virtual T AddOrUpdate(Expression<Func<T, object>> identifierExpression, T entity)
         {
-            Dbset.AddOrUpdate(identifierExpression, entity);
+            DbsetRaw.AddOrUpdate(identifierExpression, entity);
             return entity;
         }
 
         public virtual void AddOrUpdate(Expression<Func<T, object>> identifierExpression, params T[] entities)
         {
-            Dbset.AddOrUpdate(identifierExpression, entities);
+            DbsetRaw.AddOrUpdate(identifierExpression, entities);
         }
 
         public virtual void Delete(T entity)
         {
-            Dbset.Remove(entity);
+            DbsetRaw.Remove(entity);
         }
 
         public virtual void Delete(Expression<Func<T, bool>> where)
         {
             var objects = Dbset.Where(where).AsEnumerable();
-            Dbset.RemoveRange(objects);
+            DbsetRaw.RemoveRange(objects);
         }
 
         public virtual T GetById(long id)
         {
-            var entity = Dbset.Find(id);
+            var entity = DbsetRaw.Find(id);
             if (entity != null)
                 DataContext.Entry(entity).Reload();
             return entity;
@@ -373,7 +378,7 @@
 
         public virtual T GetById(string id)
         {
-            var entity = Dbset.Find(id);
+            var entity = DbsetRaw.Find(id);
             if (entity != null)
                 DataContext.Entry(entity).Reload();
             return entity;
@@ -381,7 +386,7 @@
 
         public virtual async Task<T> GetByIdAsync(string id)
         {
-            var entity = await Dbset.FindAsync(id);
+            var entity = await DbsetRaw.FindAsync(id);
             if (entity != null)
                 await DataContext.Entry(entity).ReloadAsync();
             return entity;
@@ -389,7 +394,7 @@
 
         public virtual T GetById(Guid id)
         {
-            var entity = Dbset.Find(id);
+            var entity = DbsetRaw.Find(id);
             if (entity != null)
                 DataContext.Entry(entity).Reload();
             return entity;
@@ -397,14 +402,15 @@
 
         public virtual IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes)
         {
-            var query = AppendIncludes(Dbset, includes);
+            var query = Dbset;
+            query = AppendIncludes(query, includes);
 
             return query;
         }
 
         public virtual IQueryable<T> GetMany(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
         {
-            var query = Dbset.AsExpandable().Where(where);
+            var query = Dbset;
             query = AppendIncludes(query, includes);
 
             return query;
@@ -414,7 +420,7 @@
         {
             var page = new Page(filter.PageNumber, filter.PageSize);
 
-            var queryable = Dbset.AsExpandable();
+            var queryable = Dbset;
             if (checkPermission != null)
                 queryable = queryable.Where(checkPermission);
 
@@ -485,8 +491,6 @@
 
             return query.FirstOrDefaultAsync();
         }
-
-        protected IQueryable<TSet> GetDbSet<TSet>() where TSet : class => DataContext.Set<TSet>().AsExpandable();
 
         private IQueryable<T> AppendIncludes(IQueryable<T> query, IEnumerable<Expression<Func<T, object>>> includes)
         {
