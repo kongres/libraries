@@ -54,7 +54,7 @@
         
         protected DbSet<T> DbsetRaw => DataContext.Set<T>();
 
-        protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable(ExpressionOptimizer.visit).DecompileAsync();
+        protected IQueryable<T> Dbset => DataContext.Set<T>().DecompileAsync().AsExpandable();
 
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
 
