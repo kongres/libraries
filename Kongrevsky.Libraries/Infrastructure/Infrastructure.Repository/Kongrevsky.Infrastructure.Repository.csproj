@@ -7,13 +7,15 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.0" />
+    <PackageReference Include="DelegateDecompiler.EntityFramework" Version="0.24.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.1" />
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.2" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.3" />
     <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
+    <PackageReference Include="Linq.Expression.Optimizer" Version="1.0.11" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
     <PackageReference Include="PagedList" Version="1.17.0" />
