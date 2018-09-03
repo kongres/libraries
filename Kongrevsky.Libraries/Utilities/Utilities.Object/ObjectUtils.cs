@@ -41,7 +41,7 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static T ConvertToType<T>(this object obj)
+        public static T ConvertToType<T>(object obj)
         {
             if (obj is T variable)
                 return variable;
@@ -51,9 +51,17 @@
 
             try
             {
-                return (T)Convert.ChangeType(obj, typeof(T));
+                var type = typeof(T);
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    var underlyingType = Nullable.GetUnderlyingType(type);
+                    var val = Convert.ChangeType(obj, underlyingType);
+                    return (T)val;
+                }
+
+                return (T)Convert.ChangeType(obj, type);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return default(T);
             }
