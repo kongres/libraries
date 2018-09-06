@@ -15,6 +15,7 @@
     <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Linq.Translations" Version="1.0.1" />
     <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
     <PackageReference Include="PagedList" Version="1.17.0" />
     <PackageReference Include="SqlBulkTools" Version="4.5.0" />
