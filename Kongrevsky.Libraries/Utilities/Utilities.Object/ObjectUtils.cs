@@ -41,7 +41,7 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static T ConvertToType<T>(object obj)
+        public static T ConvertToType<T>(this object obj)
         {
             if (obj is T variable)
                 return variable;
