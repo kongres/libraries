@@ -48,11 +48,9 @@
                             content = file.ReadToEnd();
                         }
 
-                        context.Response.ContentType = "application/json";
-
-                        string jsonString = JsonConvert.SerializeObject(content);
+                        context.Response.ContentType = "text/json";
                         context.Response.StatusCode = (int)HttpStatusCode.OK;
-                        await context.Response.WriteAsync(jsonString, Encoding.UTF8);
+                        await context.Response.WriteAsync(content, Encoding.UTF8);
                         return;
                     }
                 }
