@@ -92,7 +92,7 @@
         /// <param name="sequence"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static T MinOrDefault<T>(this IEnumerable<T> sequence, T defaultValue) where T : IComparable
+        public static T MinOrDefault<T>(this IEnumerable<T> sequence, T defaultValue)
         {
             var enumerable = sequence as IList<T> ?? sequence.ToList();
 
@@ -108,7 +108,7 @@
         /// <param name="sequence"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static T MaxOrDefault<T>(this IEnumerable<T> sequence, T defaultValue) where T : IComparable
+        public static T MaxOrDefault<T>(this IEnumerable<T> sequence, T defaultValue)
         {
             var enumerable = sequence as IList<T> ?? sequence.ToList();
             return enumerable.Any() ?
@@ -125,7 +125,7 @@
         /// <param name="selector"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static R MinOrDefault<T, R>(this IEnumerable<T> sequence, Func<T, R> selector, R defaultValue) where R : IComparable
+        public static R MinOrDefault<T, R>(this IEnumerable<T> sequence, Func<T, R> selector, R defaultValue)
         {
             var enumerable = sequence as IList<T> ?? sequence.ToList();
             return enumerable.Any() ?
@@ -142,7 +142,7 @@
         /// <param name="selector"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static R MaxOrDefault<T, R>(this IEnumerable<T> sequence, Func<T, R> selector, R defaultValue) where R : IComparable
+        public static R MaxOrDefault<T, R>(this IEnumerable<T> sequence, Func<T, R> selector, R defaultValue)
         {
             var enumerable = sequence as IList<T> ?? sequence.ToList();
             return enumerable.Any() ?

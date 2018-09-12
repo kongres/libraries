@@ -14,7 +14,7 @@
     {
         #region Nested Classes
 
-        class TestClass : IComparable
+        class TestClass
         {
             #region Properties
 
