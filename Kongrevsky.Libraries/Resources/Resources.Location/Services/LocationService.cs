@@ -94,7 +94,13 @@
                     filter.CountryId = country.Code;
             }
 
-            if (!filter.StateName.IsNullOrEmpty())
+            if (!filter.StateAbbr.IsNullOrEmpty())
+            {
+                var state = _states.FirstOrDefault(x => string.Equals(x.Abbr, filter.StateAbbr, _options.StringComparison));
+                if (state != null)
+                    filter.StateId = state.Name;
+            }
+            else if (!filter.StateName.IsNullOrEmpty())
             {
                 var state = _states.FirstOrDefault(x => string.Equals(x.Name, filter.StateName, _options.StringComparison));
                 if (state != null)
@@ -129,7 +135,7 @@
             }
 
             var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
-                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)))
+                                .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison) || x.Abbr.Contains(r, _options.StringComparison)))
                                 .OrderBy(filter.OrderProperty, filter.IsDesc)
                                 .ToList();
 

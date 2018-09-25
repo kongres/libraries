@@ -8,6 +8,8 @@
 
         public string CountryId { get; set; }
 
+        public string Abbr { get; set; }
+
         #endregion
     }
 }

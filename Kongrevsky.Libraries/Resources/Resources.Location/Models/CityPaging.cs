@@ -22,7 +22,12 @@
         /// <summary>
         ///     If specified then used instead of <see cref="StateId" />
         /// </summary>
-        public string StateName { get; set; }
+        public string StateName { get; set; }        
+        
+        /// <summary>
+        ///     If specified then used instead of <see cref="StateName" />
+        /// </summary>
+        public string StateAbbr { get; set; }
 
         #endregion
     }
