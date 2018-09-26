@@ -78,7 +78,11 @@
                                                      {
                                                          conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
                                                                                                           {
-                                                                                                              if((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute)) ?? false)
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute)) ?? false)
+                                                                                                              {
+                                                                                                                  c.Ignore();
+                                                                                                              }
+
                                                                                                               if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
                                                                                                                   return;
                                                                                                               if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
@@ -147,6 +151,11 @@
                                                      {
                                                          conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
                                                                                                           {
+                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute)) ?? false)
+                                                                                                              {
+                                                                                                                  c.Ignore();
+                                                                                                              }
+
                                                                                                               if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
                                                                                                                   return;
                                                                                                               if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
