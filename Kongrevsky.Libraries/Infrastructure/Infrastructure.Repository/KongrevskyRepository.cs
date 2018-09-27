@@ -106,6 +106,7 @@
                                 .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                 .AddAllColumns()
                                 .DetectColumnWithCustomColumnName()
+                                .RemoveNotMappedColumns()
                                 .BulkInsert()
                                 .SetIdentityColumn(identificator, ColumnDirectionType.Input)
                                 .Commit(conn);
@@ -179,6 +180,8 @@
                                 .WithTable(DataContext.GetTableName<T>())
                                 .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
                                 .AddAllColumns()
+                                .DetectColumnWithCustomColumnName()
+                                .RemoveNotMappedColumns()
                                 .BulkUpdate()
                                 .MatchTargetOn(identificator)
                                 .Commit(conn);
