@@ -133,6 +133,22 @@
             return GetRelationships(context, EntityState.Deleted, (e, i) => e.OriginalValues[i]);
         }
 
+        /// <summary>
+        /// Insert Entities using classic workflow with disabled <see cref="DbContextConfiguration.AutoDetectChangesEnabled"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbContext"></param>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static int ClassicBulkInsert<T>(this DbContext dbContext, IEnumerable<T> entities) where T : class
+        {
+            dbContext.Configuration.AutoDetectChangesEnabled = false;
+            foreach (T entity in entities)
+                dbContext.Entry<T>(entity).State = EntityState.Added;
+            dbContext.Configuration.AutoDetectChangesEnabled = true;
+            return entities.Count();
+        }
+
         private static IEnumerable<Tuple<object, object>> GetRelationships(DbContext context, EntityState relationshipState, Func<ObjectStateEntry, int, object> getValue)
         {
             context.ChangeTracker.DetectChanges();
