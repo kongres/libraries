@@ -52,7 +52,11 @@
         public static bool ContainsColumns<T>(this AbstractColumnSelection<T> bulk, Expression<Func<T, object>> columnName)
         {
             var propertyName = GetPropertyName(columnName);
-            return bulk.GetPropValue<HashSet<string>>("_columns").Contains(propertyName);
+            var prop = typeof(AbstractColumnSelection<T>).GetProperty("_column", BindingFlags.NonPublic | BindingFlags.Instance);
+            var getter = prop.GetGetMethod(nonPublic: true);
+            var _columns = (HashSet<string>)getter.Invoke(bulk, null);
+
+            return _columns.Contains(propertyName);
         }
 
         /// <summary>
