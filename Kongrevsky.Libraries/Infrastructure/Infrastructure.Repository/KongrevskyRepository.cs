@@ -4,7 +4,6 @@
 
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Data.SqlClient;
@@ -29,9 +28,8 @@
     using LinqKit;
     using Microsoft.Linq.Translations;
     using SqlBulkTools;
-    using SqlBulkTools.Enumeration;
     using Z.EntityFramework.Plus;
-    using QueryableUtils = Utils.QueryableUtils;
+    using QueryableUtils = Kongrevsky.Infrastructure.Repository.Utils.QueryableUtils;
 
     #endregion
 
@@ -56,8 +54,6 @@
 
         protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable().WithTranslations();
 
-        protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().WithTranslations() : DataContext.Set<TSet>();
-
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
@@ -67,61 +63,8 @@
             if (!entities.Any())
                 return 0;
 
-            lock (_lockObject)
-            {
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseInserting(entities, DataContext);
-                }
-
-                var config = new MapperConfiguration(conf =>
-                                                     {
-                                                         conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
-                                                                                                          {
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute)) ?? false)
-                                                                                                              {
-                                                                                                                  c.Ignore();
-                                                                                                              }
-
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                                                                                                                  return;
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                                                                                                                  return;
-                                                                                                              c.Ignore();
-                                                                                                          });
-                                                     });
-                var mapper = config.CreateMapper();
-
-                var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
-                var ent = mapper.Map<List<T>>(distEnts);
-
-                int num;
-                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
-                {
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        num = new BulkOperations().Setup<T>()
-                                .ForCollection(ent)
-                                .WithTable(DataContext.GetTableName<T>())
-                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
-                                .AddAllColumns()
-                                .DetectColumnWithCustomColumnName()
-                                .RemoveNotMappedColumns()
-                                .BulkInsert()
-                                .SetIdentityColumn(identificator, ColumnDirectionType.Input)
-                                .Commit(conn);
-                    }
-
-                    trans.Complete();
-                }
-
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseInserted(entities, DataContext, identificator);
-                }
-
-                return num;
-            }
+            var num = DataContext.BulkInsert(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            return num;
         }
 
         public virtual int ClassicBulkInsert(List<T> entities)
@@ -141,62 +84,8 @@
             if (!entities.Any())
                 return 0;
 
-            lock (_lockObject)
-            {
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseUpdating(entities, DataContext, identificator);
-                }
-
-                var config = new MapperConfiguration(conf =>
-                                                     {
-                                                         conf.CreateMap<T, T>().MaxDepth(1).ForAllMembers(c =>
-                                                                                                          {
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute)) ?? false)
-                                                                                                              {
-                                                                                                                  c.Ignore();
-                                                                                                              }
-
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.CustomAttributes.Any(x => x.AttributeType == typeof(ComplexTypeAttribute)) ?? false)
-                                                                                                                  return;
-                                                                                                              if ((c.DestinationMember as PropertyInfo)?.PropertyType.IsSimple() ?? false)
-                                                                                                                  return;
-                                                                                                              c.Ignore();
-                                                                                                          });
-                                                     });
-                var mapper = config.CreateMapper();
-
-                var distEnts = entities.Distinct(new GenericCompare<T>(identificator)).ToList();
-                var ent = mapper.Map<List<T>>(distEnts);
-                //ent.ForEach(x => x.DateModified = DateTime.UtcNow);
-
-                int num;
-                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
-                {
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        num = new BulkOperations().Setup<T>()
-                                .ForCollection(ent)
-                                .WithTable(DataContext.GetTableName<T>())
-                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
-                                .AddAllColumns()
-                                .DetectColumnWithCustomColumnName()
-                                .RemoveNotMappedColumns()
-                                .BulkUpdate()
-                                .MatchTargetOn(identificator)
-                                .Commit(conn);
-                    }
-
-                    trans.Complete();
-                }
-
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseUpdated(entities, DataContext, identificator);
-                }
-
-                return num;
-            }
+            var num = DataContext.BulkUpdate(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            return num;
         }
 
         public virtual int ClassicBulkUpdate(List<T> entities)
@@ -216,38 +105,8 @@
             if (!entities.Any())
                 return 0;
 
-            lock (_lockObject)
-            {
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseDeleting(entities, DataContext, identificator);
-                }
-
-                int num;
-                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
-                {
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        num = new BulkOperations().Setup<T>()
-                                .ForCollection(entities)
-                                .WithTable(DataContext.GetTableName<T>())
-                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
-                                .AddColumn(identificator)
-                                .BulkDelete()
-                                .MatchTargetOn(identificator)
-                                .Commit(conn);
-                    }
-
-                    trans.Complete();
-                }
-
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseDeleted(entities, DataContext);
-                }
-
-                return num;
-            }
+            var num = DataContext.BulkDelete(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            return num;
         }
 
         public virtual int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true)
@@ -504,6 +363,8 @@
 
             return query.FirstOrDefaultAsync();
         }
+
+        protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().WithTranslations() : DataContext.Set<TSet>();
 
         private IQueryable<T> AppendIncludes(IQueryable<T> query, IEnumerable<Expression<Func<T, object>>> includes)
         {

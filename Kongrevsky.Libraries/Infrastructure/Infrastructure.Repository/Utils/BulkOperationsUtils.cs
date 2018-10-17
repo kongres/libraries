@@ -7,7 +7,6 @@
     using System.Linq;
     using Kongrevsky.Utilities.Expression;
     using SqlBulkTools;
-    using SqlBulkTools.BulkCopy;
 
     #endregion
 
