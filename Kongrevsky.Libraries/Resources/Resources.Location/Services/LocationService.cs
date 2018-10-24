@@ -142,6 +142,11 @@
             filter.SetResult(states.GetPage(new Page(filter.PageNumber, filter.PageSize)),
                              states.Count, states.GetPageCount(filter.PageSize));
 
+            foreach (var state in filter.Items)
+            {
+                state.HasCities = this.GetCities(new CityPaging { StateAbbr = state.Abbr }).TotalItems > 0;
+            }
+
             return filter;
         }
 
@@ -161,6 +166,11 @@
             filter.SetResult(countries.GetPage(new Page(filter.PageNumber, filter.PageSize)),
                              countries.Count, countries.GetPageCount(filter.PageSize));
 
+            foreach (var country in filter.Items)
+            {
+                country.HasStates = this.GetStates(new StatePaging { CountryId = country.Code }).TotalItems > 0;
+                country.HasCities = this.GetCities(new CityPaging { CountryId = country.Code }).TotalItems > 0;
+            }
             return filter;
         }
 

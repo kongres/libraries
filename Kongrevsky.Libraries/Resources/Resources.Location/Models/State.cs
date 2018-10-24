@@ -10,6 +10,8 @@
 
         public string Abbr { get; set; }
 
+        public bool HasCities { get; set; }
+
         #endregion
     }
 }
