@@ -47,7 +47,14 @@
             get
             {
                 if (this.statesValue == null || !this.statesValue.Any())
+                {
                     this.statesValue = _tryRetrieveEmbeddedList<State>(_statesResourcePath);
+                    foreach (var state in this.statesValue)
+                    {
+                        state.HasCities = _cities.Any(city => city.StateId == state.Abbr);
+                    }
+                }
+
 
                 return this.statesValue;
             }
@@ -58,7 +65,16 @@
             get
             {
                 if (this.countriesValue == null || !this.countriesValue.Any())
+                {
                     this.countriesValue = _tryRetrieveEmbeddedList<Country>(_countriesResourcePath);
+                    foreach (var country in this.countriesValue)
+                    {
+                        country.HasStates = _states.Any(state => state.CountryId == country.Code);
+                        country.HasCities = _cities.Any(city => city.CountryId == country.Code);
+                    }
+
+                }
+
 
                 return this.countriesValue;
             }
@@ -91,7 +107,15 @@
             {
                 var country = _countries.FirstOrDefault(x => string.Equals(x.Name, filter.CountryName, _options.StringComparison));
                 if (country != null)
+                {
                     filter.CountryId = country.Code;
+                    if (!country.HasCities)
+                    {
+                        filter.SetResult(Enumerable.Empty<City>(), 0, 0);
+                        return filter;
+                    }
+                }
+                   
             }
 
             if (!filter.StateAbbr.IsNullOrEmpty())
@@ -131,7 +155,14 @@
             {
                 var country = _countries.FirstOrDefault(x => string.Equals(x.Name, filter.CountryName, _options.StringComparison));
                 if (country != null)
+                {
                     filter.CountryId = country.Code;
+                    if (!country.HasStates)
+                    {
+                        filter.SetResult(Enumerable.Empty<State>(), 0, 0);
+                        return filter;
+                    }
+                }
             }
 
             var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
@@ -141,11 +172,6 @@
 
             filter.SetResult(states.GetPage(new Page(filter.PageNumber, filter.PageSize)),
                              states.Count, states.GetPageCount(filter.PageSize));
-
-            foreach (var state in filter.Items)
-            {
-                state.HasCities = this.GetCities(new CityPaging { StateAbbr = state.Abbr }).TotalItems > 0;
-            }
 
             return filter;
         }
@@ -166,11 +192,6 @@
             filter.SetResult(countries.GetPage(new Page(filter.PageNumber, filter.PageSize)),
                              countries.Count, countries.GetPageCount(filter.PageSize));
 
-            foreach (var country in filter.Items)
-            {
-                country.HasStates = this.GetStates(new StatePaging { CountryId = country.Code }).TotalItems > 0;
-                country.HasCities = this.GetCities(new CityPaging { CountryId = country.Code }).TotalItems > 0;
-            }
             return filter;
         }
 
