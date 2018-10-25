@@ -14,5 +14,6 @@
         ///     If specified then used instead of <see cref="CountryId" />
         /// </summary>
         public string CountryName { get; set; }
+        public bool? HasCities { get; set; }
     }
 }

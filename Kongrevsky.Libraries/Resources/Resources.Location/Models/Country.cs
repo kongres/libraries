@@ -8,6 +8,10 @@
 
         public string Code { get; set; }
 
+        public bool HasStates { get; set; }
+
+        public bool HasCities { get; set; }
+
         #endregion
     }
 }
