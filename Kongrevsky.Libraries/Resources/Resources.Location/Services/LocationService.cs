@@ -51,7 +51,7 @@
                     this.statesValue = _tryRetrieveEmbeddedList<State>(_statesResourcePath);
                     foreach (var state in this.statesValue)
                     {
-                        state.HasCities = _cities.Any(city => city.StateId == state.Abbr);
+                        state.HasCities = _cities.Any(city => city.StateId == state.Name);
                     }
                 }
 
@@ -115,7 +115,7 @@
                         return filter;
                     }
                 }
-                   
+
             }
 
             if (!filter.StateAbbr.IsNullOrEmpty())
@@ -165,7 +165,8 @@
                 }
             }
 
-            var states = _states.Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
+            var states = _states.Where(x => !filter.HasCities.HasValue || x.HasCities == filter.HasCities.Value)
+                                .Where(x => filter.CountryId.IsNullOrWhiteSpace() || x.CountryId == filter.CountryId)
                                 .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison) || x.Abbr.Contains(r, _options.StringComparison)))
                                 .OrderBy(filter.OrderProperty, filter.IsDesc)
                                 .ToList();
@@ -185,7 +186,9 @@
         {
             var search = filter.Search.SplitBySpaces();
 
-            var countries = _countries.Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)) || search.Any(r => x.Code.Contains(r, _options.StringComparison)))
+            var countries = _countries.Where(x => !filter.HasCities.HasValue || x.HasCities == filter.HasCities.Value)
+                                      .Where(x => !filter.HasStates.HasValue || x.HasStates == filter.HasStates.Value)
+                                      .Where(x => !search.Any() || search.Any(r => x.Name.Contains(r, _options.StringComparison)) || search.Any(r => x.Code.Contains(r, _options.StringComparison)))
                                       .OrderBy(filter.OrderProperty, filter.IsDesc)
                                       .ToList();
 
