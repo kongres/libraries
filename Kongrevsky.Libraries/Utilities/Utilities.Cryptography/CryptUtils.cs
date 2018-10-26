@@ -152,8 +152,6 @@
 
         #region PasswordHash
 
-        private const int SALT_SIZE = 8;
-
         private const int NUM_ITERATIONS = 1000;
 
         private static readonly RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
@@ -163,9 +161,12 @@
         /// </summary>
         /// <param name="password">The password to hash.</param>
         /// <returns>the "salt:hash" for the password.</returns>
-        public static string CreatePasswordSalt(string password)
+        public static string CreatePasswordSalt(string password, int saltSize = 64)
         {
-            var buf = new byte[SALT_SIZE];
+            if (saltSize < 8)
+                throw new ArgumentException("Salt is not at least eight bytes", nameof(saltSize));
+                
+            var buf = new byte[saltSize];
             rng.GetBytes(buf);
             var salt = Convert.ToBase64String(buf);
 
