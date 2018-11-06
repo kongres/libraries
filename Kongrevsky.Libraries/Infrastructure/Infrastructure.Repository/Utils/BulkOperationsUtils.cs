@@ -7,6 +7,8 @@
     using System.Linq;
     using Kongrevsky.Utilities.Expression;
     using SqlBulkTools;
+    using System.Linq.Expressions;
+    using SqlBulkTools.Enumeration;
 
     #endregion
 
@@ -21,10 +23,18 @@
                     continue;
 
                 var columnAttribute = attrs.First() as ColumnAttribute;
-                bulk.CustomColumnMapping(ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                if (!string.IsNullOrEmpty(columnAttribute?.Name))
+                {
+                    bulk.CustomColumnMapping(ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                }
             }
 
             return bulk;
+        }
+
+        public static BulkInsert<T> ApplyIdentityColumn<T>(this BulkInsert<T> bulk, Expression<Func<T, object>> identificator, ColumnDirectionType columnDirectionType)
+        {
+            return identificator != null ? bulk.SetIdentityColumn(identificator, columnDirectionType) : bulk;
         }
 
         public static BulkAddColumnList<T> RemoveNotMappedColumns<T>(this BulkAddColumnList<T> bulk)

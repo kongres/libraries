@@ -55,7 +55,7 @@
                                                      });
                 var mapper = config.CreateMapper();
 
-                var distEnts = enumerable.Distinct(new GenericCompare<T>(identificator)).ToList();
+                var distEnts = identificator != null ? enumerable.Distinct(new GenericCompare<T>(identificator)).ToList() : enumerable;
                 var ent = mapper.Map<List<T>>(distEnts);
 
                 int num;
@@ -69,7 +69,7 @@
                             .DetectColumnWithCustomColumnName()
                             .RemoveNotMappedColumns()
                             .BulkInsert()
-                            .SetIdentityColumn(identificator, ColumnDirectionType.Input)
+                            .ApplyIdentityColumn(identificator, ColumnDirectionType.Input)
                             .Commit(dbContext.Database.Connection as SqlConnection);
 
                     trans.Complete();
