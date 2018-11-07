@@ -265,7 +265,7 @@
 
         /// <summary>
         /// Detects if type is primitive, enum or one of the following types:
-        /// string, decimal, DateTime
+        /// string, decimal, DateTime, TimeSpan
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -278,7 +278,8 @@
                 || type.IsEnum
                 || type == typeof(string)
                 || type == typeof(decimal)
-                || type == typeof(DateTime);
+                || type == typeof(DateTime)
+                || type == typeof(TimeSpan);
         }
 
         /// <summary>
