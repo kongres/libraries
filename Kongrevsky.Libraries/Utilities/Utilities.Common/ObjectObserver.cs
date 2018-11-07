@@ -97,6 +97,13 @@
 
                         return;
                     }
+                    if (typeof(TTarget) == typeof(TimeSpan))
+                    {
+                        if (((TimeSpan)(object)oldValue).Subtract((TimeSpan)(object)handledValue).Duration() > TimeSpan.FromSeconds(1))
+                            ActionIfDiff();
+
+                        return;
+                    }
 
                     if (!typeof(TTarget).IsSimple())
                     {
