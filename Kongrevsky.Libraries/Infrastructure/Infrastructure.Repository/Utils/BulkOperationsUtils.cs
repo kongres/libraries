@@ -21,7 +21,10 @@
                     continue;
 
                 var columnAttribute = attrs.First() as ColumnAttribute;
-                bulk.CustomColumnMapping(ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                if (!string.IsNullOrEmpty(columnAttribute?.Name))
+                {
+                    bulk.CustomColumnMapping(ExpressionUtils.ToLambda<T, object>(property.Name), columnAttribute.Name);
+                }
             }
 
             return bulk;
