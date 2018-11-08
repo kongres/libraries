@@ -69,7 +69,7 @@
                             .DetectColumnWithCustomColumnName()
                             .RemoveNotMappedColumns()
                             .BulkInsert()
-                            .SetIdentityColumn(identificator, ColumnDirectionType.Input)
+                            //.SetIdentityColumn(identificator, ColumnDirectionType.Input)
                             .Commit(dbContext.Database.Connection as SqlConnection);
 
                     trans.Complete();

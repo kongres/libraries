@@ -12,7 +12,7 @@
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.4" />
     <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.4" />
-    <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.1" />
+    <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.2" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     <PackageReference Include="Microsoft.Linq.Translations" Version="1.0.1" />
