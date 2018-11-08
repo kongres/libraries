@@ -74,11 +74,10 @@
         /// <returns></returns>
         public static Expression ToExpression<TInput, TOutput>(this Expression<Func<TInput, TOutput>> expression)
         {
-            var memberName = ((MemberExpression)expression.Body).Member.Name;
-
-            var param = Expression.Parameter(typeof(TInput));
-            var field = Expression.Property(param, memberName);
-            return Expression.Lambda(field, param);
+            var body = expression.Body;
+            var @params = expression.Parameters;
+            var lambdaExpression = Expression.Lambda(body, @params);
+            return lambdaExpression;
         }
 
         public static Expression CreateMemberAccess(ParameterExpression parameter, string propertyName)
