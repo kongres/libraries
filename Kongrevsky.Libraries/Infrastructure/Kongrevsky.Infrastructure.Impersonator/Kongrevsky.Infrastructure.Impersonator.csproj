@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>Kongrevsky.Infrastructure.Impersonator</AssemblyName>
+    <PackageId>Kongrevsky.Infrastructure.Impersonator</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Authors>Valikovsky Igor</Authors>
+    <Description>Windows Impersonator</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+  </PropertyGroup>
+
+</Project>
