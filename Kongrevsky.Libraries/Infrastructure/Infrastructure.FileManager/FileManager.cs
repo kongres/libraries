@@ -8,7 +8,6 @@
     using Kongrevsky.Infrastructure.FileManager.Utils;
     using Kongrevsky.Infrastructure.Impersonator;
     using Kongrevsky.Utilities.Common;
-    using Microsoft.Extensions.Options;
 
     #endregion
 
@@ -39,9 +38,9 @@
 
         #region Interface Implementations
 
-        public FileManager(IOptions<FileManagerOptions> fileManagerOptions)
+        public FileManager(FileManagerOptions fileManagerOptions)
         {
-            _fileManagerOptions = fileManagerOptions.Value ?? throw new ArgumentNullException(nameof(fileManagerOptions));
+            _fileManagerOptions = fileManagerOptions ?? throw new ArgumentNullException(nameof(fileManagerOptions));
             if (string.IsNullOrEmpty(_fileManagerOptions.RootPath))
                 throw new ArgumentNullException(nameof(_fileManagerOptions.RootPath));
 
