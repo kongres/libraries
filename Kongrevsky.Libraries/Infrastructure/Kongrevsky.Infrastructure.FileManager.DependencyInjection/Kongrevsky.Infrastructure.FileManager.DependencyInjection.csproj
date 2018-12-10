@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <AssemblyName>Kongrevsky.Infrastructure.FileManager.DependencyInjection</AssemblyName>
+    <PackageId>Kongrevsky.Infrastructure.FileManager.DependencyInjection</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Authors>Valikovsky Igor</Authors>
+    <Description>File manager</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kongrevsky.Infrastructure.FileManager" Version="1.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+  </ItemGroup>
+</Project>
