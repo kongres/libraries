@@ -89,7 +89,7 @@
         }
 
         /// <summary>
-        /// Sets Image background color to specified color
+        /// Set Image background color to specified color
         /// </summary>
         /// <param name="image"></param>
         /// <param name="color"></param>
@@ -112,25 +112,34 @@
         }
 
         /// <summary>
-        /// Set background color for image
+        /// Check if stream is Image
         /// </summary>
-        /// <param name="image"></param>
-        /// <param name="color"></param>
+        /// <param name="stream"></param>
         /// <returns></returns>
-        public static Image SetBackgroudColor(this Image image, Color color)
+        public static bool IsImage(Stream stream)
         {
-            //create a Bitmap the size of the image provided  
-            var bmp = new Bitmap(image.Width, image.Height);
-
-            //create a graphics object from the image  
-            using (var gfx = Graphics.FromImage(bmp))
+            bool isValid;
+            var position = stream.Position;
+            try
             {
-                //clear image by color
-                gfx.Clear(color);
-                //now draw the image  
-                gfx.DrawImage(image, new Rectangle(0, 0, bmp.Width, bmp.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
+                // Read the image without validating image data
+                using (Image.FromStream(stream, false, false))
+                {
+                    isValid = true;
+                }
             }
-            return bmp;
+            catch
+            {
+                isValid = false;
+            }
+            finally
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Seek(position, SeekOrigin.Begin);
+                }
+            }
+            return isValid;
         }
     }
 }
