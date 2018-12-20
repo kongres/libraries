@@ -19,6 +19,7 @@
     using Kongrevsky.Infrastructure.Repository.Models;
     using Kongrevsky.Infrastructure.Repository.Triggers;
     using Kongrevsky.Infrastructure.Repository.Utils;
+    using Kongrevsky.Infrastructure.Repository.Utils.Options;
     using Kongrevsky.Utilities.EF6;
     using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
@@ -58,12 +59,12 @@
 
         private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
 
-        public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
+        public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkInsertOptions<T>> configAction = null)
         {
             if (!entities.Any())
                 return 0;
 
-            var num = DataContext.BulkInsert(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            var num = DataContext.BulkInsert(entities, identificator, configAction);
             return num;
         }
 
@@ -79,12 +80,12 @@
             return entities.Count;
         }
 
-        public virtual int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
+        public virtual int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkUpdateOptions<T>> configAction = null)
         {
             if (!entities.Any())
                 return 0;
 
-            var num = DataContext.BulkUpdate(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            var num = DataContext.BulkUpdate(entities, identificator, configAction);
             return num;
         }
 
@@ -100,12 +101,12 @@
             return entities.Count;
         }
 
-        public virtual int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600)
+        public virtual int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkDeleteOptions<T>> configAction = null)
         {
             if (!entities.Any())
                 return 0;
 
-            var num = DataContext.BulkDelete(entities, identificator, fireTriggers, batchSize, bulkCopyTimeout);
+            var num = DataContext.BulkDelete(entities, identificator, configAction);
             return num;
         }
 

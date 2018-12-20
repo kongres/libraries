@@ -9,6 +9,7 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using Kongrevsky.Infrastructure.Repository.Models;
+    using Kongrevsky.Infrastructure.Repository.Utils.Options;
     using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 
@@ -20,15 +21,15 @@
 
     public interface IKongrevskyRepository<T> where T : class
     {
-        int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
+        int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkInsertOptions<T>> configAction = null);
 
         int ClassicBulkInsert(List<T> entities);
 
-        int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
+        int BulkUpdate(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkUpdateOptions<T>> configAction = null);
 
         int ClassicBulkUpdate(List<T> entities);
 
-        int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, bool fireTriggers = true, int batchSize = 5000, int bulkCopyTimeout = 600);
+        int BulkDelete(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkDeleteOptions<T>> configAction = null);
 
         int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true);
 
