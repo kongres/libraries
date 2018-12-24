@@ -143,11 +143,11 @@
 
                 try
                 {
-                    records.AddRange((where == null ? Dbset : Dbset.Where(where)).GroupBy(expression).Where(x => x.Count() > 1).ToList());
+                    records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).GroupBy(expression).Where(x => x.Count() > 1).ToList());
                 }
                 catch (Exception e)
                 {
-                    records.AddRange((where == null ? Dbset : Dbset.Where(where)).ToList().GroupBy(expression.Compile()).Where(x => x.Count() > 1).ToList());
+                    records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).ToList().GroupBy(expression.Compile()).Where(x => x.Count() > 1).ToList());
                 }
 
                 var ent = new List<T>();
@@ -237,7 +237,7 @@
 
         public virtual void Delete(Expression<Func<T, bool>> where)
         {
-            var objects = Dbset.Where(where).AsEnumerable();
+            var objects = Dbset.Where(where).WithTranslations().AsEnumerable();
             DbsetRaw.RemoveRange(objects);
         }
 
@@ -283,7 +283,7 @@
 
         public virtual IQueryable<T> GetMany(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
         {
-            var query = Dbset.Where(where);
+            var query = Dbset.Where(where).WithTranslations();
             query = AppendIncludes(query, includes);
 
             return query;
@@ -351,7 +351,7 @@
 
         public T Get(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
         {
-            var query = Dbset.Where(where);
+            var query = Dbset.Where(where).WithTranslations();
             query = AppendIncludes(query, includes);
 
             return query.FirstOrDefault();
@@ -359,7 +359,7 @@
 
         public Task<T> GetAsync(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
         {
-            var query = Dbset.Where(where);
+            var query = Dbset.Where(where).WithTranslations();
             query = AppendIncludes(query, includes);
 
             return query.FirstOrDefaultAsync();
