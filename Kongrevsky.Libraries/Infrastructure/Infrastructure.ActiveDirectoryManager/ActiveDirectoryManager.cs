@@ -198,6 +198,7 @@
                             {
                                 try
                                 {
+                                    username = username?.Split('@').FirstOrDefault();
                                     var domain = _activeDirectoryOptions.Url;
                                     if (Uri.TryCreate(_activeDirectoryOptions.Url, UriKind.Absolute, out var uri))
                                     {
