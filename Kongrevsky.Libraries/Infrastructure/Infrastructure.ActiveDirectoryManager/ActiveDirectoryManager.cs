@@ -5,7 +5,11 @@
     using System;
     using System.Collections.Generic;
     using System.DirectoryServices;
+    using System.DirectoryServices.AccountManagement;
+    using System.DirectoryServices.Protocols;
     using System.Linq;
+    using System.Net;
+    using System.Security.Policy;
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
     using Kongrevsky.Utilities.String;
@@ -15,6 +19,8 @@
 
     public class ActiveDirectoryManager : IActiveDirectoryManager
     {
+        private const int ERROR_LOGON_FAILURE = 0x31;
+
         #region Properties
 
         private ActiveDirectoryOptions _activeDirectoryOptions { get; }
@@ -73,12 +79,12 @@
                                                null :
                                                new ADUser()
                                                {
-                                                       Email = FirstOrDefault(result.Properties["mail"]) as string,
-                                                       FirstName = FirstOrDefault(result.Properties["givenName"]) as string,
-                                                       LastName = FirstOrDefault(result.Properties["sn"]) as string,
-                                                       Phone = FirstOrDefault(result.Properties["telephoneNumber"]) as string,
-                                                       Username = FirstOrDefault(result.Properties["sAMAccountName"]) as string,
-                                                       IsActive = IsUserActive(result.GetDirectoryEntry())
+                                                   Email = FirstOrDefault(result.Properties["mail"]) as string,
+                                                   FirstName = FirstOrDefault(result.Properties["givenName"]) as string,
+                                                   LastName = FirstOrDefault(result.Properties["sn"]) as string,
+                                                   Phone = FirstOrDefault(result.Properties["telephoneNumber"]) as string,
+                                                   Username = FirstOrDefault(result.Properties["sAMAccountName"]) as string,
+                                                   IsActive = IsUserActive(result.GetDirectoryEntry())
                                                };
                             });
         }
@@ -102,12 +108,12 @@
                                                null :
                                                new ADUser()
                                                {
-                                                       Email = FirstOrDefault(result.Properties["mail"]) as string,
-                                                       FirstName = FirstOrDefault(result.Properties["givenName"]) as string,
-                                                       LastName = FirstOrDefault(result.Properties["sn"]) as string,
-                                                       Phone = FirstOrDefault(result.Properties["telephoneNumber"]) as string,
-                                                       Username = FirstOrDefault(result.Properties["sAMAccountName"]) as string,
-                                                       IsActive = IsUserActive(result.GetDirectoryEntry())
+                                                   Email = FirstOrDefault(result.Properties["mail"]) as string,
+                                                   FirstName = FirstOrDefault(result.Properties["givenName"]) as string,
+                                                   LastName = FirstOrDefault(result.Properties["sn"]) as string,
+                                                   Phone = FirstOrDefault(result.Properties["telephoneNumber"]) as string,
+                                                   Username = FirstOrDefault(result.Properties["sAMAccountName"]) as string,
+                                                   IsActive = IsUserActive(result.GetDirectoryEntry())
                                                };
                             });
         }
@@ -121,9 +127,9 @@
 
                                 var searchAd = string.Join("", searchList.Select(x => $"(givenName={x})(sn={x})(mail={x})"));
                                 var searcher = new DirectorySearcher(_directoryEntry)
-                                               {
-                                                       Filter = $"(&(objectClass=user)(|{searchAd}))"
-                                               };
+                                {
+                                    Filter = $"(&(objectClass=user)(|{searchAd}))"
+                                };
                                 //searcher.SizeLimit = sizeLimit;
 
                                 searcher.PropertiesToLoad.Add("givenName");          // first name
@@ -139,14 +145,14 @@
                                 foreach (SearchResult o in resultCollection)
                                 {
                                     var adUser = new ADUser()
-                                                 {
-                                                         Email = FirstOrDefault(o.Properties["mail"]) as string,
-                                                         FirstName = FirstOrDefault(o.Properties["givenName"]) as string,
-                                                         LastName = FirstOrDefault(o.Properties["sn"]) as string,
-                                                         Phone = FirstOrDefault(o.Properties["telephoneNumber"]) as string,
-                                                         Username = FirstOrDefault(o.Properties["sAMAccountName"]) as string,
-                                                         IsActive = IsUserActive(o.GetDirectoryEntry())
-                                                 };
+                                    {
+                                        Email = FirstOrDefault(o.Properties["mail"]) as string,
+                                        FirstName = FirstOrDefault(o.Properties["givenName"]) as string,
+                                        LastName = FirstOrDefault(o.Properties["sn"]) as string,
+                                        Phone = FirstOrDefault(o.Properties["telephoneNumber"]) as string,
+                                        Username = FirstOrDefault(o.Properties["sAMAccountName"]) as string,
+                                        IsActive = IsUserActive(o.GetDirectoryEntry())
+                                    };
 
                                     if (!string.IsNullOrEmpty(adUser.Email))
                                         adUsers.Add(adUser);
@@ -176,12 +182,12 @@
                                                null :
                                                new ADUser()
                                                {
-                                                       Email = FirstOrDefault(result.Properties["mail"]).ToString(),
-                                                       FirstName = FirstOrDefault(result.Properties["givenName"])?.ToString(),
-                                                       LastName = FirstOrDefault(result.Properties["sn"])?.ToString(),
-                                                       Phone = FirstOrDefault(result.Properties["telephoneNumber"])?.ToString(),
-                                                       Username = FirstOrDefault(result.Properties["sAMAccountName"])?.ToString(),
-                                                       IsActive = IsUserActive(result.GetDirectoryEntry())
+                                                   Email = FirstOrDefault(result.Properties["mail"]).ToString(),
+                                                   FirstName = FirstOrDefault(result.Properties["givenName"])?.ToString(),
+                                                   LastName = FirstOrDefault(result.Properties["sn"])?.ToString(),
+                                                   Phone = FirstOrDefault(result.Properties["telephoneNumber"])?.ToString(),
+                                                   Username = FirstOrDefault(result.Properties["sAMAccountName"])?.ToString(),
+                                                   IsActive = IsUserActive(result.GetDirectoryEntry())
                                                };
                             });
         }
@@ -190,25 +196,36 @@
         {
             return Task.Run(() =>
                             {
-                                var authenticated = false;
-
                                 try
                                 {
-                                    username = username.Split('@').FirstOrDefault();
-                                    var entry = new DirectoryEntry(_activeDirectoryOptions.Url, username, password);
-                                    var nativeObject = entry.NativeObject;
-                                    authenticated = true;
+                                    var domain = _activeDirectoryOptions.Url;
+                                    if (Uri.TryCreate(_activeDirectoryOptions.Url, UriKind.Absolute, out var uri))
+                                    {
+                                        domain = uri.Host;
+                                    }
+
+                                    var credentials = new NetworkCredential(username, password, domain);
+
+                                    var directoryIdentifier = new LdapDirectoryIdentifier(domain);
+
+                                    using (var connection = new LdapConnection(directoryIdentifier, credentials, AuthType.Kerberos))
+                                    {
+                                        connection.SessionOptions.Sealing = true;
+                                        connection.SessionOptions.Signing = true;
+
+                                        connection.Bind();
+                                    }
+                                    return true;
                                 }
-                                catch (DirectoryServicesCOMException)
+                                catch (LdapException lEx)
                                 {
-                                    //not authenticated; reason why is in cex
-                                }
-                                catch (Exception)
-                                {
-                                    //not authenticated due to some other exception [this is optional]
+                                    if (ERROR_LOGON_FAILURE == lEx.ErrorCode)
+                                    {
+                                        return false;
+                                    }
                                 }
 
-                                return authenticated;
+                                return false;
                             });
         }
 
