@@ -208,7 +208,7 @@
 
                                     var directoryIdentifier = new LdapDirectoryIdentifier(domain);
 
-                                    using (var connection = new LdapConnection(directoryIdentifier, credentials, AuthType.Kerberos))
+                                    using (var connection = new LdapConnection(directoryIdentifier, credentials, AuthType.Negotiate))
                                     {
                                         connection.SessionOptions.Sealing = true;
                                         connection.SessionOptions.Signing = true;
