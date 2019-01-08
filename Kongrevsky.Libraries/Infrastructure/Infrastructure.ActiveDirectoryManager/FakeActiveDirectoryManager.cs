@@ -84,9 +84,14 @@
             return Task.FromResult(users.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.Email).ToList());
         }
 
-        public Task<bool> ValidateUserCredentialsAsync(string username, string password)
+        public Task<bool> ValidateEmailAndPasswordAsync(string email, string password)
         {
-            var random = new Random();
+            var username = email?.Split('@').FirstOrDefault();
+            return ValidateUsernameAndPasswordAsync(username, password);
+        }
+
+        public Task<bool> ValidateUsernameAndPasswordAsync(string username, string password)
+        {
             return Task.FromResult(adUsers.Any(x => string.Equals(x.Email, username, StringComparison.InvariantCultureIgnoreCase) || string.Equals(x.Username, username, StringComparison.InvariantCultureIgnoreCase)) && password == _activeDirectoryOptions.Password.IfNullOrEmpty("123456789"));
         }
 

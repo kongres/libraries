@@ -5,11 +5,9 @@
     using System;
     using System.Collections.Generic;
     using System.DirectoryServices;
-    using System.DirectoryServices.AccountManagement;
     using System.DirectoryServices.Protocols;
     using System.Linq;
     using System.Net;
-    using System.Security.Policy;
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
     using Kongrevsky.Utilities.String;
@@ -51,7 +49,7 @@
         {
             try
             {
-                var checkConnection = ValidateUserCredentialsAsync(_activeDirectoryOptions.Username, _activeDirectoryOptions.Password).Result;
+                var checkConnection = ValidateUsernameAndPasswordAsync(_activeDirectoryOptions.Username, _activeDirectoryOptions.Password).Result;
                 return checkConnection;
             }
             catch
@@ -192,13 +190,18 @@
                             });
         }
 
-        public Task<bool> ValidateUserCredentialsAsync(string username, string password)
+        public Task<bool> ValidateEmailAndPasswordAsync(string email, string password)
+        {
+            var username = email?.Split('@').FirstOrDefault();
+            return ValidateUsernameAndPasswordAsync(username, password);
+        }
+
+        public Task<bool> ValidateUsernameAndPasswordAsync(string username, string password)
         {
             return Task.Run(() =>
                             {
                                 try
                                 {
-                                    username = username?.Split('@').FirstOrDefault();
                                     var domain = _activeDirectoryOptions.Url;
                                     if (Uri.TryCreate(_activeDirectoryOptions.Url, UriKind.Absolute, out var uri))
                                     {
@@ -209,7 +212,7 @@
 
                                     var directoryIdentifier = new LdapDirectoryIdentifier(domain);
 
-                                    using (var connection = new LdapConnection(directoryIdentifier, credentials, AuthType.Negotiate))
+                                    using (var connection = new LdapConnection(directoryIdentifier, credentials, _activeDirectoryOptions.GetAuthType()))
                                     {
                                         connection.SessionOptions.Sealing = true;
                                         connection.SessionOptions.Signing = true;

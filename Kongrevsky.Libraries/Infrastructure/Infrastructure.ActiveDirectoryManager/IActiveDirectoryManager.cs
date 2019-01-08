@@ -50,6 +50,14 @@ namespace Kongrevsky.Infrastructure.ActiveDirectoryManager
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<bool> ValidateUserCredentialsAsync(string username, string password);
+        Task<bool> ValidateEmailAndPasswordAsync(string email, string password);        
+        
+        /// <summary>
+        /// Async detects if specified credentials are valid
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        Task<bool> ValidateUsernameAndPasswordAsync(string username, string password);
     }
 }
