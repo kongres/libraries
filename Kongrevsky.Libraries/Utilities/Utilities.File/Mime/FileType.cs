@@ -78,6 +78,9 @@
 
         public override bool Equals(object other)
         {
+            if (object.ReferenceEquals(other, null))
+                return false;
+
             if (!(other is FileType)) return false;
 
             var otherType = (FileType)other;
@@ -85,6 +88,16 @@
             if (Extension == otherType.Extension && Mime == otherType.Mime) return true;
 
             return base.Equals(other);
+        }
+
+        public static bool operator ==(FileType a1, FileType a2)
+        {
+            return a1?.Equals(a2) ?? false;
+        }
+
+        public static bool operator !=(FileType a1, FileType a2)
+        {
+            return !(a1 == a2);
         }
 
         public override int GetHashCode()
