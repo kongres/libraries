@@ -7,36 +7,12 @@
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
+    using System.Xml.Serialization;
 
     #endregion
 
     public static class MimeTypes
     {
-        #region Constants
-
-        // number of bytes we read from a file
-        public const int MaxHeaderSize = 560; // some file formats have headers offset to 512 bytes
-
-        // all the file types to be put into one list
-        public static List<FileType> types;
-
-        public static readonly FileType LIB_COFF = new FileType(new byte?[] { 0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E, 0x0A }, "lib", "application/octet-stream");
-
-        /*
-         * 46 72 6F 6D 20 20 20 or	 	From
-        46 72 6F 6D 20 3F 3F 3F or	 	From ???
-        46 72 6F 6D 3A 20	 	From:
-        EML	 	A commmon file extension for e-mail files. Signatures shown here
-        are for Netscape, Eudora, and a generic signature, respectively.
-        EML is also used by Outlook Express and QuickMail.
-         */
-        public static readonly FileType EML_FROM = new FileType(new byte?[] { 0x46, 0x72, 0x6F, 0x6D }, "eml", "message/rfc822");
-
-        //EVTX	 	Windows Vista event log file
-        public static readonly FileType ELF = new FileType(new byte?[] { 0x45, 0x6C, 0x66, 0x46, 0x69, 0x6C, 0x65, 0x00 }, "elf", "text/plain");
-
-        #endregion
-
         #region Constructors
 
         static MimeTypes()
@@ -89,6 +65,31 @@
 
         #endregion
 
+        #region Constants
+
+        // number of bytes we read from a file
+        public const int MaxHeaderSize = 560; // some file formats have headers offset to 512 bytes
+
+        // all the file types to be put into one list
+        public static List<FileType> types;
+
+        public static readonly FileType LIB_COFF = new FileType(new byte?[] { 0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E, 0x0A }, "lib", "application/octet-stream");
+
+        /*
+         * 46 72 6F 6D 20 20 20 or	 	From
+        46 72 6F 6D 20 3F 3F 3F or	 	From ???
+        46 72 6F 6D 3A 20	 	From:
+        EML	 	A commmon file extension for e-mail files. Signatures shown here
+        are for Netscape, Eudora, and a generic signature, respectively.
+        EML is also used by Outlook Express and QuickMail.
+         */
+        public static readonly FileType EML_FROM = new FileType(new byte?[] { 0x46, 0x72, 0x6F, 0x6D }, "eml", "message/rfc822");
+
+        //EVTX	 	Windows Vista event log file
+        public static readonly FileType ELF = new FileType(new byte?[] { 0x45, 0x6C, 0x66, 0x46, 0x69, 0x6C, 0x65, 0x00 }, "elf", "text/plain");
+
+        #endregion
+
         // file headers are taken from here:
         //http://www.garykessler.net/library/file_sigs.html
         //mime types are taken from here:
@@ -122,7 +123,8 @@
 
         //application/xml text/xml
         public static readonly FileType XML = new FileType(new byte?[] { 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x3D, 0x22, 0x31, 0x2E, 0x30, 0x22 },
-                                                           "xml,xul", "text/xml");
+                                                           "xml,xul",
+                                                           "text/xml");
 
         //text files
         public static readonly FileType HTML = new FileType(new byte?[] { 0x3C, 0x21, 0x44, 0x4F, 0x43, 0x54, 0x59, 0x50 }, "html", "text/html");
@@ -201,7 +203,9 @@
                                                             {
                                                                     0x52, 0x49, 0x46, 0x46, null, null, null, null,
                                                                     0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20
-                                                            }, "wav", "audio/wav");
+                                                            },
+                                                            "wav",
+                                                            "audio/wav");
 
         public static readonly FileType PST = new FileType(new byte?[] { 0x21, 0x42, 0x44, 0x4E }, "pst", "application/octet-stream");
 
@@ -235,7 +239,7 @@
         {
             using (var file = File.OpenWrite(path))
             {
-                var serializer = new System.Xml.Serialization.XmlSerializer(types.GetType());
+                var serializer = new XmlSerializer(types.GetType());
                 serializer.Serialize(file, types);
             }
         }
@@ -244,7 +248,7 @@
         {
             using (var file = File.OpenRead(path))
             {
-                var serializer = new System.Xml.Serialization.XmlSerializer(types.GetType());
+                var serializer = new XmlSerializer(types.GetType());
                 var tmpTypes = (List<FileType>)serializer.Deserialize(file);
                 foreach (var type in tmpTypes)
                     types.Add(type);
@@ -252,80 +256,54 @@
         }
 
         /// <summary>
-        /// Read header of bytes and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
+        ///     Read header of bytes and depending on the information in the header
+        ///     return object FileType.
         /// </summary>
-        /// <remarks>
-        /// A temp file is written to get a FileInfo from the given bytes.
-        /// If this is not intended use 
-        /// 
-        ///     GetFileType(() => bytes); 
-        ///     
-        /// </remarks>
-        /// <param name="file">The FileInfo object.</param>
+        /// <param name="bytes">Bytes array of file.</param>
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this byte[] bytes)
         {
-            return GetFileType(new MemoryStream(bytes));
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+                var header = ReadFileHeader(memoryStream, MaxHeaderSize);
+                return GetFileType(() => header, memoryStream);
+            }
         }
 
         /// <summary>
-        /// Read header of a stream and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
+        ///     Read header of a stream and depending on the information in the header
+        ///     return object FileType.
         /// </summary>
-        /// <param name="file">The FileInfo object.</param>
+        /// <param name="stream">The Stream object.</param>
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this Stream stream)
         {
-            FileType fileType = null;
-            var fileName = Path.GetTempFileName();
-
-            try
-            {
-                using (var fileStream = File.Create(fileName))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
-                }
-
-                fileType = GetFileType(new FileInfo(fileName));
-            }
-            finally
-            {
-                stream.Position = 0;
-                File.Delete(fileName);
-            }
-
-            return fileType ?? TXT;
+            return GetFileType(() => ReadFileHeader(stream, MaxHeaderSize), stream);
         }
 
         /// <summary>
-        /// Read header of a file and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
+        ///     Read header of a file and depending on the information in the header
+        ///     return object FileType.
         /// </summary>
         /// <param name="file">The FileInfo object.</param>
         /// <returns>FileType or null not identified</returns>
         public static FileType GetFileType(this FileInfo file)
         {
-            return GetFileType(() => ReadFileHeader(file, MaxHeaderSize), file.FullName);
+            using (var fsSource = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
+            {
+                var header = ReadFileHeader(fsSource, MaxHeaderSize);
+                return GetFileType(() => header, fsSource);
+            }
         }
 
         /// <summary>
-        /// Read header of a file and depending on the information in the header
-        /// return object FileType.
-        /// Return null in case when the file type is not identified. 
-        /// Throws Application exception if the file can not be read or does not exist
+        ///     Read header of a file and depending on the information in the header
+        ///     return object FileType.
         /// </summary>
         /// <param name="fileHeaderReadFunc">A function which returns the bytes found</param>
-        /// <param name="fileFullName">If given and file typ is a zip file, a check for docx and xlsx is done</param>
+        /// <param name="stream">If given and file typ is a zip file, a check for docx and xlsx is done</param>
         /// <returns>FileType or null not identified</returns>
-        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc, string fileFullName = "")
+        public static FileType GetFileType(Func<byte[]> fileHeaderReadFunc, Stream stream = null)
         {
             // if none of the types match, return null
             FileType fileType = null;
@@ -336,14 +314,12 @@
             // compare the file header to the stored file headers
             foreach (var type in types)
             {
-                var matchingCount = SearchBytes(fileHeader, Enumerable.ToArray(Enumerable.Select(type.Header, x => x.GetValueOrDefault())));
+                var matchingCount = SearchBytes(fileHeader, type.Header.Select(x => x.GetValueOrDefault()).ToArray());
                 if (matchingCount != -1)
                 {
                     // check for docx and xlsx only if a file name is given
-                    // there may be situations where the file name is not given
-                    // or it is unpracticable to write a temp file to get the FileInfo
-                    if (type.Equals(ZIP) && !String.IsNullOrEmpty(fileFullName))
-                        fileType = CheckForDocxAndXlsx(type, fileFullName);
+                    if (type.Equals(ZIP) && stream != null)
+                        fileType = CheckForDocxAndXlsx(stream) ?? type;
                     else
                         fileType = type; // if all the bytes match, return the type
 
@@ -355,89 +331,78 @@
         }
 
         /// <summary>
-        /// Determines whether provided file belongs to one of the provided list of files
+        ///     Determines whether provided file belongs to one of the provided list of files
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="requiredTypes">The required types.</param>
         /// <returns>
-        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
+        ///     <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
         /// </returns>
-        public static bool isFileOfTypes(this FileInfo file, List<FileType> requiredTypes)
+        public static bool IsFileOfTypes(this FileInfo file, params FileType[] requiredTypes)
         {
             var currentType = file.GetFileType();
-
-            if (null == currentType)
-                return false;
-
-            return requiredTypes.Contains(currentType);
+            return currentType != null && requiredTypes.Contains(currentType);
         }
 
         /// <summary>
-        /// Determines whether provided file belongs to one of the provided list of files,
-        /// where list of files provided by string with Comma-Separated-Values of extensions
+        ///     Determines whether provided file belongs to one of the provided list of files,
+        ///     where list of files provided by string with Comma-Separated-Values of extensions
         /// </summary>
         /// <param name="file">The file.</param>
-        /// <param name="requiredTypes">The required types.</param>
+        /// <param name="extensions">The extensions of required types.</param>
         /// <returns>
-        ///   <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
+        ///     <c>true</c> if file of the one of the provided types; otherwise, <c>false</c>.
         /// </returns>
-        public static bool isFileOfTypes(this FileInfo file, String CSV)
+        public static bool IsFileOfTypes(this FileInfo file, params String[] extensions)
         {
-            var providedTypes = GetFileTypesByExtensions(CSV);
+            var providedTypes = GetFileTypesByExtensions(extensions);
 
-            return file.isFileOfTypes(providedTypes);
+            return file.IsFileOfTypes(providedTypes.ToArray());
         }
 
-        /// <summary>
-        /// Gets the list of FileTypes based on list of extensions in Comma-Separated-Values string
-        /// </summary>
-        /// <param name="CSV">The CSV String with extensions</param>
-        /// <returns>List of FileTypes</returns>
-        private static List<FileType> GetFileTypesByExtensions(String CSV)
+        private static List<FileType> GetFileTypesByExtensions(string[] extensions)
         {
-            var extensions = CSV.ToUpper().Replace(" ", "").Split(',');
-
             var result = new List<FileType>();
 
             foreach (var type in types)
-                if (extensions.Contains(type.Extension.ToUpper()))
+                if (extensions.Contains(type.Extension, StringComparer.InvariantCultureIgnoreCase))
                     result.Add(type);
 
             return result;
         }
 
-        private static FileType CheckForDocxAndXlsx(FileType type, string fileFullName)
+        private static FileType CheckForDocxAndXlsx(Stream stream)
         {
             FileType result = null;
 
+            var position = stream.Position;
+            stream.Seek(0, SeekOrigin.Begin);
             //check for docx and xlsx
-            using (var zipFile = ZipFile.OpenRead(fileFullName))
+            using (var zipFile = new ZipArchive(stream, ZipArchiveMode.Read))
             {
                 if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
                     result = WORDX;
                 else if (zipFile.Entries.Any(e => e.FullName.StartsWith("xl/")))
                     result = EXCELX;
                 else
-                    result = CheckForOdtAndOds(result, zipFile);
+                {
+                    var ooMimeType = zipFile.Entries.FirstOrDefault(e => e.FullName == "mimetype");
+                    if (ooMimeType == null)
+                        return null;
+                    using (var textReader = new StreamReader(ooMimeType.Open()))
+                    {
+                        var mimeType = textReader.ReadToEnd();
+                        textReader.Close();
+
+                        if (mimeType == ODT.Mime)
+                            result = ODT;
+                        else if (mimeType == ODS.Mime)
+                            result = ODS;
+                    }
+                }
             }
 
-            return result;
-        }
-
-        private static FileType CheckForOdtAndOds(FileType result, ZipArchive zipFile)
-        {
-            var ooMimeType = zipFile.Entries.FirstOrDefault(e => e.FullName == "mimetype");
-            if (ooMimeType != null)
-                using (var textReader = new StreamReader(ooMimeType.Open()))
-                {
-                    var mimeType = textReader.ReadToEnd();
-                    textReader.Close();
-
-                    if (mimeType == ODT.Mime)
-                        result = ODT;
-                    else if (mimeType == ODS.Mime)
-                        result = ODS;
-                }
+            stream.Seek(position, SeekOrigin.Begin);
 
             return result;
         }
@@ -460,25 +425,18 @@
         }
 
         /// <summary>
-        /// Reads the file header - first (16) bytes from the file
+        ///     Reads the file header - first (16) bytes from the file
         /// </summary>
         /// <param name="file">The file to work with</param>
+        /// <param name="headerSize">Number of bytes to read from file</param>
         /// <returns>Array of bytes</returns>
-        private static Byte[] ReadFileHeader(FileInfo file, int MaxHeaderSize)
+        private static byte[] ReadFileHeader(Stream file, int headerSize)
         {
-            var header = new byte[MaxHeaderSize];
-            try // read file
-            {
-                using (var fsSource = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
-                {
-                    // read first symbols from file into array of bytes.
-                    fsSource.Read(header, 0, MaxHeaderSize);
-                } // close the file stream
-            }
-            catch (Exception e) // file could not be found/read
-            {
-                throw new ApplicationException("Could not read file : " + e.Message);
-            }
+            var header = new byte[headerSize];
+            var position = file.Position;
+            file.Seek(0, SeekOrigin.Begin);
+            file.Read(header, 0, headerSize);
+            file.Seek(position, SeekOrigin.Begin);
 
             return header;
         }
@@ -488,39 +446,31 @@
         #region isType functions
 
         /// <summary>
-        /// Determines whether the specified file is of provided type
+        ///     Determines whether the specified file is of provided type
         /// </summary>
         /// <param name="file">The file.</param>
         /// <param name="type">The FileType</param>
         /// <returns>
-        ///   <c>true</c> if the specified file is type; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified file is type; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsType(this FileInfo file, FileType type)
         {
             var actualType = GetFileType(file);
-
-            if (null == actualType)
-                return false;
-
-            return (actualType.Equals(type));
+            return null != actualType && actualType.Equals(type);
         }
 
         public static bool IsType(this Stream file, FileType type)
         {
             var actualType = GetFileType(file);
-
-            if (null == actualType)
-                return false;
-
-            return (actualType.Equals(type));
+            return null != actualType && actualType.Equals(type);
         }
 
         /// <summary>
-        /// Determines whether the specified file is MS Excel spreadsheet
+        ///     Determines whether the specified file is MS Excel spreadsheet
         /// </summary>
         /// <param name="fileInfo">The FileInfo</param>
         /// <returns>
-        ///   <c>true</c> if the specified file info is excel; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified file info is excel; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsExcel(this FileInfo fileInfo)
         {
@@ -528,11 +478,11 @@
         }
 
         /// <summary>
-        /// Determines whether the specified file is Microsoft PowerPoint Presentation
+        ///     Determines whether the specified file is Microsoft PowerPoint Presentation
         /// </summary>
         /// <param name="fileInfo">The FileInfo object.</param>
         /// <returns>
-        ///   <c>true</c> if the specified file info is PPT; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified file info is PPT; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsPpt(this FileInfo fileInfo)
         {
@@ -540,7 +490,7 @@
         }
 
         /// <summary>
-        /// Checks if the file is executable
+        ///     Checks if the file is executable
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
@@ -550,10 +500,10 @@
         }
 
         /// <summary>
-        /// Check if the file is Microsoft Installer.
-        /// Beware, many Microsoft file types are starting with the same header. 
-        /// So use this one with caution. If you think the file is MSI, just need to confirm, use this method. 
-        /// But it could be MSWord or MSExcel, or Powerpoint... 
+        ///     Check if the file is Microsoft Installer.
+        ///     Beware, many Microsoft file types are starting with the same header.
+        ///     So use this one with caution. If you think the file is MSI, just need to confirm, use this method.
+        ///     But it could be MSWord or MSExcel, or Powerpoint...
         /// </summary>
         /// <param name="fileInfo"></param>
         /// <returns></returns>

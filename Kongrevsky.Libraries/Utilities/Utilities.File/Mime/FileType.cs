@@ -34,6 +34,21 @@
         /// <param name="header">Byte array with header.</param>
         /// <param name="extension">String with extension.</param>
         /// <param name="mime">The description of MIME.</param>
+        public FileType(string extension, string mime)
+        {
+            Header = new byte?[0];
+            Extension = extension;
+            Mime = mime;
+            HeaderOffset = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileType"/> class.
+        /// Default construction with the header offset being set to zero by default
+        /// </summary>
+        /// <param name="header">Byte array with header.</param>
+        /// <param name="extension">String with extension.</param>
+        /// <param name="mime">The description of MIME.</param>
         public FileType(byte?[] header, string extension, string mime)
         {
             Header = header;
