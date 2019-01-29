@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
+    using Kongrevsky.Infrastructure.ActiveDirectoryManager.Utils;
     using Kongrevsky.Utilities.String;
     using Microsoft.Extensions.Options;
 
@@ -82,6 +83,11 @@
                                .ToList();
 
             return Task.FromResult(users.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.Email).ToList());
+        }
+
+        public Task<bool> ValidateLoginAndPasswordAsync(string login, string password)
+        {
+            return ValidatorUtils.IsValidEmail(login) ? ValidateEmailAndPasswordAsync(login, password) : ValidateUsernameAndPasswordAsync(login, password);
         }
 
         public Task<bool> ValidateEmailAndPasswordAsync(string email, string password)

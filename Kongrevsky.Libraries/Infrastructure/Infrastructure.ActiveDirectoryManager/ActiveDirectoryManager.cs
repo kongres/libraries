@@ -10,6 +10,7 @@
     using System.Net;
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
+    using Kongrevsky.Infrastructure.ActiveDirectoryManager.Utils;
     using Kongrevsky.Utilities.String;
     using Microsoft.Extensions.Options;
 
@@ -188,6 +189,11 @@
                                                    IsActive = IsUserActive(result.GetDirectoryEntry())
                                                };
                             });
+        }
+
+        public Task<bool> ValidateLoginAndPasswordAsync(string login, string password)
+        {
+            return ValidatorUtils.IsValidEmail(login) ? ValidateEmailAndPasswordAsync(login, password) : ValidateUsernameAndPasswordAsync(login, password);
         }
 
         public async Task<bool> ValidateEmailAndPasswordAsync(string email, string password)
