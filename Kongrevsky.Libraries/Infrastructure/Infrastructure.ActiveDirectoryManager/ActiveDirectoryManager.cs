@@ -190,10 +190,13 @@
                             });
         }
 
-        public Task<bool> ValidateEmailAndPasswordAsync(string email, string password)
+        public async Task<bool> ValidateEmailAndPasswordAsync(string email, string password)
         {
-            var username = email?.Split('@').FirstOrDefault();
-            return ValidateUsernameAndPasswordAsync(username, password);
+            var user = await GetUserByEmailAsync(email);
+            if (user == null)
+                return false;
+
+            return await ValidateUsernameAndPasswordAsync(user.Username, password);
         }
 
         public Task<bool> ValidateUsernameAndPasswordAsync(string username, string password)
