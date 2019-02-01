@@ -22,5 +22,20 @@
             stream.Position = 0;
             return stream;
         }
+
+        /// <summary>Read a stream into a byte array</summary>
+        /// <param name="input">Stream to read</param>
+        /// <returns>byte[]</returns>
+        public static byte[] ReadAsBytes(this Stream input)
+        {
+            byte[] buffer = new byte[16384];
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                int count;
+                while ((count = input.Read(buffer, 0, buffer.Length)) > 0)
+                    memoryStream.Write(buffer, 0, count);
+                return memoryStream.ToArray();
+            }
+        }
     }
 }
