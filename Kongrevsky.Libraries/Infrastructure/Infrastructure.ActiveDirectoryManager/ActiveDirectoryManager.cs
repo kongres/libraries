@@ -63,6 +63,8 @@
         {
             return Task.Run(() =>
                             {
+                                email = Microsoft.Security.Application.Encoder.LdapFilterEncode(email);
+
                                 var directorySearcher = new DirectorySearcher(_directoryEntry);
                                 directorySearcher.Filter = $"(&(objectClass=user)(mail={email}))";
                                 directorySearcher.PropertiesToLoad.Add("givenName");          // first name
@@ -92,6 +94,8 @@
         {
             return Task.Run(() =>
                             {
+                                username = Microsoft.Security.Application.Encoder.LdapFilterEncode(username);
+
                                 var directorySearcher = new DirectorySearcher(_directoryEntry);
                                 directorySearcher.Filter = $"(&(objectClass=user)(sAMAccountName={username}))";
                                 directorySearcher.PropertiesToLoad.Add("givenName");          // first name
@@ -121,6 +125,7 @@
         {
             return Task.Run(() =>
                             {
+                                search = Microsoft.Security.Application.Encoder.LdapFilterEncode(search);
                                 var searchList = search.SplitBySpaces();
                                 searchList = searchList.Any() ? searchList.Select(x => $"*{x}*").ToList() : new List<string>() { "*" };
 
@@ -165,6 +170,7 @@
         {
             return Task.Run(() =>
                             {
+                                search = Microsoft.Security.Application.Encoder.LdapFilterEncode(search);
                                 search = string.IsNullOrEmpty(search) ? "*" : $"*{search}*";
                                 var directorySearcher = new DirectorySearcher(_directoryEntry);
                                 directorySearcher.Filter = $"(&(objectClass=user)(|(givenName={search})(sn={search})(mail={search})))";

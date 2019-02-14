@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AntiXSS" Version="4.3.0" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
