@@ -21,5 +21,22 @@
             var timeZone = timeZoneInfos.First();
             return timeZone;
         }
+
+        public static string DefaultTimeZone { get; set; } = "UTC";
+
+        public static TimeZoneInfo TryFindSystemTimeZoneByIdOrDefault(string timezoneId)
+        {
+            TimeZoneInfo result;
+            try
+            {
+                result = TimeZoneInfo.FindSystemTimeZoneById(timezoneId);
+            }
+            catch (Exception e)
+            {
+                result = TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZone);
+            }
+
+            return result;
+        }
     }
 }
