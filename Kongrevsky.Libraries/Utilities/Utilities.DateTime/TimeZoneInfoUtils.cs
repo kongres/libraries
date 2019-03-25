@@ -22,8 +22,22 @@
             return timeZone;
         }
 
-        public static string DefaultTimeZone { get; set; } = "UTC";
+        public static string DefaultTimeZoneId { get; set; } = "UTC";
 
+        public static TimeZoneInfo TryFromSerializedStringOrDefault(string timezoneId)
+        {
+            TimeZoneInfo result;
+            try
+            {
+                result = TimeZoneInfo.FromSerializedString(timezoneId);
+            }
+            catch (Exception e)
+            {
+                result = TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
+            }
+
+            return result;
+        }
         public static TimeZoneInfo TryFindSystemTimeZoneByIdOrDefault(string timezoneId)
         {
             TimeZoneInfo result;
@@ -33,7 +47,7 @@
             }
             catch (Exception e)
             {
-                result = TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZone);
+                result = TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
             }
 
             return result;
