@@ -38,8 +38,6 @@
             where T : class
             where DB : KongrevskyDbContext
     {
-        private static readonly object _lockObject = new object();
-
         public KongrevskyRepository(IKongrevskyDatabaseFactory<DB> kongrevskyDatabaseFactory)
         {
             _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
@@ -112,87 +110,82 @@
 
         public virtual int BulkDelete(Expression<Func<T, bool>> where, bool fireTriggers = true)
         {
-            lock (_lockObject)
+            var entities = DataContext.Set<T>().Where(where).ToList();
+            if (fireTriggers)
             {
-                var entities = DataContext.Set<T>().Where(where).ToList();
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseDeleting(entities, DataContext);
-                }
-
-                var bulkDelete = DataContext.Set<T>().Where(where).Delete();
-
-                if (fireTriggers)
-                {
-                    TriggersBulk<T, DB>.RaiseDeleted(entities, DataContext);
-                }
-
-                return bulkDelete;
+                TriggersBulk<T, DB>.RaiseDeleting(entities, DataContext);
             }
+
+            var bulkDelete = DataContext.Set<T>().Where(where).Delete();
+
+            if (fireTriggers)
+            {
+                TriggersBulk<T, DB>.RaiseDeleted(entities, DataContext);
+            }
+
+            return bulkDelete;
         }
 
         public virtual int BulkDeleteDuplicates<Ts>(Expression<Func<T, Ts>> expression, Expression<Func<T, bool>> where = null, int batchSize = 5000, int bulkCopyTimeout = 600)
         {
             var num = 0;
-            lock (_lockObject)
+
+            if (!typeof(BaseEntity).IsAssignableFrom(typeof(T)))
+                return num;
+
+            var records = new List<IGrouping<Ts, T>>();
+
+            try
             {
-                if (!typeof(BaseEntity).IsAssignableFrom(typeof(T)))
-                    return num;
+                records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).GroupBy(expression).Where(x => x.Count() > 1).ToList());
+            }
+            catch (Exception e)
+            {
+                records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).ToList().GroupBy(expression.Compile()).Where(x => x.Count() > 1).ToList());
+            }
 
-                var records = new List<IGrouping<Ts, T>>();
+            var ent = new List<T>();
+            foreach (var group in records)
+            {
+                var entities = group.OrderBy(x => (x as BaseEntity)?.DateCreated).Skip(1).ToList();
+                ent.AddRange(entities);
+            }
 
-                try
+            if (!ent.Any())
+                return num;
+
+            try
+            {
+                var bulk = new BulkOperations();
+
+                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
                 {
-                    records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).GroupBy(expression).Where(x => x.Count() > 1).ToList());
-                }
-                catch (Exception e)
-                {
-                    records.AddRange((where == null ? Dbset : Dbset.Where(where).WithTranslations()).ToList().GroupBy(expression.Compile()).Where(x => x.Count() > 1).ToList());
-                }
-
-                var ent = new List<T>();
-                foreach (var group in records)
-                {
-                    var entities = group.OrderBy(x => (x as BaseEntity)?.DateCreated).Skip(1).ToList();
-                    ent.AddRange(entities);
-                }
-
-                if (!ent.Any())
-                    return num;
-
-                try
-                {
-                    var bulk = new BulkOperations();
-
-                    using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
+                    using (var conn = new SqlConnection(connectionString))
                     {
-                        using (var conn = new SqlConnection(connectionString))
-                        {
-                            num = bulk.Setup<T>()
-                                    .ForCollection(ent)
-                                    .WithTable(DataContext.GetTableName<T>())
-                                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
-                                    .AddColumn(x => (x as BaseEntity).Id)
-                                    .BulkDelete()
-                                    .MatchTargetOn(x => (x as BaseEntity).Id)
-                                    .Commit(conn);
-                        }
-
-                        trans.Complete();
-                        return num;
+                        num = bulk.Setup<T>()
+                                .ForCollection(ent)
+                                .WithTable(DataContext.GetTableName<T>())
+                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
+                                .AddColumn(x => (x as BaseEntity).Id)
+                                .BulkDelete()
+                                .MatchTargetOn(x => (x as BaseEntity).Id)
+                                .Commit(conn);
                     }
-                }
-                catch (Exception e)
-                {
-                    var entIds = ent.Select(x => (x as BaseEntity).Id).ToList();
 
-                    var containsMethod = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Count() == 2)?.MakeGenericMethod(typeof(string));
-                    var parameterExpression = Expression.Parameter(typeof(T), "x");
-                    var expr = Expression.Call(null, containsMethod, Expression.Constant(entIds), Expression.Property(parameterExpression, nameof(BaseEntity.Id)));
-                    var lambda = Expression.Lambda<Func<T, bool>>(expr, parameterExpression);
-                    num = Dbset.Where(lambda).Delete();
+                    trans.Complete();
                     return num;
                 }
+            }
+            catch (Exception e)
+            {
+                var entIds = ent.Select(x => (x as BaseEntity).Id).ToList();
+
+                var containsMethod = typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList().FirstOrDefault(m => m.Name == "Contains" && m.GetParameters().Count() == 2)?.MakeGenericMethod(typeof(string));
+                var parameterExpression = Expression.Parameter(typeof(T), "x");
+                var expr = Expression.Call(null, containsMethod, Expression.Constant(entIds), Expression.Property(parameterExpression, nameof(BaseEntity.Id)));
+                var lambda = Expression.Lambda<Func<T, bool>>(expr, parameterExpression);
+                num = Dbset.Where(lambda).Delete();
+                return num;
             }
         }
 
