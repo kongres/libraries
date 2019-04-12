@@ -4,6 +4,7 @@
 
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -34,6 +35,9 @@
         public List<ChangedPropertyItem> ChangedProperties { get; } = new List<ChangedPropertyItem>();
 
         private Action _actionIfChanged { get; }
+
+        private static ConcurrentDictionary<string, object> _setExprDict { get; } = new ConcurrentDictionary<string, object>();
+        private static ConcurrentDictionary<string, object> _getExprDict { get; } = new ConcurrentDictionary<string, object>();
 
         #endregion
 
@@ -81,69 +85,67 @@
         /// <param name="value"></param>
         public void Set<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr, TTarget value)
         {
-            if (propertyExpr.Body is MemberExpression memberSelectorExpression)
+            if (!(propertyExpr.Body is MemberExpression memberSelectorExpression))
+                return;
+
+            var property = memberSelectorExpression.Member as PropertyInfo;
+            if (property == null)
+                return;
+
+            var getter = CreateGetter(propertyExpr);
+            var oldValue = getter(_object);
+
+            var handledValue = value;
+
+            if (typeof(TTarget) == typeof(DateTime))
             {
-                var property = memberSelectorExpression.Member as PropertyInfo;
-                if (property != null)
+                if (((DateTime)(object)oldValue).Difference((DateTime)(object)handledValue) > TimeSpan.FromSeconds(1))
+                    ActionIfDiff();
+
+                return;
+            }
+            if (typeof(TTarget) == typeof(TimeSpan))
+            {
+                if (((TimeSpan)(object)oldValue).Subtract((TimeSpan)(object)handledValue).Duration() > TimeSpan.FromSeconds(1))
+                    ActionIfDiff();
+
+                return;
+            }
+
+            if (!typeof(TTarget).IsSimple())
+            {
+                if (typeof(IEnumerable).IsAssignableFrom(typeof(TTarget)))
                 {
-                    var oldValue = propertyExpr.Invoke(_object);
-
-                    var handledValue = value;
-
-                    if (typeof(TTarget) == typeof(DateTime))
-                    {
-                        if (((DateTime)(object)oldValue).Difference((DateTime)(object)handledValue) > TimeSpan.FromSeconds(1))
-                            ActionIfDiff();
-
-                        return;
-                    }
-                    if (typeof(TTarget) == typeof(TimeSpan))
-                    {
-                        if (((TimeSpan)(object)oldValue).Subtract((TimeSpan)(object)handledValue).Duration() > TimeSpan.FromSeconds(1))
-                            ActionIfDiff();
-
-                        return;
-                    }
-
-                    if (!typeof(TTarget).IsSimple())
-                    {
-                        if (typeof(IEnumerable).IsAssignableFrom(typeof(TTarget)))
-                        {
-                            if (!JToken.DeepEquals(JArray.FromObject(oldValue), JArray.FromObject(handledValue)))
-                                ActionIfDiff();
-                        }
-                        else
-                        {
-                            if (!JToken.DeepEquals(JObject.FromObject(oldValue), JObject.FromObject(handledValue)))
-                                ActionIfDiff();
-                        }
-
-                        return;
-                    }
-
-                    if (!Equals(oldValue, handledValue))
-                    {
+                    if (!JToken.DeepEquals(JArray.FromObject(oldValue), JArray.FromObject(handledValue)))
                         ActionIfDiff();
-                        return;
-                    }
-
-                    void ActionIfDiff()
-                    {
-                        var setterExpr = CreateSetter(propertyExpr);
-                        setterExpr.Compile()(_object, handledValue);
-                        _actionIfChanged?.Invoke();
-                        IsChanged = true;
-
-                        if (IsLogChangedPropertiesEnabled)
-                            ChangedProperties.Add(new ChangedPropertyItem()
-                                                  {
-                                                          PropertyName = property.Name,
-                                                          PropertyType = property.PropertyType,
-                                                          OldValue = oldValue,
-                                                          NewValue = handledValue
-                                                  });
-                    }
                 }
+                else
+                {
+                    if (!JToken.DeepEquals(JObject.FromObject(oldValue), JObject.FromObject(handledValue)))
+                        ActionIfDiff();
+                }
+
+                return;
+            }
+
+            if (!Equals(oldValue, handledValue))
+                ActionIfDiff();
+
+            void ActionIfDiff()
+            {
+                var setter = CreateSetter(propertyExpr);
+                setter(_object, handledValue);
+                _actionIfChanged?.Invoke();
+                IsChanged = true;
+
+                if (IsLogChangedPropertiesEnabled)
+                    ChangedProperties.Add(new ChangedPropertyItem()
+                    {
+                        PropertyName = property.Name,
+                        PropertyType = property.PropertyType,
+                        OldValue = oldValue,
+                        NewValue = handledValue
+                    });
             }
         }
 
@@ -184,30 +186,52 @@
             Set(propertyExpr, handledValue);
         }
 
-        private static Expression<Action<TEntity, TProperty>> CreateSetter<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> selector)
-        {
-            var valueParam = Expression.Parameter(typeof(TProperty));
-            var body = Expression.Assign(selector.Body, valueParam);
-            return Expression.Lambda<Action<TEntity, TProperty>>(body,
-                                                                 selector.Parameters.Single(),
-                                                                 valueParam);
-        }
-
         public override string ToString()
         {
             var str = new StringBuilder();
 
             str.AppendLine($"Object: {_object.ToString()}");
-            if (IsLogChangedPropertiesEnabled)
-            {
-                str.AppendLine($"Changed Properties:");
-                str.AppendLine("Property Name | Old Value | New Value");
+            if (!IsLogChangedPropertiesEnabled)
+                return str.ToString();
+            str.AppendLine($"Changed Properties:");
+            str.AppendLine("Property Name | Old Value | New Value");
 
-                foreach (var changedPropertyItem in ChangedProperties)
-                    str.AppendLine($"{changedPropertyItem.PropertyName} | {JsonConvert.SerializeObject(changedPropertyItem.OldValue)} | {JsonConvert.SerializeObject(changedPropertyItem.NewValue)}");
-            }
+            foreach (var changedPropertyItem in ChangedProperties)
+                str.AppendLine($"{changedPropertyItem.PropertyName} | {JsonConvert.SerializeObject(changedPropertyItem.OldValue)} | {JsonConvert.SerializeObject(changedPropertyItem.NewValue)}");
 
             return str.ToString();
+        }
+
+        private Action<TEntity, TProperty> CreateSetter<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> selector)
+        {
+            var key = GetValidationKey(selector);
+            if (_setExprDict.ContainsKey(key))
+                return (Action<TEntity, TProperty>)_setExprDict[key];
+
+            var valueParam = Expression.Parameter(typeof(TProperty));
+            var expression = Expression.Lambda<Action<TEntity, TProperty>>(Expression.Assign(selector.Body, valueParam), selector.Parameters.Single(), valueParam).Compile();
+            _setExprDict[key] = expression;
+            return expression;
+        }
+
+        private Func<TObj, TTarget> CreateGetter<TTarget>(Expression<Func<TObj, TTarget>> propertyExpr)
+        {
+            var key = GetValidationKey(propertyExpr);
+            if (_getExprDict.ContainsKey(key))
+                return (Func<TObj, TTarget>)_getExprDict[key];
+
+            var compile = propertyExpr.Compile();
+            _getExprDict.TryAdd(key, compile);
+            return compile;
+        }
+
+        private string GetValidationKey<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> propertyLambda)
+        {
+            if (!(propertyLambda.Body is MemberExpression member))
+                throw new ArgumentException($"Expression '{propertyLambda}' can't be cast to a {nameof(MemberExpression)}.");
+
+            var key = $"{member.Expression.Type.FullName}_{member}";
+            return key;
         }
     }
 }
