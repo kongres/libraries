@@ -13,12 +13,10 @@
 
     public class RepositoryPagingModelUtils
     {
-        public static object ExcludeIgnoredPropertiesPagingModel<TFilter, TItem>(TFilter filter, List<string> loadProperties, Type itemType)
-                where TFilter : RepositoryPagingModel<TItem>
+        public static object ExcludeIgnoredPropertiesPagingModel<TItem>(RepositoryPagingModel<TItem> filter, List<string> loadProperties, Type itemType)
                 where TItem : class
         {
-            var contractResolver = new PagingContractResolver(loadProperties, itemType);
-            return JsonConvert.SerializeObject(filter, Formatting.Indented, new JsonSerializerSettings() { ContractResolver = contractResolver });
+            return JsonConvert.SerializeObject(filter, Formatting.Indented, new JsonSerializerSettings() { ContractResolver = new PagingContractResolver(loadProperties, itemType) });
         }
     }
 
