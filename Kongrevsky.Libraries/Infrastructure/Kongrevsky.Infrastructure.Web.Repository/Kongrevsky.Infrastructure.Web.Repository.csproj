@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <Description>Repository Extensions for Web</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+    <Authors>Valikovsky Igor</Authors>
+    <Company>Kongrevsky</Company>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Kongrevsky.Infrastructure.Repository" Version="1.0.26" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+
+  </ItemGroup>
+</Project>

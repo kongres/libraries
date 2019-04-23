@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}"
 EndProject
@@ -65,7 +65,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Impersonator", "Infrastructure\Kongrevsky.Infrastructure.Impersonator\Kongrevsky.Infrastructure.Impersonator.csproj", "{7FE9843B-E5C3-4568-93AD-0F6569B39C94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.FileManager.DependencyInjection", "Infrastructure\Kongrevsky.Infrastructure.FileManager.DependencyInjection\Kongrevsky.Infrastructure.FileManager.DependencyInjection.csproj", "{E7033A8F-A547-4528-B0D4-AD16ABA43CB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.FileManager.DependencyInjection", "Infrastructure\Kongrevsky.Infrastructure.FileManager.DependencyInjection\Kongrevsky.Infrastructure.FileManager.DependencyInjection.csproj", "{E7033A8F-A547-4528-B0D4-AD16ABA43CB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Web.Repository", "Infrastructure\Kongrevsky.Infrastructure.Web.Repository\Kongrevsky.Infrastructure.Web.Repository.csproj", "{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,10 @@ Global
 		{E7033A8F-A547-4528-B0D4-AD16ABA43CB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7033A8F-A547-4528-B0D4-AD16ABA43CB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7033A8F-A547-4528-B0D4-AD16ABA43CB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -218,6 +224,7 @@ Global
 		{3E20BDE4-225A-4F75-B73A-E4CCCDE6A704} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{7FE9843B-E5C3-4568-93AD-0F6569B39C94} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{E7033A8F-A547-4528-B0D4-AD16ABA43CB4} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{DC18B624-3C7B-4062-ABDC-2EDC898FF2B6} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D46F8133-0CD3-457B-A289-439722F553A8}
