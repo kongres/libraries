@@ -306,11 +306,10 @@
 
             IOrderedQueryable<TCast> orderedQuery;
 
-            var distinctProperty = typeof(TCast).GetPropertyByName(filter.Distinct);
-            if (distinctProperty != null && distinctProperty.PropertyType.IsSimple())
+            if (!filter.Distinct.IsNullOrEmpty())
             {
-                castQuery = castQuery.DistinctByField(distinctProperty.Name).AsExpandable();
-                orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(distinctProperty.Name) : castQuery.OrderByWithNullLowPriority(distinctProperty.Name);
+                castQuery = castQuery.DistinctByField(filter.Distinct).AsExpandable();
+                orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(filter.Distinct) : castQuery.OrderByWithNullLowPriority(filter.Distinct);
             }
             else
             {

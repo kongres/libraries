@@ -32,9 +32,8 @@
 
             if (!string.IsNullOrEmpty(filter.Distinct))
             {
-                var distinctProperty = destType.GetPropertyByName(filter.Distinct);
-                if (distinctProperty != null && distinctProperty.PropertyType.IsSimple())
-                    filter.LoadProperties = new List<string>() { distinctProperty.Name };
+
+                filter.LoadProperties = new List<string>() { filter.Distinct.Split(new[] { '.' }, 2)[0] };
             }
 
             var properties = (filter.LoadProperties ?? (filter.LoadProperties = new List<string>())).ToList();
@@ -50,15 +49,13 @@
                 return expression;
             }
 
-            properties.Add("Id");
-
             var orderProperties = filter.OrderProperty?.Split(new[] { ',', ' ', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
 
             if (orderProperties.Any())
             {
                 foreach (var property in orderProperties)
                 {
-                    var split = property.Split(new char[] { '.' }, 2);
+                    var split = property.Split(new[] { '.' }, 2);
                     var orderProperty = infos.FirstOrDefault(x => !string.IsNullOrEmpty(split[0]) && string.Equals(x.Name, split[0], StringComparison.InvariantCultureIgnoreCase));
 
                     if (orderProperty != null && !properties.Contains(orderProperty.Name, new GenericCompare<string>(x => x.ToLowerInvariant())))
