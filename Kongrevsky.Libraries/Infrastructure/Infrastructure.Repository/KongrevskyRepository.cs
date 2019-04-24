@@ -14,6 +14,7 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using AutoMapper;
+    using AutoMapper.Configuration;
     using AutoMapper.QueryableExtensions;
     using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
@@ -24,7 +25,6 @@
     using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
     using Kongrevsky.Utilities.Object;
-    using Kongrevsky.Utilities.Reflection;
     using Kongrevsky.Utilities.String;
     using LinqKit;
     using Microsoft.Linq.Translations;
@@ -266,6 +266,22 @@
             return entity;
         }
 
+        public T Get(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
+        {
+            var query = Dbset.Where(where).WithTranslations();
+            query = AppendIncludes(query, includes);
+
+            return query.FirstOrDefault();
+        }
+
+        public Task<T> GetAsync(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
+        {
+            var query = Dbset.Where(where).WithTranslations();
+            query = AppendIncludes(query, includes);
+
+            return query.FirstOrDefaultAsync();
+        }
+
         public virtual IQueryable<T> GetAll(params Expression<Func<T, object>>[] includes)
         {
             var query = Dbset;
@@ -282,7 +298,7 @@
             return query;
         }
 
-        public virtual PagingQueryable<TCast> GetPage<TCast>(RepositoryPagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> @where, IConfigurationProvider configurationProvider, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
+        public virtual PagingQueryable<TCast> GetPage<TCast>(RepositoryPagingModel<TCast> filter, Expression<Func<T, bool>> checkPermission, List<Expression<Func<T, bool>>> @where, Action<IMapperConfigurationExpression> configure, List<Expression<Func<TCast, bool>>> postWhere = null) where TCast : class
         {
             var page = new Page(filter.PageNumber, filter.PageSize);
 
@@ -293,6 +309,12 @@
             foreach (var expression in where)
                 queryable = queryable.Where(expression);
 
+            var configurationProvider = AutoMapperDomainUtils.GetConfigurationProvider(config =>
+                                                                                       {
+                                                                                           configure.Invoke(config);
+                                                                                           var mappingExpression = ((IProfileConfiguration)config).TypeMapConfigs.FirstOrDefault(x => x is IMappingExpression<T, TCast>) as IMappingExpression<T, TCast>;
+                                                                                           mappingExpression?.LoadProperties(filter, DataContext);
+                                                                                       });
             var castQuery = queryable.ProjectTo<TCast>(configurationProvider).AsExpandable().WithTranslations();
 
             if (postWhere != null)
@@ -306,55 +328,32 @@
 
             IOrderedQueryable<TCast> orderedQuery;
 
-            if (!filter.Distinct.IsNullOrEmpty())
+            if (filter.Distinct.IsNullOrEmpty())
+            {
+                orderProperties.AddRange(_dataContext.GetKeyNames<T>());
+                orderProperties = orderProperties.Distinct(new GenericCompare<string>(x => x.ToLowerInvariant())).ToList();
+
+                if (orderProperties.Any())
+                {
+                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(orderProperties.First()) : castQuery.OrderByWithNullLowPriority(orderProperties.First());
+                    orderProperties.RemoveAt(0);
+                }
+                else
+                {
+                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority() : castQuery.OrderByWithNullLowPriority();
+                }
+                if (orderProperties.Any())
+                    orderedQuery = orderProperties.Aggregate(orderedQuery, (current, property) => filter.IsDesc ? current.ThenByDescendingWithNullLowPriority(property) : current.ThenByWithNullLowPriority(property));
+                else
+                    orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
+            }
+            else
             {
                 castQuery = castQuery.DistinctByField(filter.Distinct).AsExpandable();
                 orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(filter.Distinct) : castQuery.OrderByWithNullLowPriority(filter.Distinct);
             }
-            else
-            {
-                if (orderProperties.Any())
-                {
-                    orderProperties.AddRange(_dataContext.GetKeyNames<T>());
-                    orderProperties = orderProperties.Distinct(new GenericCompare<string>(x => x.ToLowerInvariant())).ToList();
-
-                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority(orderProperties.First()) : castQuery.OrderByWithNullLowPriority(orderProperties.First());
-                    orderProperties.RemoveAt(0);
-                    if (orderProperties.Any())
-                        orderedQuery = orderProperties.Aggregate(orderedQuery, (current, property) => filter.IsDesc ? current.ThenByDescendingWithNullLowPriority(property) : current.ThenByWithNullLowPriority(property));
-                    else
-                        orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
-                }
-                else
-                {
-                    orderProperties.AddRange(_dataContext.GetKeyNames<T>());
-                    orderProperties = orderProperties.Distinct(new GenericCompare<string>(x => x.ToLowerInvariant())).ToList();
-
-                    orderedQuery = filter.IsDesc ? castQuery.OrderByDescendingWithNullLowPriority() : castQuery.OrderByWithNullLowPriority();
-                    if (orderProperties.Any())
-                        orderedQuery = orderProperties.Aggregate(orderedQuery, (current, property) => filter.IsDesc ? current.ThenByDescendingWithNullLowPriority(property) : current.ThenByWithNullLowPriority(property));
-                    else
-                        orderedQuery = filter.IsDesc ? orderedQuery.ThenByDescendingWithNullLowPriority() : orderedQuery.ThenByWithNullLowPriority();
-                }
-            }
 
             return new PagingQueryable<TCast>(orderedQuery, page);
-        }
-
-        public T Get(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
-        {
-            var query = Dbset.Where(where).WithTranslations();
-            query = AppendIncludes(query, includes);
-
-            return query.FirstOrDefault();
-        }
-
-        public Task<T> GetAsync(Expression<Func<T, bool>> where, params Expression<Func<T, object>>[] includes)
-        {
-            var query = Dbset.Where(where).WithTranslations();
-            query = AppendIncludes(query, includes);
-
-            return query.FirstOrDefaultAsync();
         }
 
         protected IQueryable<TSet> GetDbSet<TSet>(bool isExpanded = true) where TSet : class => isExpanded ? DataContext.Set<TSet>().AsExpandable().WithTranslations() : DataContext.Set<TSet>();
