@@ -3,6 +3,8 @@
     #region << Using >>
 
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Kongrevsky.Utilities.EF6.Models;
     using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion
@@ -26,5 +28,13 @@
         ///     Distinct result by this field
         /// </summary>
         public string Distinct { get; set; }
+
+        public async Task SetResult(PagingQueryable<T> pagingQueryable)
+        {
+            if (IsTotalsOnly)
+                SetTotals(await pagingQueryable.GetTotalResultAsync());
+            else
+                SetResult(await pagingQueryable.GetPageResultAsync());
+        }
     }
 }
