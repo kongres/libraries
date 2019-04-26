@@ -13,6 +13,11 @@
         [ReadOnly(true)]
         public List<T> Items { get; private set; } = new List<T>();
 
+        /// <summary>
+        /// If true then load only totals info when call SetResult method
+        /// </summary>
+        public bool IsTotalsOnly { get; set; } = false;
+
         public void SetItems(IEnumerable<T> items)
         {
             Items = items.ToList();
@@ -20,12 +25,14 @@
 
         public void SetResult(IEnumerable<T> items, int totalItems, int totalPages)
         {
-            SetItems(items);
+            if (!IsTotalsOnly)
+                SetItems(items);
             SetTotals(totalItems, totalPages);
         }
         public void SetResult(PageResult<T> pageResult)
         {
-            SetItems(pageResult.Items);
+            if (!IsTotalsOnly)
+                SetItems(pageResult.Items);
             SetTotals(pageResult.TotalItemCount, pageResult.PageCount);
         }
     }
@@ -50,6 +57,12 @@
         {
             TotalItems = totalItems;
             TotalPages = totalPages;
+        }
+
+        public void SetTotals(PageResult pageResult)
+        {
+            TotalItems = pageResult.TotalItemCount;
+            TotalPages = pageResult.PageCount;
         }
     }
 }
