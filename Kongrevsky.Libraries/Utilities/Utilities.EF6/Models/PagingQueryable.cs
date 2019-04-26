@@ -1,12 +1,17 @@
 ﻿namespace Kongrevsky.Utilities.EF6.Models
 {
+    #region << Using >>
+
     using System;
     using System.Collections.Generic;
+    using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
     using Kongrevsky.Utilities.Enumerable.Models;
     using Kongrevsky.Utilities.Object;
     using Z.EntityFramework.Plus;
+
+    #endregion
 
     public class PagingQueryable<T>
     {
@@ -17,9 +22,11 @@
         }
 
         private IQueryable<T> _queryable { get; }
+
         private Page _page { get; }
 
         public IQueryable<T> Queryable => _queryable;
+
         public Page Page => _page;
 
         public async Task<List<T>> GetPageAsync()
@@ -39,6 +46,20 @@
             var result = new PageResult<T>()
                          {
                                  Items = items,
+                                 PageCount = pageCount,
+                                 TotalItemCount = totalItemCount
+                         };
+
+            return result;
+        }
+
+        public async Task<PageResult> GetTotalResultAsync()
+        {
+            var totalItemCount = await _queryable.CountAsync();
+            var pageCount = _page.PageSize > 0 ? (int)Math.Ceiling((double)totalItemCount / _page.PageSize) : totalItemCount > 0 ? 1 : 0;
+
+            var result = new PageResult()
+                         {
                                  PageCount = pageCount,
                                  TotalItemCount = totalItemCount
                          };
