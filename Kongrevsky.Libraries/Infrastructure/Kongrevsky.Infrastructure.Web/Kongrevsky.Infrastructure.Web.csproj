@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-
+    <Description>Web Infrastructure</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+    <Authors>Valikovsky Igor</Authors>
+    <Company>Kongrevsky</Company>
   </PropertyGroup>
 
   <ItemGroup>
