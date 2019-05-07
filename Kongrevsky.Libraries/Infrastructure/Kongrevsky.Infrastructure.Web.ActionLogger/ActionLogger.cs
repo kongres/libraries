@@ -99,7 +99,8 @@
                                                     LogType = logType,
                                                     Name = action,
                                                     InputData = inputData.ToString(),
-                                                    OutputData = outputData
+                                                    OutputData = outputData,
+                                                    ResponseStatusCode = (int)responseStatusCode
                                             });
             }
             catch (Exception e)
