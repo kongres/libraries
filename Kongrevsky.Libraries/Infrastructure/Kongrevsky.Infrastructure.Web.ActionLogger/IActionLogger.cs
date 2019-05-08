@@ -14,6 +14,6 @@
 
         void SetOptions(Action<ActionLoggerOptions> action);
 
-        void LogAction(FilterContext context);
+        void LogAction(ResultExecutedContext context);
     }
 }

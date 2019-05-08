@@ -41,7 +41,7 @@
             action.Invoke(_options);
         }
 
-        public void LogAction(FilterContext context)
+        public void LogAction(ResultExecutedContext context)
         {
             try
             {
@@ -88,11 +88,9 @@
 
                 var action = logActionAttribute?.Name ?? actionDescriptor.ActionName.SplitCamelCase();
 
-                context.TryGetPropValue("Result", out ObjectResult result);
-
                 var inputData = FormatInputData(context.HttpContext.Items[ActionLoggerAttribute.ActionArgumentsKey] as IDictionary<string, object> ?? new Dictionary<string, object>());
 
-                var outputData = result?.Value == null ? string.Empty : GetFormattedObject(result.Value);
+                var outputData = context.Result is ObjectResult objectResult && objectResult.Value != null ?  GetFormattedObject(objectResult.Value) : string.Empty;
 
                 _options?.LogAction?.Invoke(new ActionLog()
                                             {
@@ -144,6 +142,12 @@
             if (_options.DataFormatters.TryGetValue(type, out var dataFormatter))
             {
                 str.AppendLine(tabs + dataFormatter(obj));
+                return str.ToString();
+            }
+
+            if (type.IsSimple())
+            {
+                str.AppendLine(tabs + $"{obj}");
                 return str.ToString();
             }
 
