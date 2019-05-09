@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.4" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.5" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>

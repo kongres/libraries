@@ -14,8 +14,8 @@
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.3" />
     <PackageReference Include="Kongrevsky.Utilities.Enum" Version="1.0.0" />
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.4" />
-    <PackageReference Include="Kongrevsky.Utilities.File" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.5" />
+    <PackageReference Include="Kongrevsky.Utilities.File" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.1.0" />
