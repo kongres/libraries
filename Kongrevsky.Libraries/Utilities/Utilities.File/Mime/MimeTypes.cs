@@ -378,7 +378,7 @@
             var position = stream.Position;
             stream.Seek(0, SeekOrigin.Begin);
             //check for docx and xlsx
-            using (var zipFile = new ZipArchive(stream, ZipArchiveMode.Read))
+            using (var zipFile = new ZipArchive(stream, ZipArchiveMode.Read, true))
             {
                 if (zipFile.Entries.Any(e => e.FullName.StartsWith("word/")))
                     result = WORDX;
