@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
     <Description>Active directory manager</Description>
@@ -10,17 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="AntiXSS" Version="4.3.0" />
-    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.0" />
+    <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="4.5.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.DirectoryServices" />
-    <Reference Include="System.DirectoryServices.AccountManagement" />
-    <Reference Include="System.DirectoryServices.Protocols" />
-  </ItemGroup>
-
 </Project>
