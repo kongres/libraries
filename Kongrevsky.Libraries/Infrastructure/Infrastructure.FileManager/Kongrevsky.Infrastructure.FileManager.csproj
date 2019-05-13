@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <AssemblyName>Kongrevsky.Infrastructure.FileManager</AssemblyName>
     <PackageId>Kongrevsky.Infrastructure.FileManager</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Infrastructure.Impersonator" Version="1.0.0" />
-    <PackageReference Include="Kongrevsky.Utilities.Common" Version="1.0.2" />
+    <PackageReference Include="Kongrevsky.Infrastructure.Impersonator" Version="1.0.1" />
+    <PackageReference Include="Kongrevsky.Utilities.Common" Version="1.0.4" />
   </ItemGroup>
 
 </Project>
