@@ -156,25 +156,13 @@
 
             try
             {
-                var bulk = new BulkOperations();
-
-                using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(120)))
-                {
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        num = bulk.Setup<T>()
-                                .ForCollection(ent)
-                                .WithTable(DataContext.GetTableName<T>())
-                                .WithBulkCopySettings(new BulkCopySettings() { BatchSize = batchSize, BulkCopyTimeout = bulkCopyTimeout })
-                                .AddColumn(x => (x as BaseEntity).Id)
-                                .BulkDelete()
-                                .MatchTargetOn(x => (x as BaseEntity).Id)
-                                .Commit(conn);
-                    }
-
-                    trans.Complete();
-                    return num;
-                }
+                num = DataContext.BulkDelete(ent, x => (x as BaseEntity).Id,
+                                                 config =>
+                                                 {
+                                                     config.BatchSize = batchSize;
+                                                     config.Timeout = bulkCopyTimeout;
+                                                 });
+                return num;
             }
             catch (Exception e)
             {

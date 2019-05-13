@@ -11,13 +11,11 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
-    using System.Transactions;
     using AutoMapper;
     using Kongrevsky.Infrastructure.Repository.Triggers;
     using Kongrevsky.Infrastructure.Repository.Utils.Options;
     using Kongrevsky.Utilities.EF6;
     using Kongrevsky.Utilities.Object;
-    using Nito.AsyncEx;
     using SqlBulkTools;
     using SqlBulkTools.Enumeration;
 
@@ -75,25 +73,19 @@
             var distEnts = enumerable.Distinct(new GenericCompare<T>(identificator)).ToList();
             var ent = mapper.Map<List<T>>(distEnts);
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkInsert = new BulkOperations().Setup<T>()
-                        .ForCollection(ent)
-                        .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddAllColumns()
-                        .DetectColumnWithCustomColumnName()
-                        .RemoveNotMappedColumns()
-                        .BulkInsert();
+            var bulkInsert = new BulkOperations().Setup<T>()
+                    .ForCollection(ent)
+                    .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddAllColumns()
+                    .DetectColumnWithCustomColumnName()
+                    .RemoveNotMappedColumns()
+                    .BulkInsert();
 
-                if (options.IdentityColumn != null)
-                    bulkInsert = bulkInsert.SetIdentityColumn(options.IdentityColumn, ColumnDirectionType.Input);
+            if (options.IdentityColumn != null)
+                bulkInsert = bulkInsert.SetIdentityColumn(options.IdentityColumn, ColumnDirectionType.Input);
 
-                num = bulkInsert.Commit(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var num = bulkInsert.Commit(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {
@@ -153,25 +145,19 @@
             var distEnts = enumerable.Distinct(new GenericCompare<T>(identificator)).ToList();
             var ent = mapper.Map<List<T>>(distEnts);
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkInsert = new BulkOperations().Setup<T>()
-                        .ForCollection(ent)
-                        .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddAllColumns()
-                        .DetectColumnWithCustomColumnName()
-                        .RemoveNotMappedColumns()
-                        .BulkInsert();
+            var bulkInsert = new BulkOperations().Setup<T>()
+                    .ForCollection(ent)
+                    .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddAllColumns()
+                    .DetectColumnWithCustomColumnName()
+                    .RemoveNotMappedColumns()
+                    .BulkInsert();
 
-                if (options.IdentityColumn != null)
-                    bulkInsert = bulkInsert.SetIdentityColumn(options.IdentityColumn, ColumnDirectionType.Input);
+            if (options.IdentityColumn != null)
+                bulkInsert = bulkInsert.SetIdentityColumn(options.IdentityColumn, ColumnDirectionType.Input);
 
-                num = await bulkInsert.CommitAsync(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var num = await bulkInsert.CommitAsync(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {
@@ -231,24 +217,18 @@
             var distEnts = enumerable.Distinct(new GenericCompare<T>(identificator)).ToList();
             var ent = mapper.Map<List<T>>(distEnts);
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkUpdate = new BulkOperations().Setup<T>()
-                        .ForCollection(ent)
-                        .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddAllColumns()
-                        .DetectColumnWithCustomColumnName()
-                        .RemoveNotMappedColumns()
-                        .BulkUpdate();
+            var bulkUpdate = new BulkOperations().Setup<T>()
+                    .ForCollection(ent)
+                    .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddAllColumns()
+                    .DetectColumnWithCustomColumnName()
+                    .RemoveNotMappedColumns()
+                    .BulkUpdate();
 
-                num = bulkUpdate
-                        .MatchTargetOn(identificator)
-                        .Commit(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var num = bulkUpdate
+                    .MatchTargetOn(identificator)
+                    .Commit(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {
@@ -308,24 +288,18 @@
             var distEnts = enumerable.Distinct(new GenericCompare<T>(identificator)).ToList();
             var ent = mapper.Map<List<T>>(distEnts);
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkUpdate = new BulkOperations().Setup<T>()
-                        .ForCollection(ent)
-                        .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddAllColumns()
-                        .DetectColumnWithCustomColumnName()
-                        .RemoveNotMappedColumns()
-                        .BulkUpdate();
+            var bulkUpdate = new BulkOperations().Setup<T>()
+                    .ForCollection(ent)
+                    .WithTable(string.IsNullOrEmpty(options.TableName) ? dbContext.GetTableName<T>() : options.TableName)
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddAllColumns()
+                    .DetectColumnWithCustomColumnName()
+                    .RemoveNotMappedColumns()
+                    .BulkUpdate();
 
-                num = await bulkUpdate
-                        .MatchTargetOn(identificator)
-                        .CommitAsync(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var num = await bulkUpdate
+                    .MatchTargetOn(identificator)
+                    .CommitAsync(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {
@@ -364,21 +338,15 @@
                 TriggersBulk<T, DB>.RaiseDeleting(enumerable, dbContext, identificator);
             }
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkDelete = new BulkOperations().Setup<T>()
-                        .ForCollection(enumerable)
-                        .WithTable(dbContext.GetTableName<T>())
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddColumn(identificator)
-                        .BulkDelete();
-                num = bulkDelete
-                        .MatchTargetOn(identificator)
-                        .Commit(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var bulkDelete = new BulkOperations().Setup<T>()
+                    .ForCollection(enumerable)
+                    .WithTable(dbContext.GetTableName<T>())
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddColumn(identificator)
+                    .BulkDelete();
+            var num = bulkDelete
+                    .MatchTargetOn(identificator)
+                    .Commit(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {
@@ -417,22 +385,16 @@
                 TriggersBulk<T, DB>.RaiseDeleting(enumerable, dbContext, identificator);
             }
 
-            int num;
-            using (var trans = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromSeconds(options.Timeout)))
-            {
-                var bulkDelete = new BulkOperations().Setup<T>()
-                        .ForCollection(enumerable)
-                        .WithTable(dbContext.GetTableName<T>())
-                        .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
-                        .AddColumn(identificator)
-                        .BulkDelete();
+            var bulkDelete = new BulkOperations().Setup<T>()
+                    .ForCollection(enumerable)
+                    .WithTable(dbContext.GetTableName<T>())
+                    .WithBulkCopySettings(new BulkCopySettings() { BatchSize = options.BatchSize, BulkCopyTimeout = options.Timeout, SqlBulkCopyOptions = options.SqlBulkCopyOptions })
+                    .AddColumn(identificator)
+                    .BulkDelete();
 
-                num = await bulkDelete
-                        .MatchTargetOn(identificator)
-                        .CommitAsync(dbContext.Database.Connection as SqlConnection);
-
-                trans.Complete();
-            }
+            var num = await bulkDelete
+                    .MatchTargetOn(identificator)
+                    .CommitAsync(dbContext.Database.Connection as SqlConnection);
 
             if (options.FireTriggers)
             {

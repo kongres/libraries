@@ -1,37 +1,50 @@
 ﻿namespace Kongrevsky.Infrastructure.Repository.Triggers
 {
+    #region << Using >>
+
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-
     using CoContra;
     using Kongrevsky.Utilities.Enumerable;
     using Kongrevsky.Utilities.Expression;
-
     using LinqKit;
+
+    #endregion
 
     public static class TriggersBulk<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext
     {
         private static readonly CovariantAction<IInsertingEntry<TEntity, TDbContext>> inserting = new CovariantAction<IInsertingEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>> bulkInserting = new CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IUpdatingEntry<TEntity, TDbContext>> updating = new CovariantAction<IUpdatingEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkUpdatingEntry<TEntity, TDbContext>> bulkUpdating = new CovariantAction<IBulkUpdatingEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IDeletingEntry<TEntity, TDbContext>> deleting = new CovariantAction<IDeletingEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkDeletingEntry<TEntity, TDbContext>> bulkDeleting = new CovariantAction<IBulkDeletingEntry<TEntity, TDbContext>>();
 
         private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> insertFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
+
         private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> updateFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
+
         private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> deleteFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
 
         private static readonly CovariantAction<IInsertedEntry<TEntity, TDbContext>> inserted = new CovariantAction<IInsertedEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkInsertedEntry<TEntity, TDbContext>> bulkInserted = new CovariantAction<IBulkInsertedEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IUpdatedEntry<TEntity, TDbContext>> updated = new CovariantAction<IUpdatedEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkUpdatedEntry<TEntity, TDbContext>> bulkUpdated = new CovariantAction<IBulkUpdatedEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IDeletedEntry<TEntity, TDbContext>> deleted = new CovariantAction<IDeletedEntry<TEntity, TDbContext>>();
+
         private static readonly CovariantAction<IBulkDeletedEntry<TEntity, TDbContext>> bulkDeleted = new CovariantAction<IBulkDeletedEntry<TEntity, TDbContext>>();
 
         public static event Action<IInsertingEntry<TEntity, TDbContext>> Inserting
@@ -63,6 +76,7 @@
             add => deleting.Add(value);
             remove => deleting.Remove(value);
         }
+
         public static event Action<IBulkDeletingEntry<TEntity, TDbContext>> BulkDeleting
         {
             add => bulkDeleting.Add(value);
@@ -156,6 +170,7 @@
                 updating.Invoke(new UpdatingEntry<TEntity, TDbContext>(original, entity, dbContext));
                 eventParams.Add(new BulkUpdatingEntity<TEntity>(original, entity));
             }
+
             bulkUpdating.Invoke(new BulkUpdatingEntry<TEntity, TDbContext>(eventParams, dbContext));
         }
 
@@ -180,6 +195,7 @@
                     continue;
                 deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(original, dbContext));
             }
+
             bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(deletingEntities, dbContext));
         }
 
@@ -193,6 +209,7 @@
             {
                 deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(entity, dbContext));
             }
+
             bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(list, dbContext));
         }
 
@@ -232,6 +249,7 @@
                     continue;
                 inserted.Invoke(new InsertedEntry<TEntity, TDbContext>(original, dbContext));
             }
+
             bulkInserted.Invoke(new BulkInsertedEntry<TEntity, TDbContext>(insertedEntities, dbContext));
         }
 
@@ -256,6 +274,7 @@
                     continue;
                 updated.Invoke(new UpdatedEntry<TEntity, TDbContext>(original, dbContext));
             }
+
             bulkUpdated.Invoke(new BulkUpdatedEntry<TEntity, TDbContext>(updatedEntities, dbContext));
         }
 
