@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <Description>Repository Extensions for Web</Description>
     <Copyright>Valikovsky Igor</Copyright>
     <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Infrastructure.Repository" Version="1.0.27" />
+    <PackageReference Include="Kongrevsky.Infrastructure.Repository" Version="1.0.30" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
 
   </ItemGroup>
