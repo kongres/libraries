@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.0" />
+    <PackageReference Include="CoContra" Version="1.1.1" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.1" />
