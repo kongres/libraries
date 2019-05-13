@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <Description>Utilities for Entity Framework 6</Description>
     <Copyright>Valikovsky Igor</Copyright>
     <Authors>Valikovsky Igor</Authors>
@@ -11,8 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.5" />
-    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.3" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.6" />
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.4" />
     <PackageReference Include="System.Linq.Dynamic" Version="1.0.7" />
     <PackageReference Include="LinqKit" Version="1.1.16" />
     <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.8.25" />
