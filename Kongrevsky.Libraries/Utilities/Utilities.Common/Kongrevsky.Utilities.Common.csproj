@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <Description>Common Utilities</Description>
     <Copyright>Valikovsky Igor</Copyright>
     <Authors>Valikovsky Igor</Authors>
@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Utilities.DateTime" Version="1.0.0" />
-    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.3" />
+    <PackageReference Include="Kongrevsky.Utilities.DateTime" Version="1.0.4" />
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="LinqKit" Version="1.1.15" />
   </ItemGroup>
