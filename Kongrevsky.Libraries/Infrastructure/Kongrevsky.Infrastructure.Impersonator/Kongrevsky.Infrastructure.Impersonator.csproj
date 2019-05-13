@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
     <AssemblyName>Kongrevsky.Infrastructure.Impersonator</AssemblyName>
     <PackageId>Kongrevsky.Infrastructure.Impersonator</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -11,5 +11,9 @@
     <Description>Windows Impersonator</Description>
     <Copyright>Valikovsky Igor</Copyright>
   </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.5.1" />
+  </ItemGroup>
 
 </Project>
