@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
-    <Authors>Valikovsky Igor, Savchenko Dmitry</Authors>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
+    <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
     <Copyright>Valikovsky Igor</Copyright>
     <Description>Provides access to locations resources</Description>
@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.5" />
-    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.0" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.6" />
+    <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
