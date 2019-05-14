@@ -11,6 +11,7 @@
     using System.Reflection;
     using System.Text;
     using Kongrevsky.Utilities.DateTime;
+    using Kongrevsky.Utilities.Json.JsonConverters;
     using Kongrevsky.Utilities.Object;
     using LinqKit;
     using Newtonsoft.Json;
@@ -114,14 +115,17 @@
 
             if (!typeof(TTarget).IsSimple())
             {
+                var jsonSerializerSettings = new JsonSerializerSettings();
+                jsonSerializerSettings.Converters.Add(new DecimalConverter() { Precision = 4 });
+                var jsonSerializer = JsonSerializer.Create(jsonSerializerSettings);
                 if (typeof(IEnumerable).IsAssignableFrom(typeof(TTarget)))
                 {
-                    if (!JToken.DeepEquals(JArray.FromObject(oldValue), JArray.FromObject(handledValue)))
+                    if (!JToken.DeepEquals(JArray.FromObject(oldValue, jsonSerializer), JArray.FromObject(handledValue, jsonSerializer)))
                         ActionIfDiff();
                 }
                 else
                 {
-                    if (!JToken.DeepEquals(JObject.FromObject(oldValue), JObject.FromObject(handledValue)))
+                    if (!JToken.DeepEquals(JObject.FromObject(oldValue, jsonSerializer), JObject.FromObject(handledValue, jsonSerializer)))
                         ActionIfDiff();
                 }
 
