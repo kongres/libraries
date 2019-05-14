@@ -37,7 +37,7 @@
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            decimal? d = default;
+            decimal? d = default(decimal);
             if (value != null)
             {
                 d = value as decimal?;
