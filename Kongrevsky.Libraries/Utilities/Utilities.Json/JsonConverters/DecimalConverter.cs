@@ -37,9 +37,10 @@
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            
             decimal? d;
             if (value != null)
-                d = ((decimal)value).Truncate(Precision);
+                d =  DecimalUtils.Truncate((decimal)value, Precision);
             else
                 d = null;
             JToken.FromObject(d).WriteTo(writer);

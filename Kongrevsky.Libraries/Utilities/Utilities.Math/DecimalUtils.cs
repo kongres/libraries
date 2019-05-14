@@ -74,7 +74,7 @@
         /// <param name="value">Value</param>
         /// <param name="precision">Precision</param>
         /// <returns></returns>
-        public static decimal Truncate(this decimal value, byte precision)
+        public static decimal TruncateEx(this decimal value, byte precision)
         {
             var round = Math.Round(value, precision);
 
