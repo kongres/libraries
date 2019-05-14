@@ -67,5 +67,24 @@
         {
             return Math.Round(decimal1 - decimal2, precision) == 0;
         }
+
+        /// <summary>
+        /// Truncate value to specified precision
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <param name="precision">Precision</param>
+        /// <returns></returns>
+        public static decimal Truncate(this decimal value, byte precision)
+        {
+            var round = Math.Round(value, precision);
+
+            if (value > 0 && round > value)
+                return round - new decimal(1, 0, 0, false, precision);
+
+            if (value < 0 && round < value)
+                return round + new decimal(1, 0, 0, false, precision);
+
+            return round;
+        }
     }
 }
