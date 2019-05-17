@@ -7,14 +7,14 @@
 
     #endregion
 
-    public class ProviderNumberValidator : PropertyValidator
+    public class WebSiteLinkValidator : PropertyValidator
     {
         private readonly Regex regex;
 
-        public ProviderNumberValidator()
-                : base("{PropertyName} is not a valid phone number.")
+        public WebSiteLinkValidator()
+                : base("{PropertyName} is not a valid WebSite link.")
         {
-            this.regex = new Regex(@"^[\d,\-,\(,\),\+,\ ]+$");
+            this.regex = new Regex(@"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$");
         }
 
         protected override bool IsValid(PropertyValidatorContext context)

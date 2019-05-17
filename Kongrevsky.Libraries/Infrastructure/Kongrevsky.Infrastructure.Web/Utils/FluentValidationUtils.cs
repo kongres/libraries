@@ -13,5 +13,10 @@
         {
             return ruleBuilder.SetValidator(new ProviderNumberValidator());
         }
+
+        public static IRuleBuilderOptions<T, string> WebSiteLink<T>(this IRuleBuilder<T, string> ruleBuilder)
+        {
+            return ruleBuilder.SetValidator(new WebSiteLinkValidator());
+        }
     }
 }
