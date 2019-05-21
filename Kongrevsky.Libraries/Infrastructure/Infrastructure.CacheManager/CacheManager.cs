@@ -10,22 +10,17 @@
 
     public class CacheManager : ICacheManager
     {
-        #region Properties
 
         private IMemoryCache _memoryCache { get; }
 
-        #endregion
 
-        #region Constructors
 
         public CacheManager(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
         }
 
-        #endregion
 
-        #region Interface Implementations
 
         public void SetValue<T>(string userKey, string key, T obj, TimeSpan? expiration = null)
         {
@@ -68,6 +63,5 @@
             return _memoryCache.TryGetValue(hash, out value);
         }
 
-        #endregion
     }
 }
