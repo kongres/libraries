@@ -8,7 +8,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using CoContra;
     using Kongrevsky.Utilities.Enumerable;
     using Kongrevsky.Utilities.Expression;
     using LinqKit;
@@ -17,35 +16,35 @@
 
     public static class TriggersBulk<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext
     {
-        private static readonly CovariantAction<IInsertingEntry<TEntity, TDbContext>> inserting = new CovariantAction<IInsertingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IInsertingEntry<TEntity, TDbContext>>> inserting = new List<Action<IInsertingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>> bulkInserting = new CovariantAction<IBulkInsertingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkInsertingEntry<TEntity, TDbContext>>> bulkInserting = new List<Action<IBulkInsertingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IUpdatingEntry<TEntity, TDbContext>> updating = new CovariantAction<IUpdatingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IUpdatingEntry<TEntity, TDbContext>>> updating = new List<Action<IUpdatingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkUpdatingEntry<TEntity, TDbContext>> bulkUpdating = new CovariantAction<IBulkUpdatingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkUpdatingEntry<TEntity, TDbContext>>> bulkUpdating = new List<Action<IBulkUpdatingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IDeletingEntry<TEntity, TDbContext>> deleting = new CovariantAction<IDeletingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IDeletingEntry<TEntity, TDbContext>>> deleting = new List<Action<IDeletingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkDeletingEntry<TEntity, TDbContext>> bulkDeleting = new CovariantAction<IBulkDeletingEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkDeletingEntry<TEntity, TDbContext>>> bulkDeleting = new List<Action<IBulkDeletingEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> insertFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
+        private static readonly List<Action<IEnumerable<TEntity>, TDbContext>> insertFailed = new List<Action<IEnumerable<TEntity>, TDbContext>>();
 
-        private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> updateFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
+        private static readonly List<Action<IEnumerable<TEntity>, TDbContext>> updateFailed = new List<Action<IEnumerable<TEntity>, TDbContext>>();
 
-        private static readonly CovariantAction<IEnumerable<TEntity>, TDbContext> deleteFailed = new CovariantAction<IEnumerable<TEntity>, TDbContext>();
+        private static readonly List<Action<IEnumerable<TEntity>, TDbContext>> deleteFailed = new List<Action<IEnumerable<TEntity>, TDbContext>>();
 
-        private static readonly CovariantAction<IInsertedEntry<TEntity, TDbContext>> inserted = new CovariantAction<IInsertedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IInsertedEntry<TEntity, TDbContext>>> inserted = new List<Action<IInsertedEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkInsertedEntry<TEntity, TDbContext>> bulkInserted = new CovariantAction<IBulkInsertedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkInsertedEntry<TEntity, TDbContext>>> bulkInserted = new List<Action<IBulkInsertedEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IUpdatedEntry<TEntity, TDbContext>> updated = new CovariantAction<IUpdatedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IUpdatedEntry<TEntity, TDbContext>>> updated = new List<Action<IUpdatedEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkUpdatedEntry<TEntity, TDbContext>> bulkUpdated = new CovariantAction<IBulkUpdatedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkUpdatedEntry<TEntity, TDbContext>>> bulkUpdated = new List<Action<IBulkUpdatedEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IDeletedEntry<TEntity, TDbContext>> deleted = new CovariantAction<IDeletedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IDeletedEntry<TEntity, TDbContext>>> deleted = new List<Action<IDeletedEntry<TEntity, TDbContext>>>();
 
-        private static readonly CovariantAction<IBulkDeletedEntry<TEntity, TDbContext>> bulkDeleted = new CovariantAction<IBulkDeletedEntry<TEntity, TDbContext>>();
+        private static readonly List<Action<IBulkDeletedEntry<TEntity, TDbContext>>> bulkDeleted = new List<Action<IBulkDeletedEntry<TEntity, TDbContext>>>();
 
         public static event Action<IInsertingEntry<TEntity, TDbContext>> Inserting
         {
@@ -143,8 +142,8 @@
             if (!list.Any())
                 return;
             foreach (var entity in list)
-                inserting.Invoke(new InsertingEntry<TEntity, TDbContext>(entity, dbContext));
-            bulkInserting.Invoke(new BulkInsertingEntry<TEntity, TDbContext>(list, dbContext));
+                inserting.ForEach(x => x.Invoke(new InsertingEntry<TEntity, TDbContext>(entity, dbContext)));
+            bulkInserting.ForEach(x => x.Invoke(new BulkInsertingEntry<TEntity, TDbContext>(list, dbContext)));
         }
 
         public static void RaiseUpdating(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
@@ -167,11 +166,11 @@
                 var original = originals.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
-                updating.Invoke(new UpdatingEntry<TEntity, TDbContext>(original, entity, dbContext));
+                updating.ForEach(x => x.Invoke(new UpdatingEntry<TEntity, TDbContext>(original, entity, dbContext)));
                 eventParams.Add(new BulkUpdatingEntity<TEntity>(original, entity));
             }
 
-            bulkUpdating.Invoke(new BulkUpdatingEntry<TEntity, TDbContext>(eventParams, dbContext));
+            bulkUpdating.ForEach(x => x.Invoke(new BulkUpdatingEntry<TEntity, TDbContext>(eventParams, dbContext)));
         }
 
         public static void RaiseDeleting(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
@@ -193,10 +192,10 @@
                 var original = deletingEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
-                deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(original, dbContext));
+                deleting.ForEach(x => x.Invoke(new DeletingEntry<TEntity, TDbContext>(original, dbContext)));
             }
 
-            bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(deletingEntities, dbContext));
+            bulkDeleting.ForEach(x => x.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(deletingEntities, dbContext)));
         }
 
         public static void RaiseDeleting(IEnumerable<TEntity> entities, TDbContext dbContext)
@@ -207,25 +206,25 @@
 
             foreach (var entity in list)
             {
-                deleting.Invoke(new DeletingEntry<TEntity, TDbContext>(entity, dbContext));
+                deleting.ForEach(x => x.Invoke(new DeletingEntry<TEntity, TDbContext>(entity, dbContext)));
             }
 
-            bulkDeleting.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(list, dbContext));
+            bulkDeleting.ForEach(x => x.Invoke(new BulkDeletingEntry<TEntity, TDbContext>(list, dbContext)));
         }
 
         public static void RaiseInsertFailed(IEnumerable<TEntity> entities, TDbContext dbContext)
         {
-            insertFailed.Invoke(entities, dbContext);
+            insertFailed.ForEach(x => x.Invoke(entities, dbContext));
         }
 
         public static void RaiseUpdateFailed(IEnumerable<TEntity> entities, TDbContext dbContext)
         {
-            updateFailed.Invoke(entities, dbContext);
+            updateFailed.ForEach(x => x.Invoke(entities, dbContext));
         }
 
         public static void RaiseDeleteFailed(IEnumerable<TEntity> entities, TDbContext dbContext)
         {
-            deleteFailed.Invoke(entities, dbContext);
+            deleteFailed.ForEach(x => x.Invoke(entities, dbContext));
         }
 
         public static void RaiseInserted(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
@@ -247,10 +246,10 @@
                 var original = insertedEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
-                inserted.Invoke(new InsertedEntry<TEntity, TDbContext>(original, dbContext));
+                inserted.ForEach(x => x.Invoke(new InsertedEntry<TEntity, TDbContext>(original, dbContext)));
             }
 
-            bulkInserted.Invoke(new BulkInsertedEntry<TEntity, TDbContext>(insertedEntities, dbContext));
+            bulkInserted.ForEach(x => x.Invoke(new BulkInsertedEntry<TEntity, TDbContext>(insertedEntities, dbContext)));
         }
 
         public static void RaiseUpdated(IEnumerable<TEntity> entities, TDbContext dbContext, Expression<Func<TEntity, object>> identificator)
@@ -272,10 +271,10 @@
                 var original = updatedEntities.FirstOrDefault(x => Equals(funcIdentificator(x), id));
                 if (original == null)
                     continue;
-                updated.Invoke(new UpdatedEntry<TEntity, TDbContext>(original, dbContext));
+                updated.ForEach(x => x.Invoke(new UpdatedEntry<TEntity, TDbContext>(original, dbContext)));
             }
 
-            bulkUpdated.Invoke(new BulkUpdatedEntry<TEntity, TDbContext>(updatedEntities, dbContext));
+            bulkUpdated.ForEach(x => x.Invoke(new BulkUpdatedEntry<TEntity, TDbContext>(updatedEntities, dbContext)));
         }
 
         public static void RaiseDeleted(IEnumerable<TEntity> entities, TDbContext dbContext)
@@ -284,8 +283,8 @@
             if (!list.Any())
                 return;
             foreach (var entity in list)
-                deleted.Invoke(new DeletedEntry<TEntity, TDbContext>(entity, dbContext));
-            bulkDeleted.Invoke(new BulkDeletedEntry<TEntity, TDbContext>(list, dbContext));
+                deleted.ForEach(x => x.Invoke(new DeletedEntry<TEntity, TDbContext>(entity, dbContext)));
+            bulkDeleted.ForEach(x => x.Invoke(new BulkDeletedEntry<TEntity, TDbContext>(list, dbContext)));
         }
 
         private static IQueryable<TEntity> QueryableContains(IQueryable<TEntity> queryable, IEnumerable<TEntity> list, Expression<Func<TEntity, object>> identificator)
