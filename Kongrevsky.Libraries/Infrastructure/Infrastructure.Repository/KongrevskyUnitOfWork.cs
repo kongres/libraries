@@ -81,6 +81,8 @@
                 AddedBeforeSaveChanges?.Invoke(addedRelationships);
                 RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
+                var commitExecutingContext = TriggersCommon<T>.RaiseCommitExecuting(Database);
+
                 try
                 {
                     await Database.SaveChangesAsync(Task.Factory.CancellationToken);
@@ -93,6 +95,8 @@
                         exceptions.Add(new Exception($"Property: {validationError.PropertyName} Error: {validationError.ErrorMessage}"));
                     throw new AggregateException("Validation failed for one or more entities. See InnerExceptions.", exceptions);
                 }
+
+                TriggersCommon<T>.RaiseCommitExecuted(Database, commitExecutingContext);
 
                 AddedAfterSaveChanges?.Invoke(addedRelationships);
                 RemovedAfterSaveChanges?.Invoke(deletedRelationships);
