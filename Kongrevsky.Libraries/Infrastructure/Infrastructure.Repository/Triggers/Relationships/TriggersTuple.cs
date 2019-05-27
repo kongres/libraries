@@ -1,8 +1,7 @@
-﻿namespace Kongrevsky.Infrastructure.Repository.Triggers
+﻿namespace Kongrevsky.Infrastructure.Repository.Triggers.Relationships
 {
     using System;
     using System.Collections.Generic;
-    using EntityFramework.Triggers;
 
     public static class TriggersTuple<Db> where Db : KongrevskyDbContext
     {

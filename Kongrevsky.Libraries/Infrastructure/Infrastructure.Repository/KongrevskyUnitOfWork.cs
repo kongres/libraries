@@ -7,6 +7,7 @@
     using System.Data.Entity.Validation;
     using System.Linq;
     using System.Threading.Tasks;
+    using Kongrevsky.Infrastructure.Repository.Triggers.Common;
     using Kongrevsky.Utilities.EF6;
 
     #endregion
@@ -42,6 +43,8 @@
                 AddedBeforeSaveChanges?.Invoke(addedRelationships);
                 RemovedBeforeSaveChanges?.Invoke(deletedRelationships);
 
+                var commitExecutingContext = TriggersCommon<T>.RaiseCommitExecuting(Database);
+
                 try
                 {
                     Database.SaveChanges();
@@ -54,6 +57,8 @@
                         exceptions.Add(new Exception($"Property: {validationError.PropertyName} Error: {validationError.ErrorMessage}"));
                     throw new AggregateException("Validation failed for one or more entities. See InnerExceptions.", exceptions);
                 }
+
+                TriggersCommon<T>.RaiseCommitExecuted(Database, commitExecutingContext);
 
                 AddedAfterSaveChanges?.Invoke(addedRelationships);
                 RemovedAfterSaveChanges?.Invoke(deletedRelationships);

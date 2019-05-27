@@ -1,4 +1,4 @@
-﻿namespace Kongrevsky.Infrastructure.Repository.Triggers {
+﻿namespace Kongrevsky.Infrastructure.Repository.Triggers.Bulk {
     using System.Data.Entity;
 
     public interface IUpdatedEntry<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext {

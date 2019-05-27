@@ -12,6 +12,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.0" />
     <PackageReference Include="EntityFramework" Version="6.2.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
+    <PackageReference Include="EntityFramework.TypedOriginalValues" Version="1.1.1" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.1" />
     <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.6" />
     <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.6" />

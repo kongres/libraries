@@ -12,7 +12,7 @@
     using System.Reflection;
     using System.Threading.Tasks;
     using AutoMapper;
-    using Kongrevsky.Infrastructure.Repository.Triggers;
+    using Kongrevsky.Infrastructure.Repository.Triggers.Bulk;
     using Kongrevsky.Infrastructure.Repository.Utils.Options;
     using Kongrevsky.Utilities.EF6;
     using Kongrevsky.Utilities.Object;
