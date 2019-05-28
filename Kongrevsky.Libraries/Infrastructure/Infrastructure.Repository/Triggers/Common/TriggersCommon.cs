@@ -33,8 +33,7 @@
 
         public static ICommitExecutingContext<TDbContext> RaiseCommitExecuting(TDbContext dbContext)
         {
-
-            if (commitExecuted.Any())
+            if (commitExecuting.Any())
                 commitExecuting.ForEach(x => x.Invoke(new CommitExecutingContext<TDbContext>(dbContext)));
             return new CommitExecutingContext<TDbContext>(dbContext);
         }
