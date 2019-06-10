@@ -21,6 +21,12 @@
         TDbContext Context { get; }
 
         CommitExecutingEntities<T, TDbContext> Entity<T>() where T : class;
+
+        /// <summary>
+        ///     Has any changed entities
+        /// </summary>
+        /// <returns></returns>
+        bool Any();
     }
 
     public class CommitExecutingContext<TDbContext> : ICommitExecutingContext<TDbContext> where TDbContext : DbContext
@@ -48,6 +54,11 @@
                                                               UpdatingEntities.Where(x => x.Entity.GetType() == typeof(T)).Select(x => new UpdatingEntity<T, TDbContext>((T)x.Entity, Context)).ToList(),
                                                               DeletingEntities.OfType<T>().ToList());
         }
+
+        public bool Any()
+        {
+            return InsertingEntities.Any() || UpdatingEntities.Any() || DeletingEntities.Any();
+        }
     }
 
     public class CommitExecutingEntities<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext
@@ -64,6 +75,15 @@
         public List<UpdatingEntity<TEntity, TDbContext>> UpdatingEntities { get; }
 
         public List<TEntity> DeletingEntities { get; }
+
+        /// <summary>
+        ///     Has any changed entities
+        /// </summary>
+        /// <returns></returns>
+        public bool Any()
+        {
+            return InsertingEntities.Any() || UpdatingEntities.Any() || DeletingEntities.Any();
+        }
     }
 
     public class UpdatingEntity<TEntity, TDbContext> where TEntity : class where TDbContext : DbContext
