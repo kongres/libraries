@@ -51,7 +51,7 @@
         public CommitExecutingEntities<T, TDbContext> Entity<T>() where T : class
         {
             return new CommitExecutingEntities<T, TDbContext>(InsertingEntities.OfType<T>().ToList(),
-                                                              UpdatingEntities.Where(x => x.Entity.GetType() == typeof(T)).Select(x => new UpdatingEntity<T, TDbContext>((T)x.Entity, Context)).ToList(),
+                                                              UpdatingEntities.Where(x => x.Entity is T).Select(x => new UpdatingEntity<T, TDbContext>((T)x.Entity, Context)).ToList(),
                                                               DeletingEntities.OfType<T>().ToList());
         }
 
