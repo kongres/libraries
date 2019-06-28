@@ -36,7 +36,7 @@
 
             if (value == null)
             {
-                value = JsonConvert.SerializeObject(expr(), serializerSettings ?? _options.DefaultSerializerSettings); 
+                value = JsonConvert.SerializeObject(expr(), serializerSettings ?? _options.DefaultSerializerSettings);
                 _distributedCache.SetString(key, value, new DistributedCacheEntryOptions().SetAbsoluteExpiration(absoluteExpiration ?? _options.DefaultAbsoluteExpiration).SetSlidingExpiration(slidingExpiration ?? _options.DefaultSlidingExpiration));
             }
 
@@ -58,15 +58,22 @@
 
         public bool TryGetValue<T>(string key, out T value, JsonSerializerSettings serializerSettings = null)
         {
-            var valueStr = _distributedCache.GetString(key);
-            if (valueStr == null)
+            try
+            {
+                var valueStr = _distributedCache.GetString(key);
+                if (valueStr == null)
+                {
+                    value = default(T);
+                    return false;
+                }
+                value = JsonConvert.DeserializeObject<T>(valueStr, serializerSettings ?? _options.DefaultSerializerSettings);
+                return true;
+            }
+            catch (Exception e)
             {
                 value = default(T);
                 return false;
             }
-
-            value = JsonConvert.DeserializeObject<T>(valueStr, serializerSettings ?? _options.DefaultSerializerSettings);
-            return true;
         }
 
         public void Refresh(string key)
