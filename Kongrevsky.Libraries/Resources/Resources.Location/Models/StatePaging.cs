@@ -15,5 +15,6 @@
         /// </summary>
         public string CountryName { get; set; }
         public bool? HasCities { get; set; }
+        public string StateAbbr { get; set; }
     }
 }
