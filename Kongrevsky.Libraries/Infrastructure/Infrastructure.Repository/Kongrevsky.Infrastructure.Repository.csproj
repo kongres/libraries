@@ -10,12 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.0" />
-    <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="EntityFramework.Triggers" Version="6.1.1" />
+    <PackageReference Include="EntityFramework" Version="6.3.0-preview6-19304-03" />
+    <PackageReference Include="EntityFramework.Triggers" Version="6.2.0" />
     <PackageReference Include="EntityFramework.TypedOriginalValues" Version="1.1.1" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.1" />
     <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.6" />
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.6" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.7" />
     <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.3" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
@@ -24,6 +24,6 @@
     <PackageReference Include="PagedList" Version="1.17.0" />
     <PackageReference Include="LinqKit" Version="1.1.16" />
     <PackageReference Include="SqlBulkTools.NetStandard" Version="2.1.18" />
-    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.8.25" />
+    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.9.3" />
   </ItemGroup>
 </Project>
