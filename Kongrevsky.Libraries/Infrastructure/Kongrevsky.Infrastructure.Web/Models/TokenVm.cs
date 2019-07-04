@@ -3,11 +3,9 @@
     #region << Using >>
 
     using FluentValidation;
-    using FluentValidation.Attributes;
 
     #endregion
 
-    [Validator(typeof(TokenVmValidator))]
     public class TokenVm
     {
         public string Token { get; set; }

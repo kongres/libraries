@@ -3,11 +3,9 @@
     #region << Using >>
 
     using FluentValidation;
-    using FluentValidation.Attributes;
 
     #endregion
 
-    [Validator(typeof(IdVmValidator))]
     public class IdVm
     {
         public string Id { get; set; }

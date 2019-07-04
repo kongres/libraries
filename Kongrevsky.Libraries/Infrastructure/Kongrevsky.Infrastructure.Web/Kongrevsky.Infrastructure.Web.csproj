@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.0" />
-    <PackageReference Include="FluentValidation" Version="7.6.0" />
+    <PackageReference Include="FluentValidation" Version="8.4.0" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.1" />
     <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.4" />
     <PackageReference Include="Kongrevsky.Utilities.Enum" Version="1.0.1" />
