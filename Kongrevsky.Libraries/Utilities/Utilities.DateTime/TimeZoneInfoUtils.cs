@@ -52,5 +52,30 @@
 
             return result;
         }
+
+        public static string GetTimezoneDisplayNameIgnoreDaylight(this TimeZoneInfo timezone)
+        {
+            if (!timezone.SupportsDaylightSavingTime || !timezone.IsDaylightSavingTime(DateTime.UtcNow))
+                return timezone.DisplayName;
+
+            var adjustmentRule = timezone.GetAdjustmentRules().FirstOrDefault(r => r.DateStart <= DateTime.UtcNow && r.DateEnd >= DateTime.UtcNow);
+            if (adjustmentRule == null)
+                return timezone.DisplayName;
+
+            var actualOffset = timezone.BaseUtcOffset + adjustmentRule.DaylightDelta;
+            var offsetSign = actualOffset.Hours > 0 ? "+" : "";
+            return actualOffset == TimeSpan.Zero
+                    ? $"(UTC+00:00) {timezone.StandardName}"
+                    : $"(UTC{offsetSign}{actualOffset.Hours:00}:{actualOffset.Duration().Minutes:00}) {timezone.StandardName}";
+        }
+
+        public static double GetTimezoneOffsetIgnoreDaylight(this TimeZoneInfo timezone)
+        {
+            if (!timezone.SupportsDaylightSavingTime || !timezone.IsDaylightSavingTime(DateTime.UtcNow))
+                return timezone.BaseUtcOffset.TotalMinutes;
+
+            var adjustmentRule = timezone.GetAdjustmentRules().FirstOrDefault(r => r.DateStart <= DateTime.UtcNow && r.DateEnd >= DateTime.UtcNow);
+            return adjustmentRule == null ? timezone.BaseUtcOffset.TotalMinutes : (timezone.BaseUtcOffset + adjustmentRule.DaylightDelta).TotalMinutes;
+        }
     }
 }
