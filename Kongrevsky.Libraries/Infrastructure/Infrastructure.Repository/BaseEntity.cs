@@ -16,7 +16,7 @@
         }
 
         [Key]
-        public string Id { get; private set; }
+        public string Id { get; set; }
 
         /// <summary>
         ///     Set new Id for the entity
