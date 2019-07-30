@@ -23,7 +23,7 @@
         public HttpStatusCode StatusCode { get; }
         public string Message { get; }
 
-        public bool IsSuccess => StatusCode == HttpStatusCode.OK;
+        public bool IsSuccess => this.StatusCode >= HttpStatusCode.OK && this.StatusCode <= (HttpStatusCode)299;
 
         public ResultInfo ToResultInfo()
         {

@@ -4,10 +4,11 @@
 
     using System;
     using Kongrevsky.Infrastructure.Web.ActionLogger.Models;
+    using Microsoft.AspNetCore.Mvc.Filters;
 
     #endregion
 
-    public class ActionLogAttribute : Attribute
+    public class ActionLogAttribute : ActionFilterAttribute
     {
         public ActionLogAttribute()
         {
