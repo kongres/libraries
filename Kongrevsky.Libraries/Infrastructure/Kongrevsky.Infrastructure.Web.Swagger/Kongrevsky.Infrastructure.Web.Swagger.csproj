@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
+    <Description>Swagger for Web</Description>
+    <Copyright>Valikovsky Igor</Copyright>
+    <Authors>Valikovsky Igor</Authors>
+    <Company>Kongrevsky</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Kongrevsky.Utilities.Web" Version="1.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="4.5.5" />
+    <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="2.1.1" />
+  </ItemGroup>
+
+</Project>
