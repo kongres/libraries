@@ -10,7 +10,7 @@
 
     public static class RepositoryExtensions
     {
-        public static void AddKongrevskyRepository<Db>(this IServiceCollection services, string connectionString) where Db : KongrevskyDbContext, new()
+        public static void AddKongrevskyRepository<Db>(this IServiceCollection services, string connectionString) where Db : KongrevskyDbContext
         {
             services.AddScoped<IKongrevskyDatabaseFactory<Db>, KongrevskyDatabaseFactory<Db>>();
             services.AddScoped<IKongrevskyUnitOfWork<Db>, KongrevskyUnitOfWork<Db>>();
