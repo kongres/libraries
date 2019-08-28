@@ -75,7 +75,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Utilities.Json",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.DistributedCacheManager", "Infrastructure\Infrastructure.DistributedCacheManager\Kongrevsky.Infrastructure.DistributedCacheManager.csproj", "{47F95021-4BC9-46B8-985A-6E6F2A7281A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.Web.Swagger", "Infrastructure\Kongrevsky.Infrastructure.Web.Swagger\Kongrevsky.Infrastructure.Web.Swagger.csproj", "{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.Web.Swagger", "Infrastructure\Kongrevsky.Infrastructure.Web.Swagger\Kongrevsky.Infrastructure.Web.Swagger.csproj", "{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.LogManager", "Infrastructure\Kongrevsky.Infrastructure.LogManager\Kongrevsky.Infrastructure.LogManager.csproj", "{57AEEA78-3202-4CDE-B648-AEE7B795BD26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -215,6 +217,10 @@ Global
 		{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57AEEA78-3202-4CDE-B648-AEE7B795BD26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57AEEA78-3202-4CDE-B648-AEE7B795BD26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57AEEA78-3202-4CDE-B648-AEE7B795BD26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57AEEA78-3202-4CDE-B648-AEE7B795BD26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -253,6 +259,7 @@ Global
 		{164F86D9-261F-4432-8BF7-AB90AFC346F4} = {B882BBD3-344E-4A8B-A50B-A5FB54FFDE95}
 		{47F95021-4BC9-46B8-985A-6E6F2A7281A6} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{57AEEA78-3202-4CDE-B648-AEE7B795BD26} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D46F8133-0CD3-457B-A289-439722F553A8}
