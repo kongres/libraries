@@ -138,5 +138,25 @@
             var deletedNumber = BulkDelete(await queryable.ToListAsync(), item => item.Id);
             return deletedNumber;
         }
+
+        public async Task<ResultInfo> DeleteLogAsync(string logId)
+        {
+            var log = await GetAsync(x => x.Id == logId && x.AppName == _options.AppName);
+            if (log == null)
+                return NotFound(LogNotFound);
+
+            Delete(log);
+            return Ok();
+        }
+
+        public async Task<ResultInfo> DeleteLogAsync(int logNumber)
+        {
+            var log = await GetAsync(x => x.Number == logNumber && x.AppName == _options.AppName);
+            if (log == null)
+                return NotFound(LogNotFound);
+
+            Delete(log);
+            return Ok();
+        }
     }
 }

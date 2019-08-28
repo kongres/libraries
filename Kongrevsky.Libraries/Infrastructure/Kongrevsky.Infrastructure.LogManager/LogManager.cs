@@ -49,5 +49,21 @@
         {
             return _logRepository.DeleteLogsAsync(filter);
         }
+
+        public async Task<ResultInfo> DeleteLogAsync(string logId)
+        {
+            var result = await _logRepository.DeleteLogAsync(logId);
+            if (result.IsSuccess)
+                await _unitOfWork.CommitAsync();
+            return result;
+        }
+
+        public async Task<ResultInfo> DeleteLogAsync(int logNumber)
+        {
+            var result = await _logRepository.DeleteLogAsync(logNumber);
+            if (result.IsSuccess)
+                await _unitOfWork.CommitAsync();
+            return result; ;
+        }
     }
 }

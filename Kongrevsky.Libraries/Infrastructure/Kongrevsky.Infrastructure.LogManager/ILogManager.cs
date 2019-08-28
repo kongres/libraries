@@ -15,5 +15,9 @@
         Task<string> CreateLogAsync(CreateLogItemDto log);
 
         Task<int> DeleteLogsAsync(DeleteLogsFilterDto filter);
+
+        Task<ResultInfo> DeleteLogAsync(string logId);
+
+        Task<ResultInfo> DeleteLogAsync(int logNumber);
     }
 }

@@ -5,6 +5,7 @@
     using System;
     using Kongrevsky.Infrastructure.LogManager.Infrastructure;
     using Kongrevsky.Infrastructure.LogManager.Models;
+    using Kongrevsky.Infrastructure.LogManager.Repository;
     using Kongrevsky.Infrastructure.Repository.Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@
 
             var logManagerOptions = configurationSection.Get<LogManagerOptions>();
             services.AddKongrevskyRepository<LogDbContext>(logManagerOptions.ConnectionString);
+            services.AddTransient<ILogRepository, LogRepository>();
             services.AddTransient<ILogManager, LogManager>();
         }
 
@@ -37,6 +39,7 @@
             services.Configure<LogManagerOptions>(configurationSection);
 
             services.AddKongrevskyRepository<LogDbContext>(options.ConnectionString);
+            services.AddTransient<ILogRepository, LogRepository>();
             services.AddTransient<ILogManager, LogManager>();
         }
     }
