@@ -154,14 +154,18 @@
             if (!filter.CountryName.IsNullOrEmpty())
             {
                 var country = _countries.FirstOrDefault(x => string.Equals(x.Name, filter.CountryName, _options.StringComparison));
-                if (country != null)
+
+                if (country == null)
                 {
-                    filter.CountryId = country.Code;
-                    if (!country.HasStates)
-                    {
-                        filter.SetResult(Enumerable.Empty<State>(), 0, 0);
-                        return filter;
-                    }
+                    filter.SetResult(Enumerable.Empty<State>(), 0, 0);
+                    return filter;
+                }
+
+                filter.CountryId = country.Code;
+                if (!country.HasStates)
+                {
+                    filter.SetResult(Enumerable.Empty<State>(), 0, 0);
+                    return filter;
                 }
             }
 
