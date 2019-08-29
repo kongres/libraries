@@ -19,5 +19,11 @@
         public static string RequestQueryParams = "Request Query Params";
 
         public static string RequestBody = "Request Body";
+
+        public static string RequestData = "Request Data";
+
+        public static string ResponseStatusCode = "Response Status Code";
+
+        public static string ResponseData = "Response Data";
     }
 }
