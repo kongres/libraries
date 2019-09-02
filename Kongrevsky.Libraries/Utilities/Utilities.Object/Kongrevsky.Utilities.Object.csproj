@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Utilities.Reflection" Version="1.0.1" />
+    <PackageReference Include="Kongrevsky.Utilities.Reflection" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
