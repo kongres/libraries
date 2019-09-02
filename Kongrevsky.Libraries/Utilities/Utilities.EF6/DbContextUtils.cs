@@ -149,6 +149,49 @@
             return entities.Count();
         }
 
+        /// <summary>
+        /// Get Key Names of Db Entity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static string[] GetKeyNames<TEntity>(this DbContext context)
+                where TEntity : class
+        {
+            return context.GetKeyNames(typeof(TEntity));
+        }
+
+        /// <summary>
+        /// Get Key Names of Db Entity
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        public static string[] GetKeyNames(this DbContext context, Type entityType)
+        {
+            var metadata = ((IObjectContextAdapter)context).ObjectContext.MetadataWorkspace;
+
+            // Get the mapping between CLR types and metadata OSpace
+            var objectItemCollection = ((ObjectItemCollection)metadata.GetItemCollection(DataSpace.OSpace));
+
+            // Get metadata for given CLR type
+            var entityMetadata = metadata
+                    .GetItems<EntityType>(DataSpace.OSpace)
+                    .Single(e => objectItemCollection.GetClrType(e) == entityType);
+
+            return entityMetadata.KeyProperties.Select(p => p.Name).ToArray();
+        }
+
+        /// <summary>
+        /// Get ObjectContext from DbContext
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static ObjectContext GetObjectContext(this DbContext @this)
+        {
+            return ((IObjectContextAdapter)@this).ObjectContext;
+        }
+
         private static IEnumerable<Tuple<object, object>> GetRelationships(DbContext context, EntityState relationshipState, Func<ObjectStateEntry, int, object> getValue)
         {
             context.ChangeTracker.DetectChanges();
