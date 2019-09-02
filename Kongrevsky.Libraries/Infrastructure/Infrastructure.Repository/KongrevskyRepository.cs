@@ -40,8 +40,6 @@
             _kongrevskyDatabaseFactory = kongrevskyDatabaseFactory;
         }
 
-        private string _connectionString => DataContext.ConnectionString;
-
         private IKongrevskyDatabaseFactory<DB> _kongrevskyDatabaseFactory { get; }
 
         private DB _dataContext { get; set; }
@@ -51,8 +49,6 @@
         protected IQueryable<T> Dbset => DataContext.Set<T>().AsExpandable().WithTranslations();
 
         protected DB DataContext => _dataContext ?? (_dataContext = _kongrevskyDatabaseFactory.Get());
-
-        private string connectionString => this._connectionString.IsNullOrEmpty() ? DataContext.Database.Connection.ConnectionString : this._connectionString;
 
         public virtual int BulkInsert(List<T> entities, Expression<Func<T, object>> identificator, Action<BulkInsertOptions<T>> configAction = null)
         {

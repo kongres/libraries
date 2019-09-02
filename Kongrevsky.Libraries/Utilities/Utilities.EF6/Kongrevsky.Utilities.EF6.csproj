@@ -11,8 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.7" />
-    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.4" />
+    <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.8" />
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.5" />
     <PackageReference Include="System.Linq.Dynamic" Version="1.0.7" />
     <PackageReference Include="LinqKit" Version="1.1.16" />
     <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.10.2" />

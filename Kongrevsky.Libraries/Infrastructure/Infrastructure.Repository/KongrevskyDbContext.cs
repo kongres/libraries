@@ -2,7 +2,10 @@
 {
     #region << Using >>
 
+    using System;
+    using System.Data.Common;
     using System.Data.Entity;
+    using System.Data.Entity.Core.Objects;
     using System.Data.Entity.Infrastructure;
     using System.Data.Entity.ModelConfiguration.Conventions;
     using System.Linq;
@@ -15,14 +18,49 @@
 
     public class KongrevskyDbContext : DbContextWithTriggers
     {
-        public KongrevskyDbContext(string connectionString)
-                : base(connectionString)
+        public KongrevskyDbContext()
         {
-            ConnectionString = connectionString;
             Configure();
         }
 
-        public string ConnectionString { get; set; }
+        public KongrevskyDbContext(IServiceProvider serviceProvider)
+                : base(serviceProvider) { Configure(); }
+
+        public KongrevskyDbContext(DbCompiledModel model)
+                : base(model) { Configure(); }
+
+        public KongrevskyDbContext(string nameOrConnectionString)
+                : base(nameOrConnectionString) { Configure(); }
+
+        public KongrevskyDbContext(DbConnection existingConnection, bool contextOwnsConnection)
+                : base(existingConnection, contextOwnsConnection) { Configure(); }
+
+        public KongrevskyDbContext(ObjectContext objectContext, bool dbContextOwnsObjectContext)
+                : base(objectContext, dbContextOwnsObjectContext) { Configure(); }
+
+        public KongrevskyDbContext(string nameOrConnectionString, DbCompiledModel model)
+                : base(nameOrConnectionString, model) { Configure(); }
+
+        public KongrevskyDbContext(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection)
+                : base(existingConnection, model, contextOwnsConnection) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, DbCompiledModel model)
+                : base(serviceProvider, model) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, string nameOrConnectionString)
+                : base(serviceProvider, nameOrConnectionString) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, DbConnection existingConnection, bool contextOwnsConnection)
+                : base(serviceProvider, existingConnection, contextOwnsConnection) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, ObjectContext objectContext, bool dbContextOwnsObjectContext)
+                : base(serviceProvider, objectContext, dbContextOwnsObjectContext) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, string nameOrConnectionString, DbCompiledModel model)
+                : base(serviceProvider, nameOrConnectionString, model) { Configure(); }
+
+        public KongrevskyDbContext(IServiceProvider serviceProvider, DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection)
+                : base(serviceProvider, existingConnection, model, contextOwnsConnection) { Configure(); }
 
         private void Configure()
         {

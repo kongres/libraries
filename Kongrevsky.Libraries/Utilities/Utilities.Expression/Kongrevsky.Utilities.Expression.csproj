@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.4" />
+    <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.5" />
   </ItemGroup>
 
 </Project>

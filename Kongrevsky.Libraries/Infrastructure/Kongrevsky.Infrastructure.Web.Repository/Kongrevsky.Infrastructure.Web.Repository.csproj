@@ -8,8 +8,8 @@
     <Company>Kongrevsky</Company>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Kongrevsky.Infrastructure.Repository" Version="1.0.30" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+    <PackageReference Include="Kongrevsky.Infrastructure.Repository" Version="1.0.39" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
 
   </ItemGroup>
 </Project>
