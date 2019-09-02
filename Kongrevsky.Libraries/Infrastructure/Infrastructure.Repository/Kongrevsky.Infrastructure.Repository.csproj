@@ -24,6 +24,5 @@
     <PackageReference Include="PagedList" Version="1.17.0" />
     <PackageReference Include="LinqKit" Version="1.1.16" />
     <PackageReference Include="SqlBulkTools.NetStandard" Version="2.1.30" />
-    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.10.2" />
   </ItemGroup>
 </Project>
