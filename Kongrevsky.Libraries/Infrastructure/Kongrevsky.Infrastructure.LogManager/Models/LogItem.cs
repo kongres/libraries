@@ -7,7 +7,6 @@
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Net;
     using Kongrevsky.Infrastructure.Repository;
-    using Newtonsoft.Json;
 
     #endregion
 

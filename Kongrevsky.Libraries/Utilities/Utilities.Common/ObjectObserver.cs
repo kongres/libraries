@@ -13,7 +13,6 @@
     using Kongrevsky.Utilities.DateTime;
     using Kongrevsky.Utilities.Json.JsonConverters;
     using Kongrevsky.Utilities.Object;
-    using LinqKit;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 

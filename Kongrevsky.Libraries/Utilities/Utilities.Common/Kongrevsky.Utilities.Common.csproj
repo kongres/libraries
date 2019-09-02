@@ -13,7 +13,6 @@
     <PackageReference Include="Kongrevsky.Utilities.Json" Version="1.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.Object" Version="1.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="LinqKit" Version="1.1.16" />
   </ItemGroup>
 
 </Project>
