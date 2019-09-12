@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net471;netcoreapp2.2</TargetFrameworks>
+        <Authors>Valikovsky Igor</Authors>
+        <Company>Valikovsky Igor</Company>
+        <Description>HelpManager</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.2" />
+      <PackageReference Include="Kongrevsky.Utilities.Common" Version="1.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
+      <PackageReference Include="RestSharp" Version="106.6.10" />
+      <PackageReference Include="Slack.Webhooks" Version="1.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.configuration.abstractions\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
