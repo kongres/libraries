@@ -80,142 +80,128 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
-    <script>
-        window.onload = function () {
-            initSwagger();
-            setTimeout(() => {
-                $(document).on('click', '.auth-wrapper .btn.unlocked', function () {
-                    setTimeout(() => {
-                        var oldKey = window.localStorage.getItem('key');
-                        var oldUser = window.localStorage.getItem('user');
-                        setJwt(oldKey, oldUser);
-                    }, 200);
+<script>
+    var configObject = JSON.parse('%(ConfigObject)');
+    var oauthConfigObject = JSON.parse('%(OAuthConfigObject)');
+    console.log(configObject, oauthConfigObject);
+    window.onload = function () {
+        initSwagger();
+        setTimeout(() => {
+            $(document).on('click', '.auth-wrapper .btn.unlocked', function () {
+                setTimeout(() => {
+                    var oldKey = window.localStorage.getItem('key');
+                    var oldUser = window.localStorage.getItem('user');
+                    setJwt(oldKey, oldUser);
+                }, 200);
+            });
+
+        }, 1);
+    }
+
+    function initSwagger() {
+            
+        // Apply mandatory parameters
+        configObject.dom_id = "#swagger-ui";
+        configObject.presets = [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset];
+        configObject.layout = "StandaloneLayout";
+        configObject.showMutatedRequest = true;
+        configObject.requestInterceptor = function (request) {
+            var key = window.localStorage.getItem('key');
+            if (key !== null) 
+                request.headers.Authorization = "Bearer " + key;
+            return request;
+        };
+            
+        // If oauth2RedirectUrl isn't specified, use the built-in default
+        if (!configObject.hasOwnProperty("oauth2RedirectUrl"))
+            configObject.oauth2RedirectUrl = window.location.href.replace("index.html", "oauth2-redirect.html").split('#')[0];
+        // Build a system
+        const ui = SwaggerUIBundle(configObject);
+        // Apply OAuth config
+        ui.initOAuth(oauthConfigObject);
+    }
+
+    function getJwt(user, pass, success, error, complete) {
+        var data = { password: pass };
+        data[configObject.UsernameField] = user;
+
+        $.ajax({
+            url: configObject.SignInUrl,
+            type: 'POST',
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                success && success(data.token);
+            },
+            error: function (jqXhr, err, msg) {
+                error && error(JSON.parse(jqXhr.responseText).errors[0].value);
+            },
+            complete: complete
+        });
+    }
+
+    function setJwt(key, user) {
+        let authorizeBtn = $('button.btn.authorize.button');
+        $(authorizeBtn).hide();
+        if(!!user) {
+            var userInput = $('.swagger-ui .auth-container input[type=text]')[0];
+            $(userInput).hide();
+            $("<span>" + user + "</span>").insertBefore(userInput);
+            var passwordInput = $('.swagger-ui .auth-container input[type=password]')[0];
+            $(passwordInput).hide();
+            $("<span>******</span>").insertBefore(passwordInput);
+            $("<button id=\"btn-bearer-logout\" onclick='logout()' class=\"btn modal-btn button\">Logout</button>").insertBefore($(authorizeBtn[0])); 
+        } else {
+            $("<button id=\"btn-basic-login\" onclick=\"login()\" class=\"btn modal-btn button\">Login</button>").insertBefore($(authorizeBtn[0]));
+        }
+            
+        var inputAuth = $('.auth-container :input[type=text]')[1];
+        if(!!key) {
+            $(inputAuth).val('Bearer ' + key);
+            $(inputAuth).hide();
+            $("<span><b>******</b></span>").insertBefore(inputAuth);  
+            $(authorizeBtn).click();
+            $("<button id=\"btn-bearer-logout\" onclick='logout()' class=\"btn modal-btn button\">Logout</button>").insertBefore($(authorizeBtn[1]));    
+        } else {
+            $(inputAuth).val('Bearer ');
+            $("<button id=\"btn-basic-login\" onclick=\"setTokenAndReload()\" class=\"btn modal-btn button\">Login</button>").insertBefore($(authorizeBtn[1]));
+        }
+    }
+
+    function setTokenAndReload() {
+        var token = $($('.auth-container :input[type=text]')[1]).val().replace('Bearer ', '');
+        window.localStorage.setItem('key', token);
+        initSwagger();
+    }
+
+    function login() {
+        var user = $(':input[name=username]').val();
+        var pass = $(':input[name=password]').val();
+        if (user && pass) {
+            getJwt(user, pass,
+                function (jwt) {
+                    if (jwt !== undefined) {
+                        setJwt(jwt, user);
+                        window.localStorage.setItem('key', jwt);
+                        window.localStorage.setItem('user', user);
+                        initSwagger();
+                    } else {
+                        console.error('Check the json response for typo and casing...');
+                    }
+                },
+                function (err) {
+                    alert('Invalid login. ', err);
                 });
-
-            }, 1);
         }
+    }
 
-        function initSwagger() {
-            var configObject = JSON.parse('%(ConfigObject)');
-            var oauthConfigObject = JSON.parse('%(OAuthConfigObject)');
-            // Apply mandatory parameters
-            configObject.dom_id = "#swagger-ui";
-            configObject.presets = [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset];
-            configObject.layout = "StandaloneLayout";
-            configObject.showMutatedRequest = true;
-            configObject.requestInterceptor = function (request) {
-                var key = window.localStorage.getItem('key');
-                if (key !== null) 
-                    request.headers.Authorization = "Bearer " + key;
-                return request;
-            };
-            
-            // If oauth2RedirectUrl isn't specified, use the built-in default
-            if (!configObject.hasOwnProperty("oauth2RedirectUrl"))
-                configObject.oauth2RedirectUrl = window.location.href.replace("index.html", "oauth2-redirect.html").split('#')[0];
-            // Build a system
-            const ui = SwaggerUIBundle(configObject);
-            // Apply OAuth config
-            ui.initOAuth(oauthConfigObject);
-        }
-
-        function getJwt(user, pass, success, error, complete) {
-            $.ajax({
-                url: '/api/Auth/SignIn',
-                type: 'POST',
-                contentType: "application/json",
-                dataType: "json",
-                data: JSON.stringify({
-                    login: user,
-                    password: pass
-                }),
-                success: function (data) {
-                    success && success(data.token);
-                },
-                error: function (jqXhr, err, msg) {
-                    error && error(JSON.parse(jqXhr.responseText).errors[0].value);
-                },
-                complete: complete
-            });
-        }
-
-        function setJwt(key, user) {
-            let authorizeBtn = $('button.btn.authorize.button');
-            $(authorizeBtn).hide();
-            if(!!user) {
-                var userInput = $('.swagger-ui .auth-container input[type=text]')[0];
-                $(userInput).hide();
-                $("<span>" + user + "</span>").insertBefore(userInput);
-                var passwordInput = $('.swagger-ui .auth-container input[type=password]')[0];
-                $(passwordInput).hide();
-                $("<span>******</span>").insertBefore(passwordInput);
-                $("<button id=\"btn-bearer-logout\" onclick='logout()' class=\"btn modal-btn button\">Logout</button>").insertBefore($(authorizeBtn[0])); 
-            } else {
-                $("<button id=\"btn-basic-login\" onclick=\"login()\" class=\"btn modal-btn button\">Login</button>").insertBefore($(authorizeBtn[0]));
-            }
-            
-            var inputAuth = $('.auth-container :input[type=text]')[1];
-            if(!!key) {
-                $(inputAuth).val('Bearer ' + key);
-                $(inputAuth).hide();
-                $("<span><b>******</b></span>").insertBefore(inputAuth);  
-                $(authorizeBtn).click();
-                $("<button id=\"btn-bearer-logout\" onclick='logout()' class=\"btn modal-btn button\">Logout</button>").insertBefore($(authorizeBtn[1]));    
-            } else {
-                $(inputAuth).val('Bearer ');
-                $("<button id=\"btn-basic-login\" onclick=\"getUserAndLogin()\" class=\"btn modal-btn button\">Login</button>").insertBefore($(authorizeBtn[1]));
-            }
-        }
-
-        function login() {
-            var user = $(':input[name=username]').val();
-            var pass = $(':input[name=password]').val();
-            if (user && pass) {
-                getJwt(user, pass,
-                    function (jwt) {
-                        if (jwt !== undefined) {
-                            setJwt(jwt, user);
-                            window.localStorage.setItem('key', jwt);
-                            window.localStorage.setItem('user', user);
-                            initSwagger();
-                        } else {
-                            console.error('Check the json response for typo and casing...');
-                        }
-                    },
-                    function (err) {
-                        alert('Invalid login. ', err);
-                    });
-            }
-        }
-
-        function getUserAndLogin() {
-            var inputAuth = $('.auth-container :input[type=text]')[1];
-            var token = $(inputAuth).val().replace('Bearer', '').trim();
-            $.ajax({
-                url: '/api/Account/GetUserInfo',
-                type: 'GET',
-                contentType: "application/json",
-                headers: {
-                    Authorization: "Bearer " + token
-                },
-                success: function (data) {
-                    setJwt(token, data.email);
-                    window.localStorage.setItem('key', token);
-                    window.localStorage.setItem('user', data.email);
-                    initSwagger();
-                },
-                error: function (jqXhr, err, msg) {
-                    console.error('Error getting user info...');
-                }
-            });
-        }
-
-        function logout() {
-            window.localStorage.removeItem('key');
-            window.localStorage.removeItem('user');
-            location.reload();
-        }
-    </script>
+    function logout() {
+        window.localStorage.removeItem('key');
+        window.localStorage.removeItem('user');
+        location.reload();
+    }
+</script>
 </body>
 
 </html>
