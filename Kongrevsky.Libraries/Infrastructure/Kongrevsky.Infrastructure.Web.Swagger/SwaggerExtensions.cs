@@ -10,6 +10,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Swagger;
+    using Swashbuckle.AspNetCore.SwaggerUI;
 
     #endregion
 
@@ -23,12 +24,22 @@
             {
                 c.SwaggerEndpoint($"/swagger/{options.Version}/swagger.json", $"Versioned API {options.Version}");
                 c.IndexStream = SwaggerConfigs.GetIndexUI;
-                c.ConfigObject.AdditionalItems["SignInUrl"] = !string.IsNullOrEmpty(options.SignInUrl)
-                    ? options.SignInUrl
-                    : "/api/Auth/SignIn";
-                c.ConfigObject.AdditionalItems["UsernameField"] = !string.IsNullOrEmpty(options.UsernameField)
-                    ? options.UsernameField
-                    : "login";
+                c.ConfigObject.AdditionalItems["OAuthEnabled"] = options.OAuthEnabled;
+
+                if (!options.OAuthEnabled)
+                {
+                    c.ConfigObject.AdditionalItems["SignInUrl"] = !string.IsNullOrEmpty(options.NonOAuthOptions.SignInUrl)
+                            ? options.NonOAuthOptions.SignInUrl
+                            : "/api/Auth/SignIn";
+                    c.ConfigObject.AdditionalItems["UsernameField"] = !string.IsNullOrEmpty(options.NonOAuthOptions.UsernameField)
+                            ? options.NonOAuthOptions.UsernameField
+                            : "login";
+                }
+                else
+                {
+                    c.DocExpansion(DocExpansion.None);
+                    c.OAuthClientId(options.OAuthOptions.ClientId);
+                }
             });
         }
 
@@ -47,15 +58,30 @@
                         Version = options.Version,
                         Description = options.Description
                     });
-                c.AddSecurityDefinition("BasicAuth", new BasicAuthScheme { Description = "Login" });
-                c.AddSecurityDefinition("Bearer",
-                    new ApiKeyScheme
-                    {
-                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                        Name = "Authorization",
-                        In = "header",
-                        Type = "apiKey"
-                    });
+                if (options.OAuthEnabled)
+                {
+                    var oAuthOptions = options.OAuthOptions;
+                    c.AddSecurityDefinition("SSO", new OAuth2Scheme()
+                                                   {
+                                                           Type = "oauth2",
+                                                           AuthorizationUrl = oAuthOptions.AuthorizationUrl,
+                                                           TokenUrl = oAuthOptions.TokenUrl,
+                                                           Scopes = oAuthOptions.Scopes,
+                                                           Flow = "implicit"
+                                                   });
+                }
+                else
+                {
+                    c.AddSecurityDefinition("BasicAuth", new BasicAuthScheme { Description = "Login" });
+                    c.AddSecurityDefinition("Bearer",
+                                            new ApiKeyScheme
+                                            {
+                                                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                                                    Name = "Authorization",
+                                                    In = "header",
+                                                    Type = "apiKey"
+                                            });
+                }
 
                 c.DescribeAllEnumsAsStrings();
                 c.IncludeXmlComments(GetXmlCommentsPath(options.XmlCommentsFile));
