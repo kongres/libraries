@@ -81,42 +81,68 @@
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
             crossorigin="anonymous"></script>
 <script>
+    const tokenStorageKey = 'SwaggerToken';
+    const userStorageKey = 'SwaggerUser';
     var configObject = JSON.parse('%(ConfigObject)');
+    const oAuthEnabled = configObject.OAuthEnabled || false;
     var oauthConfigObject = JSON.parse('%(OAuthConfigObject)');
-    console.log(configObject, oauthConfigObject);
     window.onload = function () {
         initSwagger();
         setTimeout(() => {
             $(document).on('click', '.auth-wrapper .btn.unlocked', function () {
+                const token = window.localStorage.getItem(tokenStorageKey);
+                const user = window.localStorage.getItem(userStorageKey);
                 setTimeout(() => {
-                    var oldKey = window.localStorage.getItem('key');
-                    var oldUser = window.localStorage.getItem('user');
-                    setJwt(oldKey, oldUser);
+                    if (!oAuthEnabled) {
+                        setJwt(token, user);
+                    } else {
+                        const scopes = $('.auth-container :input[type=checkbox]');
+                        if (!!token) {
+                            const authorizeBtn = $('button.btn.authorize.button');
+                            $(authorizeBtn).hide();
+                            const inputAuth = $('.auth-container :input[type=text]')[0];
+                            $(inputAuth).hide();
+                            $("<span><b>******</b></span>").insertBefore(inputAuth);
+                            $("<button id=\"btn-bearer-logout\" onclick='logout()' class=\"btn modal-btn button\">Logout</button>")
+                                .insertBefore($(authorizeBtn[0]));
+                            
+                            scopes.prop('checked', true).prop('disabled', true);
+                        }
+                    }
                 }, 200);
             });
-
+            
         }, 1);
     }
 
     function initSwagger() {
-            
+        
         // Apply mandatory parameters
         configObject.dom_id = "#swagger-ui";
         configObject.presets = [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset];
         configObject.layout = "StandaloneLayout";
         configObject.showMutatedRequest = true;
         configObject.requestInterceptor = function (request) {
-            var key = window.localStorage.getItem('key');
+            const key = window.localStorage.getItem(tokenStorageKey);
             if (key !== null) 
                 request.headers.Authorization = "Bearer " + key;
             return request;
         };
-            
+
         // If oauth2RedirectUrl isn't specified, use the built-in default
         if (!configObject.hasOwnProperty("oauth2RedirectUrl"))
             configObject.oauth2RedirectUrl = window.location.href.replace("index.html", "oauth2-redirect.html").split('#')[0];
         // Build a system
         const ui = SwaggerUIBundle(configObject);
+
+        ui.authActions.authorizeOauth2 = function(auth) {
+            if (auth && auth.token && auth.token.access_token) {
+                window.localStorage.setItem(tokenStorageKey, auth.token.access_token);
+                initSwagger();
+            }
+            return auth;
+        }
+
         // Apply OAuth config
         ui.initOAuth(oauthConfigObject);
     }
@@ -126,19 +152,19 @@
         data[configObject.UsernameField] = user;
 
         $.ajax({
-            url: configObject.SignInUrl,
-            type: 'POST',
-            contentType: "application/json",
-            dataType: "json",
-            data: JSON.stringify(data),
-            success: function (data) {
-                success && success(data.token);
-            },
-            error: function (jqXhr, err, msg) {
-                error && error(JSON.parse(jqXhr.responseText).errors[0].value);
-            },
-            complete: complete
-        });
+                url: configObject.SignInUrl,
+                type: 'POST',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data),
+                success: function (data) {
+                    success && success(data.token);
+                },
+                error: function (jqXhr, err, msg) {
+                    error && error(JSON.parse(jqXhr.responseText).errors[0].value);
+                },
+                complete: complete
+            });
     }
 
     function setJwt(key, user) {
@@ -171,7 +197,7 @@
 
     function setTokenAndReload() {
         var token = $($('.auth-container :input[type=text]')[1]).val().replace('Bearer ', '');
-        window.localStorage.setItem('key', token);
+        window.localStorage.setItem(tokenStorageKey, token);
         initSwagger();
     }
 
@@ -183,8 +209,8 @@
                 function (jwt) {
                     if (jwt !== undefined) {
                         setJwt(jwt, user);
-                        window.localStorage.setItem('key', jwt);
-                        window.localStorage.setItem('user', user);
+                        window.localStorage.setItem(tokenStorageKey, jwt);
+                        window.localStorage.setItem(userStorageKey, user);
                         initSwagger();
                     } else {
                         console.error('Check the json response for typo and casing...');
@@ -197,8 +223,8 @@
     }
 
     function logout() {
-        window.localStorage.removeItem('key');
-        window.localStorage.removeItem('user');
+        window.localStorage.removeItem(tokenStorageKey);
+        window.localStorage.removeItem(userStorageKey);
         location.reload();
     }
 </script>
