@@ -97,7 +97,6 @@
                         setJwt(token, user);
                     } else {
                         const scopes = $('.auth-container :input[type=checkbox]');
-                        //$(scopes).click();
                         if (!!token) {
                             const authorizeBtn = $('button.btn.authorize.button');
                             $(authorizeBtn).hide();

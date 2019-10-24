@@ -25,6 +25,7 @@
                 c.SwaggerEndpoint($"/swagger/{options.Version}/swagger.json", $"Versioned API {options.Version}");
                 c.IndexStream = SwaggerConfigs.GetIndexUI;
                 c.ConfigObject.AdditionalItems["OAuthEnabled"] = options.OAuthEnabled;
+                c.DocExpansion(DocExpansion.None);
 
                 if (!options.OAuthEnabled)
                 {
@@ -37,7 +38,6 @@
                 }
                 else
                 {
-                    c.DocExpansion(DocExpansion.None);
                     c.OAuthClientId(options.OAuthOptions.ClientId);
                 }
             });
