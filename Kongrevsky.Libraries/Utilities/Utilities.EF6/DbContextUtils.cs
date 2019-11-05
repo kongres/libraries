@@ -10,7 +10,7 @@
     using System.Data.Entity.Core.Objects;
     using System.Data.Entity.Infrastructure;
     using System.Linq;
-    using System.Linq.Dynamic;
+    using System.Linq.Dynamic.Core;
     using System.Linq.Expressions;
 
     #endregion
