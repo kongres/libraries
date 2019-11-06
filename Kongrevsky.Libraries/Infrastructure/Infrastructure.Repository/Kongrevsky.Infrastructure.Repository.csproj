@@ -1,28 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;net471</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net471</TargetFrameworks>
     <Description>Repository level</Description>
     <Copyright>Valikovsky Igor</Copyright>
     <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="EntityFramework.Triggers" Version="6.2.0" />
-    <PackageReference Include="EntityFramework.TypedOriginalValues" Version="1.1.1" />
+    <PackageReference Include="EntityFramework" Version="6.3.0" />
+    <PackageReference Include="EntityFramework.Triggers" Version="6.2.2" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.2" />
-    <PackageReference Include="Kongrevsky.Utilities.EF6" Version="1.0.7" />
+    <PackageReference Include="Kongrevsky.Utilities.EF6" Version="2.0.0" />
     <PackageReference Include="Kongrevsky.Utilities.Enumerable" Version="1.0.8" />
     <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.3" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.2" />
+    <PackageReference Include="Linq.PropertyTranslator.Core" Version="1.0.5" />
+    <PackageReference Include="LINQKit.Core" Version="1.1.16" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Linq.Translations" Version="1.0.1" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
-    <PackageReference Include="PagedList" Version="1.17.0" />
-    <PackageReference Include="LinqKit" Version="1.1.16" />
     <PackageReference Include="SqlBulkTools.NetStandard" Version="2.1.30" />
   </ItemGroup>
 </Project>

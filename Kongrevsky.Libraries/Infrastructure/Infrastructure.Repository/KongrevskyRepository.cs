@@ -16,7 +16,6 @@
     using AutoMapper.QueryableExtensions;
     using Kongrevsky.Infrastructure.Models;
     using Kongrevsky.Infrastructure.Repository.Models;
-    using Kongrevsky.Infrastructure.Repository.Triggers;
     using Kongrevsky.Infrastructure.Repository.Triggers.Bulk;
     using Kongrevsky.Infrastructure.Repository.Utils;
     using Kongrevsky.Infrastructure.Repository.Utils.Options;
@@ -25,7 +24,6 @@
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.String;
     using LinqKit;
-    using Microsoft.Linq.Translations;
     using Z.EntityFramework.Plus;
     using QueryableUtils = Kongrevsky.Infrastructure.Repository.Utils.QueryableUtils;
 

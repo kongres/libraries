@@ -6,7 +6,6 @@
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
-    using EntityFramework.TypedOriginalValues;
 
     #endregion
 
@@ -91,7 +90,7 @@
         public UpdatingEntity(TEntity entity, TDbContext context)
         {
             this.context = context;
-            this.original = new Lazy<TEntity>(() => this.context.GetOriginal(Entity));
+            this.original = new Lazy<TEntity>(() => (TEntity)this.context.Entry(Entity).OriginalValues.ToObject());
             Entity = entity;
         }
 
