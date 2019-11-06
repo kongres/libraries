@@ -13,7 +13,7 @@ namespace HtmlRenderer.PdfSharp.Adapters
 {
     #region << Using >>
 
-#if NETSTANDARD2_1
+#if NETCOREAPP2_2
     using PdfSharpCore.Drawing;
     using PdfSharpCore.Pdf;
     using System.Drawing.Text;
@@ -124,7 +124,7 @@ namespace HtmlRenderer.PdfSharp.Adapters
 
         protected override RImage ImageFromStreamInt(Stream memoryStream)
         {
-#if NETSTANDARD2_1
+#if NETCOREAPP2_2
             return new ImageAdapter(XImage.FromStream(() => memoryStream));
 #else
             return new ImageAdapter(XImage.FromStream(memoryStream));

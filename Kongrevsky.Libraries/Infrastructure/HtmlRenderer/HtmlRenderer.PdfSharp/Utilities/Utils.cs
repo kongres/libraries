@@ -11,7 +11,7 @@
 // "The Art of War"
 namespace HtmlRenderer.PdfSharp.Utilities
 {
-#if NETSTANDARD2_1
+#if NETCOREAPP2_2
     using PdfSharpCore.Drawing;
 #else
     using global::PdfSharp.Drawing;

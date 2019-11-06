@@ -14,7 +14,7 @@
 
 namespace HtmlRenderer.PdfSharp.Adapters
 {
-#if NETSTANDARD2_1
+#if NETCOREAPP2_2
     using PdfSharpCore.Drawing;
 #else
     using global::PdfSharp.Drawing;
