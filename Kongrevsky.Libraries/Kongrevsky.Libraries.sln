@@ -79,7 +79,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.LogManager", "Infrastructure\Kongrevsky.Infrastructure.LogManager\Kongrevsky.Infrastructure.LogManager.csproj", "{57AEEA78-3202-4CDE-B648-AEE7B795BD26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongrevsky.Infrastructure.HelpManager", "Infrastructure\Kongrevsky.Infrastructure.HelpManager\Kongrevsky.Infrastructure.HelpManager.csproj", "{3559E9D7-476B-4572-9E7C-65D476373587}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.HelpManager", "Infrastructure\Kongrevsky.Infrastructure.HelpManager\Kongrevsky.Infrastructure.HelpManager.csproj", "{3559E9D7-476B-4572-9E7C-65D476373587}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HtmlRenderer", "HtmlRenderer", "{0FF42E4B-926B-478B-9BAD-4B83A99712C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.Core", "Infrastructure\HtmlRenderer\HtmlRenderer.Core\HtmlRenderer.Core.csproj", "{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.PdfSharp", "Infrastructure\HtmlRenderer\HtmlRenderer.PdfSharp\HtmlRenderer.PdfSharp.csproj", "{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -227,6 +233,14 @@ Global
 		{3559E9D7-476B-4572-9E7C-65D476373587}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3559E9D7-476B-4572-9E7C-65D476373587}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3559E9D7-476B-4572-9E7C-65D476373587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +281,9 @@ Global
 		{0E438D53-6118-408D-8DA2-AAE5E2FEEE8E} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{57AEEA78-3202-4CDE-B648-AEE7B795BD26} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{3559E9D7-476B-4572-9E7C-65D476373587} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{0FF42E4B-926B-478B-9BAD-4B83A99712C3} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
+		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F} = {0FF42E4B-926B-478B-9BAD-4B83A99712C3}
+		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF} = {0FF42E4B-926B-478B-9BAD-4B83A99712C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D46F8133-0CD3-457B-A289-439722F553A8}
