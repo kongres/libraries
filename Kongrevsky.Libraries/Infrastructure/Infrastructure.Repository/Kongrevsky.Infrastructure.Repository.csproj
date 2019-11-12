@@ -6,13 +6,13 @@
     <Copyright>Valikovsky Igor</Copyright>
     <Authors>Valikovsky Igor</Authors>
     <Company>Kongrevsky</Company>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.2.0</AssemblyVersion>
+    <FileVersion>2.0.2.0</FileVersion>
+    <Version>2.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="EntityFramework" Version="6.3.0" />
     <PackageReference Include="EntityFramework.Triggers" Version="6.2.2" />
     <PackageReference Include="Kongrevsky.Infrastructure.Models" Version="1.0.2" />
