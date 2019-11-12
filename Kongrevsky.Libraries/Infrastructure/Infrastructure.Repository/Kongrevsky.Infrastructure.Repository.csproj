@@ -21,7 +21,7 @@
     <PackageReference Include="Kongrevsky.Utilities.Expression" Version="1.0.3" />
     <PackageReference Include="Kongrevsky.Utilities.String" Version="1.0.2" />
     <PackageReference Include="Linq.PropertyTranslator.Core" Version="1.0.5" />
-    <PackageReference Include="LINQKit.Core" Version="1.1.16" />
+    <PackageReference Include="LinqKit.EntityFramework" Version="1.1.17-preview-04" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
     <PackageReference Include="SqlBulkTools.NetStandard" Version="2.1.30" />
