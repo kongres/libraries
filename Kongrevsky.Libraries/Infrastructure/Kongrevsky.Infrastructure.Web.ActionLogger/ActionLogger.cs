@@ -151,6 +151,20 @@
                 return str.ToString();
             }
 
+            if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
+            {
+                var enumerable = obj as IEnumerable<object>;
+                if (enumerable != null)
+                {
+                    foreach (var enumerableItem in enumerable.ToList())
+                    {
+                        str.AppendLine(GetFormattedObject(enumerableItem, indentTabCount + 1));
+                    }
+                }
+                    
+                return str.ToString();
+            }
+
             var properties = type.GetProperties().ToList();
             foreach (var property in properties)
             {
@@ -195,21 +209,7 @@
                         continue;
                     }
 
-                    foreach (var o in objects)
-                    {
-                        switch (logPropertyTypeAttribute?.PropertyType)
-                        {
-                            case LogPropertyType.Identifier:
-                                str.AppendLine(tabs + "\t" + $"{name}: {_options.EntityFormatter(o)}");
-                                continue;
-                            case LogPropertyType.Password:
-                                str.AppendLine(tabs + "\t" + $"{new string('*', 6)}");
-                                continue;
-                            default:
-                                str.AppendLine(tabs + "\t" + $"{o ?? "-"}");
-                                continue;
-                        }
-                    }
+                    str.AppendLine(string.Join(string.Empty, objects.Select(o => GetFormattedObject(o, indentTabCount + 1))));
                 }
                 else
                 {
