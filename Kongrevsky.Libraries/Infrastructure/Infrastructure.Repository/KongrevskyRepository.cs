@@ -24,6 +24,7 @@
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.String;
     using LinqKit;
+    using Microsoft.Linq.Translations;
     using Z.EntityFramework.Plus;
     using QueryableUtils = Kongrevsky.Infrastructure.Repository.Utils.QueryableUtils;
 

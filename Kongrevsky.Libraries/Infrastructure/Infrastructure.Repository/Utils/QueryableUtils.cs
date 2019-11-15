@@ -16,9 +16,6 @@
     using Kongrevsky.Utilities.Object;
     using Kongrevsky.Utilities.Reflection;
     using LinqKit;
-    using Linq.PropertyTranslator.Core;
-    using Z.EntityFramework.Plus;
-    using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
 
     #endregion
 
@@ -31,12 +28,6 @@
             FullEqual
         }
 
-        public static IQueryable<T> WithTranslations<T>(this IQueryable<T> queryable, params ExpressionVisitor[] visitors)
-        {
-            var visitorsList = visitors?.Any() ?? false ? visitors.ToList() : new List<ExpressionVisitor>() { new PropertyVisitor() };
-            return queryable.InterceptWith(visitorsList.ToArray());
-        }        
-        
         public static IOrderedQueryable<T> OrderByDescendingWithNullLowPriority<T, Target>(this IQueryable<T> queryable, Expression<Func<T, Target>> expression)
         {
             if (typeof(Target) == typeof(string))
