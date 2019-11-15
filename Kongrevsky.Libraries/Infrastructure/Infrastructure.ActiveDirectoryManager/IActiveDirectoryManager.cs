@@ -5,6 +5,7 @@ namespace Kongrevsky.Infrastructure.ActiveDirectoryManager
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
+    using Kongrevsky.Utilities.Enumerable.Models;
 
     #endregion
 
@@ -21,7 +22,7 @@ namespace Kongrevsky.Infrastructure.ActiveDirectoryManager
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
-        Task<ADUser> FindUserAsync(string username);
+        Task<ADUser> GetUserAsync(string search);
 
         /// <summary>
         /// Async returns an user by specified email
@@ -40,9 +41,9 @@ namespace Kongrevsky.Infrastructure.ActiveDirectoryManager
         /// <summary>
         /// Async returns users by specified searching term
         /// </summary>
-        /// <param name="search"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        Task<List<ADUser>> GetUsersAsync(string search);
+        Task<ADUserPagingModel> GetUsersAsync(ADUserPagingModel filter);
 
         /// <summary>
         /// Async detects if specified credentials are valid

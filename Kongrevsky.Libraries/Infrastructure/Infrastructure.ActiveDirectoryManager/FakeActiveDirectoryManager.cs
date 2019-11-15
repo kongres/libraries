@@ -9,6 +9,8 @@
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Utils;
     using Kongrevsky.Utilities.String;
+    using Kongrevsky.Utilities.Enumerable;
+    using Kongrevsky.Utilities.Enumerable.Models;
     using Microsoft.Extensions.Options;
 
     #endregion
@@ -44,7 +46,7 @@
             return true;
         }
 
-        public Task<ADUser> FindUserAsync(string username)
+        public Task<ADUser> GetUserAsync(string username)
         {
             return Task.FromResult(adUsers.FirstOrDefault(x => x.Email.Contains(username, StringComparison.InvariantCultureIgnoreCase) ||
                                                                x.FirstName.Contains(username, StringComparison.InvariantCultureIgnoreCase) ||
@@ -61,16 +63,18 @@
             return Task.FromResult(adUsers.FirstOrDefault(x => string.Equals(x.Username, username, StringComparison.InvariantCultureIgnoreCase)));
         }
 
-        public Task<List<ADUser>> GetUsersAsync(string search)
+        public Task<ADUserPagingModel> GetUsersAsync(ADUserPagingModel filter)
         {
-            var searchList = search.SplitBySpaces().ToList();
+            var searchList = filter.Search.SplitBySpaces().ToList();
 
             var users = adUsers.Where(x => !searchList.Any() || searchList.All(s => x.Email.Contains(s, StringComparison.InvariantCultureIgnoreCase) ||
                                                                                     x.FirstName.Contains(s, StringComparison.InvariantCultureIgnoreCase) ||
                                                                                     x.LastName.Contains(s, StringComparison.InvariantCultureIgnoreCase)))
-                               .ToList();
+                    .OrderBy(filter.OrderProperty, filter.IsDesc).GetPage(new Page(filter.PageNumber,filter.PageSize)).ToList();
 
-            return Task.FromResult(users.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.Email).ToList());
+            filter.SetResult(users, users.Count, users.GetPageCount(filter.PageSize));
+
+            return Task.FromResult(filter);
         }
 
         public Task<bool> ValidateLoginAndPasswordAsync(string login, string password)
