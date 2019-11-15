@@ -87,6 +87,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.Core", "Infras
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlRenderer.PdfSharp", "Infrastructure\HtmlRenderer\HtmlRenderer.PdfSharp\HtmlRenderer.PdfSharp.csproj", "{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kongrevsky.Infrastructure.ActiveDirectoryManager.Tests", "Tests\Kongrevsky.Infrastructure.ActiveDirectoryManager.Tests\Kongrevsky.Infrastructure.ActiveDirectoryManager.Tests.csproj", "{63521083-6138-4F90-B427-A64AF7C3B8AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,10 @@ Global
 		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63521083-6138-4F90-B427-A64AF7C3B8AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63521083-6138-4F90-B427-A64AF7C3B8AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63521083-6138-4F90-B427-A64AF7C3B8AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63521083-6138-4F90-B427-A64AF7C3B8AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +290,7 @@ Global
 		{0FF42E4B-926B-478B-9BAD-4B83A99712C3} = {18A02ADB-1707-4B1A-A01B-5680C5BB20DF}
 		{A2FBE95A-B662-4F3A-AD4C-2E29D160C43F} = {0FF42E4B-926B-478B-9BAD-4B83A99712C3}
 		{A3F0F03E-20F9-4CB5-9C4C-ADA5C6DAD8AF} = {0FF42E4B-926B-478B-9BAD-4B83A99712C3}
+		{63521083-6138-4F90-B427-A64AF7C3B8AD} = {3FD16F33-A9EB-40C9-8C38-B073370FC1E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D46F8133-0CD3-457B-A289-439722F553A8}

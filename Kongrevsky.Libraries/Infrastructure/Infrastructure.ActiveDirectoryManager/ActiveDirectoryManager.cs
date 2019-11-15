@@ -11,6 +11,7 @@
     using System.Threading.Tasks;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Models;
     using Kongrevsky.Infrastructure.ActiveDirectoryManager.Utils;
+    using Kongrevsky.Utilities.Reflection;
     using Kongrevsky.Utilities.String;
     using Microsoft.Extensions.Options;
 
@@ -72,7 +73,7 @@
                                 directorySearcher.PropertiesToLoad.Add("mail");               // smtp mail address
                                 directorySearcher.PropertiesToLoad.Add("userAccountControl"); // state of user
                                 directorySearcher.PropertiesToLoad.Add("telephoneNumber");    // phone
-                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // phone
+                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // userName
 
                                 var result = directorySearcher.FindOne();
 
@@ -103,7 +104,7 @@
                                 directorySearcher.PropertiesToLoad.Add("mail");               // smtp mail address
                                 directorySearcher.PropertiesToLoad.Add("userAccountControl"); // state of user
                                 directorySearcher.PropertiesToLoad.Add("telephoneNumber");    // phone
-                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // phone
+                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // userName
 
                                 var result = directorySearcher.FindOne();
 
@@ -121,19 +122,23 @@
                             });
         }
 
-        public Task<List<ADUser>> GetUsersAsync(string search)
+        public Task<ADUserPagingModel> GetUsersAsync(ADUserPagingModel filter)
         {
             return Task.Run(() =>
                             {
-                                search = Microsoft.Security.Application.Encoder.LdapFilterEncode(search);
+                                var search = Microsoft.Security.Application.Encoder.LdapFilterEncode(filter.Search);
                                 var searchList = search.SplitBySpaces();
                                 searchList = searchList.Any() ? searchList.Select(x => $"*{x}*").ToList() : new List<string>() { "*" };
 
                                 var searchAd = string.Join("", searchList.Select(x => $"(givenName={x})(sn={x})(mail={x})"));
+
                                 var searcher = new DirectorySearcher(_directoryEntry)
                                 {
                                     Filter = $"(&(objectClass=user)(|{searchAd}))"
                                 };
+
+                                if (filter.PageSize > 0)
+                                    searcher.VirtualListView = new DirectoryVirtualListView(0, filter.PageSize, filter.PageSize * (filter.PageNumber - 1));
                                 //searcher.SizeLimit = sizeLimit;
 
                                 searcher.PropertiesToLoad.Add("givenName");          // first name
@@ -141,7 +146,34 @@
                                 searcher.PropertiesToLoad.Add("mail");               // smtp mail address
                                 searcher.PropertiesToLoad.Add("userAccountControl"); // state of user
                                 searcher.PropertiesToLoad.Add("telephoneNumber");    // phone
-                                searcher.PropertiesToLoad.Add("sAMAccountName");     // phone
+                                searcher.PropertiesToLoad.Add("sAMAccountName");     // userName
+
+                                searcher.Sort.Direction = filter.IsDesc ? SortDirection.Descending : SortDirection.Ascending;
+
+                                var orderProperty = typeof(ADUser).GetPropertyByName(filter.OrderProperty);
+                                if (orderProperty != null)
+                                {
+                                    switch (orderProperty.Name)
+                                    {
+                                        case nameof(ADUser.Email):
+                                            searcher.Sort.PropertyName = "mail";
+                                            break;
+                                        case nameof(ADUser.FirstName):
+                                            searcher.Sort.PropertyName = "givenName";
+                                            break;
+                                        case nameof(ADUser.LastName):
+                                            searcher.Sort.PropertyName = "sn";
+                                            break;
+                                        case nameof(ADUser.Phone):
+                                            searcher.Sort.PropertyName = "telephoneNumber";
+                                            break;
+                                        case nameof(ADUser.Username):
+                                            searcher.Sort.PropertyName = "sAMAccountName";
+                                            break;
+                                    }
+                                }
+
+
                                 var resultCollection = searcher.FindAll();
 
                                 var adUsers = new List<ADUser>();
@@ -162,11 +194,14 @@
                                         adUsers.Add(adUser);
                                 }
 
-                                return adUsers.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.Email).ToList();
+                                var users = adUsers.OrderBy(x => x.FirstName).ThenBy(x => x.LastName).ThenBy(x => x.Email).ToList();
+                                var totalItems = searcher.VirtualListView.ApproximateTotal;
+                                filter.SetResult(users, totalItems, filter.PageSize > 0 ? (int)Math.Ceiling((double)totalItems / filter.PageSize) : 1);
+                                return filter;
                             });
         }
 
-        public Task<ADUser> FindUserAsync(string search)
+        public Task<ADUser> GetUserAsync(string search)
         {
             return Task.Run(() =>
                             {
@@ -179,23 +214,24 @@
                                 directorySearcher.PropertiesToLoad.Add("mail");               // smtp mail address
                                 directorySearcher.PropertiesToLoad.Add("userAccountControl"); // state of user
                                 directorySearcher.PropertiesToLoad.Add("telephoneNumber");    // phone
-                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // phone
+                                directorySearcher.PropertiesToLoad.Add("sAMAccountName");     // userName
 
                                 var result = directorySearcher.FindOne();
 
-                                return result == null ?
-                                               null :
-                                               new ADUser()
-                                               {
-                                                   Email = FirstOrDefault(result.Properties["mail"]).ToString(),
-                                                   FirstName = FirstOrDefault(result.Properties["givenName"])?.ToString(),
-                                                   LastName = FirstOrDefault(result.Properties["sn"])?.ToString(),
-                                                   Phone = FirstOrDefault(result.Properties["telephoneNumber"])?.ToString(),
-                                                   Username = FirstOrDefault(result.Properties["sAMAccountName"])?.ToString(),
-                                                   IsActive = IsUserActive(result.GetDirectoryEntry())
-                                               };
+                                return result == null ? 
+                                                null :
+                                                new ADUser()
+                                                {
+                                                    Email = FirstOrDefault(result.Properties["mail"]).ToString(),
+                                                    FirstName = FirstOrDefault(result.Properties["givenName"])?.ToString(),
+                                                    LastName = FirstOrDefault(result.Properties["sn"])?.ToString(),
+                                                    Phone = FirstOrDefault(result.Properties["telephoneNumber"])?.ToString(),
+                                                    Username = FirstOrDefault(result.Properties["sAMAccountName"])?.ToString(),
+                                                    IsActive = IsUserActive(result.GetDirectoryEntry())
+                                                };
                             });
         }
+
 
         public Task<bool> ValidateLoginAndPasswordAsync(string login, string password)
         {
