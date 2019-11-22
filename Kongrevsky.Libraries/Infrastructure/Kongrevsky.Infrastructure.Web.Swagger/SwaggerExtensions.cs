@@ -3,12 +3,14 @@
     #region << Using >>
 
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
     using MicroElements.Swashbuckle.FluentValidation;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
+    using Microsoft.OpenApi.Models;
     using Swashbuckle.AspNetCore.Swagger;
     using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -18,7 +20,13 @@
     {
         public static void UseSwagger(this IApplicationBuilder app)
         {
-            app.UseScopedSwagger(c => { c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value); });
+            app.UseScopedSwagger(c =>
+                                 {
+                                     c.PreSerializeFilters.Add((swagger, httpReq) =>
+                                                               {
+                                                                   swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+                                                               });
+                                 });
             var options = app.ApplicationServices.GetService<IOptions<SwaggerOptions>>().Value;
             app.UseSwaggerUI(c =>
             {
@@ -52,7 +60,7 @@
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(options.Version,
-                    new Info
+                    new OpenApiInfo()
                     {
                         Title = options.Title,
                         Version = options.Version,
@@ -61,29 +69,40 @@
                 if (options.OAuthEnabled)
                 {
                     var oAuthOptions = options.OAuthOptions;
-                    c.AddSecurityDefinition("SSO", new OAuth2Scheme()
+                    c.AddSecurityDefinition("SSO", new OpenApiSecurityScheme()
                                                    {
-                                                           Type = "oauth2",
-                                                           AuthorizationUrl = oAuthOptions.AuthorizationUrl,
-                                                           TokenUrl = oAuthOptions.TokenUrl,
-                                                           Scopes = oAuthOptions.Scopes,
-                                                           Flow = "implicit"
+                                                           Type = SecuritySchemeType.OAuth2,
+                                                           Flows = new OpenApiOAuthFlows()
+                                                                   {
+                                                                           Implicit = new OpenApiOAuthFlow()
+                                                                                      {
+                                                                                              AuthorizationUrl = new Uri(oAuthOptions.AuthorizationUrl),
+                                                                                              TokenUrl = new Uri(oAuthOptions.TokenUrl),
+                                                                                              Scopes = oAuthOptions.Scopes,
+                                                                                      }
+
+                                                                   }
+                                                     
                                                    });
                 }
                 else
                 {
-                    c.AddSecurityDefinition("BasicAuth", new BasicAuthScheme { Description = "Login" });
-                    c.AddSecurityDefinition("Bearer",
-                                            new ApiKeyScheme
-                                            {
-                                                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                                                    Name = "Authorization",
-                                                    In = "header",
-                                                    Type = "apiKey"
-                                            });
+                    c.AddSecurityDefinition("BasicAuth",new OpenApiSecurityScheme()
+                                                        {
+                                                                Type = SecuritySchemeType.Http,
+                                                                Description = "Login"
+                                                        });
+
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                                                      {
+                                                              Type = SecuritySchemeType.ApiKey,
+                                                              In = ParameterLocation.Header,
+                                                              Name = "Authorization",
+                                                              Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                                                              
+                                                      });
                 }
 
-                c.DescribeAllEnumsAsStrings();
                 c.IncludeXmlComments(GetXmlCommentsPath(options.XmlCommentsFile));
                 c.DocumentFilter<AuthorizeDocumentFilter>(options.AuthDocFunc);
                 c.OperationFilter<AddAuthorizationHeaderParameterOperationFilter>();
