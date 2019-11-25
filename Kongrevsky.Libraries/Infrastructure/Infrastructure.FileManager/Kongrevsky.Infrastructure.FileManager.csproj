@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Kongrevsky.Infrastructure.Impersonator" Version="1.0.1" />
-    <PackageReference Include="Kongrevsky.Utilities.Common" Version="1.0.6" />
+    <PackageReference Include="Kongrevsky.Utilities.Common" Version="1.0.7" />
   </ItemGroup>
 
 </Project>
